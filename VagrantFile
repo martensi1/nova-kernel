@@ -1,0 +1,22 @@
+# Vagrant file API version (do not touch)
+VAGRANT_FILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
+    # Box to use (Ubuntu 23.10 )
+    config.vm.box = "ubuntu/xenial32"
+    config.vm.box_version = "20211001.0.0"
+    
+    # Install dependencies for building the kernel
+    # nasm: assembler
+    # make: build automation tool
+    # build-essential: C/C++ compiler
+    # grub: bootloader
+    # qemu: emulator for testing the kernel
+    # zip: for packaging the kernel
+    $script = %Q{
+        sudo apt-get update
+        sudo apt-get install -y nasm make build-essential grub qemu zip
+    }
+
+    config.vm.provision :shell, :inline => $script 
+end
