@@ -1,26 +1,26 @@
-# Architectire and target
+# Architectire, compiler and flags
 ARCH := x86
-TARGET := kernel.elf
+TARGET := simux_kernel.elf
 
-# Compiler and flags
 CC := g++
 AS := nasm
 ASM_FLAGS := -f elf32
 CPP_FLAGS := -O2 -ffreestanding -nostdlib -Wall -Wextra -Werror
 LD_FLAGS = -m elf_i386 -T linker.ld
 
-# Directories
+# Define source and object directories
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin
 
-# Source files
 ASM_FILES := $(wildcard $(SRC_DIR)/*.asm)
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 
-# Object files
 ASM_OBJS := $(patsubst ./%.asm, $(OBJ_DIR)/%.o, $(ASM_FILES))
 CPP_OBJS := $(patsubst ./%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))
+
+OUTPUT := $(BIN_DIR)/$(TARGET)
+
 
 # Build rule for assembly files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.asm
@@ -33,11 +33,15 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CPP_FLAGS) -c $< -o $@
 
 # Default target
-all: $(TARGET)
+all: $(OUTPUT)
 
-$(TARGET): $(ASM_OBJS) $(CPP_OBJS)
+$(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
 	@mkdir -p $(BIN_DIR)
 	$(LD) $(LD_FLAGS) -o $@ $^
+
+	nm -n $(OUTPUT)
+	mbchk $(OUTPUT)
+
 
 # Clean rule
 clean:
