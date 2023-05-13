@@ -1,0 +1,1 @@
+qemu-system-i386 -m 1024 -s -hda ./kernel.img  -curses -serial /dev/tty  -redir tcp:2323::23
