@@ -70,7 +70,15 @@ grub-install --target "$GRUB_TARGET" --no-floppy --root-directory="$MOUNT_DIR" "
 cp -R bootdisk/* /mnt/
 
 # Install kernel
-cp kernel/bin/simux_kernel.elf /mnt/boot/
+cp kernel/bin/simux_kernel.elf "$MOUNT_DIR/boot/"
+grub-file --is-x86-multiboot "$MOUNT_DIR/boot/simux_kernel.elf"
+
+if [ $? -ne 0 ]; then
+    echo "Kernel is not multiboot compatible!"
+    exit 1
+else
+    echo "Kernel is multiboot compatible!"
+fi
 
 # Unmount and cleanup
 umount "$MOUNT_DIR"

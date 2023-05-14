@@ -5,10 +5,11 @@ TARGET := simux_kernel.elf
 CC := g++
 AS := nasm
 ASM_FLAGS := -f elf32
-CPP_FLAGS := -O2 -ffreestanding -nostdlib -fno-builtin  -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror
+CPP_FLAGS := -O2 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror
 LD_FLAGS = -m elf_i386 -T linker.ld
 
 # Define source and object directories
+INC_DIR := runtime/include
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin
@@ -30,7 +31,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.asm
 # Build rule for C++ files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CPP_FLAGS) -c $< -o $@
+	$(CC) $(CPP_FLAGS) -c $< -o $@ -I $(INC_DIR)
 
 # Default target
 all: $(OUTPUT)
@@ -42,9 +43,6 @@ $(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
 
 	@echo "-> Printing binary information:"
 	nm -n $(OUTPUT)
-
-	@echo "-> Performing multiboot header check"
-	mbchk $(OUTPUT)
 
 	@echo "-> Done!"
 
