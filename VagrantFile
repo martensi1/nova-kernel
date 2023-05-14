@@ -25,4 +25,7 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
         v.memory = 2048
         v.cpus = 2
     end
+
+    # Automatically navigate to vagrant synced folder on SSH login
+    config.ssh.extra_args = ["-t", "cd /vagrant; bash --login"]
 end
