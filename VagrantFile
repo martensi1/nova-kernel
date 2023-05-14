@@ -2,7 +2,7 @@
 VAGRANT_FILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
-    # Box to use (Ubuntu 23.10 )
+    # Box to use (Ubuntu 16)
     config.vm.box = "ubuntu/xenial32"
     config.vm.box_version = "20211001.0.0"
     
@@ -18,9 +18,9 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
         sudo apt-get update
         sudo apt-get install -y nasm make build-essential grub2 qemu zip ntp
     }
-
     config.vm.provision :shell, :inline => $script
     
+    # Virtual machine configuration
     config.vm.provider "virtualbox" do |v|
         v.memory = 2048
         v.cpus = 2
