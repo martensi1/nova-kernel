@@ -4,21 +4,24 @@
 # Define variables
 IMAGE_PATH="./kernel.img"
 IMAGE_SIZE="8M"
-MOUNT_DIR="/mnt"
 
 DISK_GEOMETRY_HEADS="16"
 DISK_GEOMETRY_SECTORS="63"
-DISK_GEOMETRY_CYLINDERS="4"
+DISK_GEOMETRY_CYLINDERS="12"
 
-PARTITION_FILE_SYSTEM="ext2"
-PARITION_SECTOR_OFFSET="2048"
+PARTITION_FILE_SYSTEM="ext4"
+PARITION_SECTOR_OFFSET="4096"
 PARTITION_BYTES_OFFSET=$(( $PARITION_SECTOR_OFFSET * 512 ))
 
-LOOP_DEV="/dev/loop0"
-LOOP_DEV_PART="/dev/loop1"
+LOOP_DEVICE="/dev/loop0"
+LOOP_DEVICE_PARTITION="/dev/loop1"
+MOUNT_DIR="/mnt"
+
+GRUB_TARGET="i386-pc"
 
 
 # Create empty image
+sudo rm -f "$IMAGE_PATH"
 qemu-img create "$IMAGE_PATH" "$IMAGE_SIZE"
 
 
@@ -49,53 +52,47 @@ fdisk -l -u "$IMAGE_PATH"
 
 # Associate the image with a loop device and create a partition device
 echo "-> Attaching loop devices"
-losetup "$LOOP_DEV" "$IMAGE_PATH"
-losetup -o $PARTITION_BYTES_OFFSET "$LOOP_DEV_PART" "$IMAGE_PATH"
+losetup "$LOOP_DEVICE" "$IMAGE_PATH"
+losetup -o $PARTITION_BYTES_OFFSET "$LOOP_DEVICE_PARTITION" "$IMAGE_PATH"
 sleep 0.1
-
 
 # Format the partition
 echo "-> Formatting partition"
-mke2fs -t "$PARTITION_FILE_SYSTEM" "$LOOP_DEV_PART"
+mke2fs -t "$PARTITION_FILE_SYSTEM" "$LOOP_DEVICE_PARTITION"
 
 
 # Mount the partition
 echo "-> Mounting partition"
-mount "$LOOP_DEV_PART" "$MOUNT_DIR"
+mount "$LOOP_DEVICE_PARTITION" "$MOUNT_DIR"
 rm -rf "$MOUNT_DIR"/*
 
 
 echo "-> Install GRUB"
 mkdir -p /mnt/boot/grub
 
-grub-install --target i386-pc --no-floppy --root-directory=/mnt /dev/loop0
-#cp -R bootdisk/* /mnt/
-cat > /mnt/boot/grub/device.map <<EOF
-(hd0)   /dev/loop0
-(hd0,1) /dev/loop1
-EOF
+grub-install --version
+grub-install --target "$GRUB_TARGET" --no-floppy --root-directory="$MOUNT_DIR" "$LOOP_DEVICE" --modules "normal part_msdos ext2 multiboot"
+cp -R bootdisk/* /mnt/
 
 
 echo "-> Copying kernel"
 cp kernel/bin/simux_kernel.elf /mnt/boot/
-cat /mnt/boot/grub/device.map
-rm -rf /mnt/boot/grub/device.map
-
-ls -lah /mnt/boot/grub
+#ls -lahR /mnt/
+cat /mnt/boot/grub/grub.cfg
 
 
 echo "-> Detaching loop devices..."
-umount /mnt/
+umount "$MOUNT_DIR"
 sleep 0.1
-losetup -d /dev/loop1
+losetup -d "$LOOP_DEVICE_PARTITION"
 sleep 0.1
-kpartx -v -d /dev/loop0
-sleep 0.1
-losetup -d /dev/loop0
+losetup -d "$LOOP_DEVICE"
 sleep 0.1
 
+fdisk -l -u "$IMAGE_PATH"
+
 echo "-> MD5 checksum:"
-md5sum kernel.img
+md5sum "$IMAGE_PATH"
 
 echo "-> Done!"
 
