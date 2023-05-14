@@ -3,7 +3,7 @@
 # Setup
 cd "$(dirname "$0")"
 
-IMAGE_PATH="./kernel.img"
+IMAGE_PATH="./bin/kernel.img"
 IMAGE_SIZE="8M"
 
 DISK_GEOMETRY_HEADS="16"
@@ -31,6 +31,7 @@ if [ -f "$IMAGE_PATH" ]; then
     fi
 fi
 
+mkdir -p "$(dirname "$IMAGE_PATH")"
 qemu-img create "$IMAGE_PATH" "$IMAGE_SIZE"
 
 # Partition the image
