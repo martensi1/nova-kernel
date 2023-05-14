@@ -106,10 +106,39 @@ extern "C" {
     }
     
     void kmain() {
+        int a[100];
+
+        for (int i = 0; i < 100; i++)
+            a[i] = i;
+
+        a[0] = a[1] + 3;
+
         /* Initialize terminal interface */
         terminal_initialize();
     
         /* Newline support is left as an exercise. */
+        terminal_putchar('H');
+        terminal_putchar('e');
+        terminal_putchar('l');
+        terminal_putchar('l');
+        terminal_putchar('o');
+        terminal_putchar(',');
+        terminal_putchar(' ');
+        terminal_putchar('k');
+        terminal_putchar('e');
+        terminal_putchar('r');
+        terminal_putchar('n');
+        terminal_putchar('e');
+        terminal_putchar('l');
+        terminal_putchar(' ');
+        terminal_putchar('W');
+        terminal_putchar('o');
+        terminal_putchar('r');
+        terminal_putchar('l');
+        terminal_putchar('d');
+        terminal_putchar('!');
+        terminal_putchar('\n');
+
         terminal_writestring("Hello, kernel World!\n");
     }
 }
