@@ -4,7 +4,8 @@ extern kmain
 extern ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
 
 
-section .text
+
+section .multiboot
 
 # The executable must start with a multiboot header to be loaded by GRUB
 # See specification (https://www.gnu.org/software/grub/manual/multiboot/multiboot.html)
@@ -16,6 +17,21 @@ align 4
 dd MULTIBOOT_HEADER_MAGIC
 dd MULTIBOOT_HEADER_FLAGS
 dd MULTIBOOT_CHECKSUM
+
+
+
+section .bss
+
+# Define a stack for the kernel (16 KiB)
+%define STACK_SIZE 0x1000
+align 16
+
+stack:
+    resb STACK_SIZE
+
+
+
+section .text
 
 # Run C++ global constructors before main
 run_ctors:
@@ -33,6 +49,7 @@ entrypoint:
     push eax
     push ebx
 
+    mov esp, stack + STACK_SIZE
     call kmain
 
 # Run C++ global destructors after main
@@ -49,3 +66,4 @@ run_dtors:
 # Halt the CPU (go to sleep)
 cli
 hlt
+jmp 1b
