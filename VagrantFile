@@ -13,9 +13,10 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
     # grub2: bootloader
     # qemu: emulator for testing the kernel
     # zip: for packaging the kernel
+    # ntp: for time synchronization (to avoid problems with certificates and clock skew compiler warnings)
     $script = %Q{
         sudo apt-get update
-        sudo apt-get install -y nasm make build-essential grub2 qemu zip
+        sudo apt-get install -y nasm make build-essential grub2 qemu zip ntp
     }
 
     config.vm.provision :shell, :inline => $script
