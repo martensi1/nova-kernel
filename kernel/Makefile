@@ -9,7 +9,7 @@ CPP_FLAGS := -O2 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stac
 LD_FLAGS = -m elf_i386 -T linker.ld
 
 # Define source and object directories
-INC_DIR := runtime/include
+INC_DIR := ../include
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin

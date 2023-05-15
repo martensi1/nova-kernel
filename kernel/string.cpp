@@ -1,4 +1,4 @@
-#include "memory.h"
+#include <simux/string.h>
 
 
 extern "C" {

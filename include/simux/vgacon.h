@@ -1,5 +1,5 @@
-#ifndef __SIMUX_IO_H__
-#define __SIMUX_IO_H__
+#ifndef __SIMUX_VGA_CON_H__
+#define __SIMUX_VGA_CON_H__
 
 #include <stddef.h>
 
@@ -24,14 +24,13 @@ extern "C" {
         VGA_COLOR_WHITE = 15,   
     };
 
-    void terminal_init(void);
+    void vga_initialize(void);
 
-    void terminal_set_color(vga_color foreground, vga_color background);
-    void terminal_clear(void);
+    void vga_write(const char* data, size_t size);
+    void vga_write_str(const char* data);
 
-    void terminal_write(const char* data, size_t size);
-    void terminal_write_str(const char* data);
-    
+    void vga_set_color(vga_color foreground, vga_color background);
+    void vga_clear(void);
 }
 
-#endif // __SIMUX_IO_H__
+#endif // __SIMUX_VGA_CON_H__

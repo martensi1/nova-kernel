@@ -1,9 +1,4 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-
-#include <string.h>
-#include "io.h"
+#include <simux/vgacon.h>
 
 
 #if !defined(__i386__)
@@ -13,9 +8,11 @@
 
 extern "C" {
     void kmain() {
-        terminal_init();
-        terminal_write_str("Hello, kernel World!\n");
-        terminal_write_str("This is a new line\n");
+        vga_initialize();
+        vga_write_str("\n\n");
+
+        vga_write_str("Using VGA text mode\n");
+        vga_write_str("Loading Simux kernel...\n");
 
         while (true) {
 
