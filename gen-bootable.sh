@@ -68,8 +68,6 @@ rm -rf "$MOUNT_DIR"/*
 grub-install --version
 grub-install --target "$GRUB_TARGET" --no-floppy --root-directory="$MOUNT_DIR" "$LOOP_DEVICE" --modules "$GRUB_MODULES"
 
-cp -R bootdisk/* /mnt/
-
 # Install kernel
 cp kernel/bin/simux_kernel.elf "$MOUNT_DIR/boot/"
 grub-file --is-x86-multiboot "$MOUNT_DIR/boot/simux_kernel.elf"
@@ -80,6 +78,9 @@ if [ $? -ne 0 ]; then
 else
     echo "Kernel is multiboot compatible!"
 fi
+
+# Copy OS files
+cp -R sysroot/* /mnt/
 
 # Unmount and cleanup
 umount "$MOUNT_DIR"
