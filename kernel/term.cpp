@@ -7,8 +7,10 @@ extern struct console_driver vga_driver;
 
 void term_initialize() {
     vga_driver.initialize();
-    vga_driver.disable_cursor();
     vga_driver.clear();
+
+    vga_driver.enable_cursor();
+    vga_driver.update_cursor();
 }
 
 void term_clear() {

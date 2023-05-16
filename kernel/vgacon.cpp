@@ -168,7 +168,7 @@ void vga_enable_cursor()
 
 void vga_update_cursor()
 {
-    set_cursor_pos(vga_column, vga_row + 1);
+    set_cursor_pos(vga_column, vga_row);
 }
 
 void vga_disable_cursor()
