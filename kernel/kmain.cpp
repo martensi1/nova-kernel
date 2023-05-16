@@ -1,4 +1,4 @@
-#include <simux/vgacon.h>
+#include <simux/term.h>
 
 
 #if !defined(__i386__)
@@ -8,11 +8,10 @@
 
 extern "C" {
     void kmain() {
-        vga_initialize();
-        vga_write_str("\n\n");
-
-        vga_write_str("Using VGA text mode\n");
-        vga_write_str("Loading Simux kernel...\n");
+        term_initialize();
+        term_write_str("\n\n\n");
+        term_write_str("Using VGA text mode\n");
+        term_write_str("Loading Simux kernel...\n");
 
         while (true) {
 
