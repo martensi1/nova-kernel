@@ -1,3 +1,7 @@
+/*
+VGA console driver
+http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
+*/
 #include <simux/vgacon.h>
 #include <simux/sysbus.h>
 #include <simux/atoi.h>
@@ -8,9 +12,13 @@
 #define VGA_TEXT_MODE_WIDTH 80
 #define VGA_TEXT_MODE_HEIGHT 25
 #define VGA_TEXT_BUFFER_ADDRESS 0xB8000
+
 #define VGA_INDEX_PORT 0x3D4
 #define VGA_DATA_PORT 0x3D5
+
 #define VGA_REGISTER_MODE 0x03
+#define VGA_REGISTER_CURSOR_START 0x0A
+#define VGA_REGISTER_CURSOR_END 0x0B
 #define VGA_REGISTER_CURSOR_HIGH 0x0E
 #define VGA_REGISTER_CURSOR_LOW 0x0F
 
@@ -25,10 +33,16 @@ static uint8_t vga_write_color;
 
 
 extern "C" {
+    static inline uint8_t read_register(uint8_t index)
+    {
+        sysbus_io_out(VGA_INDEX_PORT, index);
+        return sysbus_io_in(VGA_DATA_PORT);
+    }
+
     static inline void write_register(uint8_t index, uint8_t value)
     {
-        sysbus_out(VGA_INDEX_PORT, index);
-        sysbus_out(VGA_DATA_PORT, value);
+        sysbus_io_out(VGA_INDEX_PORT, index);
+        sysbus_io_out(VGA_DATA_PORT, value);
     }
 
     static inline void write_video_memory(char c, uint8_t color, size_t x, size_t y)
@@ -52,6 +66,25 @@ extern "C" {
         write_register(VGA_REGISTER_CURSOR_LOW, (uint8_t)(offset & 0xFF));
     }
 
+    static void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
+    {
+        //uint8_t start_value = (0x00 << 5) | (0x0F & cursor_start);
+        //uint8_t end_value = (0x0F & cursor_end);
+        uint8_t start_value = read_register(VGA_REGISTER_CURSOR_START);
+        uint8_t end_value = read_register(VGA_REGISTER_CURSOR_END);
+
+        start_value = (start_value & 0xC0) | cursor_start;
+        end_value = (end_value & 0xE0) | cursor_end;
+
+        write_register(VGA_REGISTER_CURSOR_START, start_value);
+        write_register(VGA_REGISTER_CURSOR_END, end_value);
+    }
+
+    static void disable_cursor(void)
+    {
+        uint8_t value = 0x01 << 5;
+        write_register(VGA_REGISTER_CURSOR_START, value);
+    }
 
 
     static void scroll_up() {
@@ -100,6 +133,8 @@ extern "C" {
         vga_buffer = (uint16_t*)VGA_TEXT_BUFFER_ADDRESS;
         
         set_mode(0x03);
+        disable_cursor();
+        enable_cursor(0x0A, 0x0F);
         vga_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
         vga_clear();
     }
@@ -116,7 +151,7 @@ extern "C" {
     {
         size_t length = strlen(data);
         vga_write(data, length);
-        //set_cursor_pos(10, 10);
+        set_cursor_pos(10, 4);
         
     }
 
