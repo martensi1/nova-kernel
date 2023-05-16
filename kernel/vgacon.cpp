@@ -186,6 +186,7 @@ void vga_clear(void)
 }
 
 
+// Define driver
 struct console_driver vga_driver = {
     vga_initialize,       // initialize
     vga_write_char,       // write_char
