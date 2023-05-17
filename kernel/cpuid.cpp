@@ -1,5 +1,6 @@
 #include <simux/cpuid.h>
 #include <simux/atoi.h>
+#include <simux/term.h>
 #include <stdint.h>
 
 
@@ -60,13 +61,25 @@ void cpuid_get_version_info(cpuid_version_info* version_info)
     get_cpuid(CPUID_FEATURES, &eax, &ebx, &ecx, &edx);
 
     version_info->stepping_id = eax & 0xF;
-    version_info->model = (eax >> 4) & 0xF;
+    version_info->model_id = (eax >> 4) & 0xF;
     version_info->family_id = (eax >> 8) & 0xF;
     version_info->processor_type = (eax >> 12) & 0x3;
-    version_info->reserved1 = (eax >> 14) & 0x3;
-    version_info->extended_model_id = (eax >> 16) & 0xF;
-    version_info->extended_family_id = (eax >> 20) & 0xFF;
-    version_info->reserved2 = (eax >> 28) & 0xF;
+
+    if (version_info->family_id == 0xF || version_info->family_id == 0x6) {
+        uint8_t extended_model_id = (eax >> 16) & 0xF;
+        term_write_str("Hej!\n");
+        version_info->model_id = version_info->model_id + (extended_model_id << 4);
+    }
+
+    if (version_info->family_id == 0xF) {
+        uint8_t extended_family_id = (eax >> 20) & 0xFF;
+        version_info->family_id = version_info->family_id + (extended_family_id << 4);
+    }
+
+    version_info->brand_id = ebx & 0xFF;
+    version_info->cache_line_size = (ebx >> 8) & 0xFF;
+    version_info->cpu_count = (ebx >> 16) & 0xFF;
+    version_info->local_apic_id = (ebx >> 24) & 0xFF;
 }
 
 void cpuid_get_serial_number(char* serial_number)

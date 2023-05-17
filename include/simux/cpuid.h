@@ -39,7 +39,7 @@
 #define CPUID_VENDOR_QNX           " QNXQVMBSQG "
 #define CPUID_PROJECT_ACRN         "ACRNACRNACRN"
 
-enum cpu_id_features {
+enum cpu_id_features_ecx {
     CPUID_FEAT_ECX_SSE3         = 1 << 0, 
     CPUID_FEAT_ECX_PCLMUL       = 1 << 1,
     CPUID_FEAT_ECX_DTES64       = 1 << 2,
@@ -71,7 +71,9 @@ enum cpu_id_features {
     CPUID_FEAT_ECX_F16C         = 1 << 29,
     CPUID_FEAT_ECX_RDRAND       = 1 << 30,
     CPUID_FEAT_ECX_HYPERVISOR   = 1 << 31,
- 
+};
+
+enum cpu_id_features_edx {
     CPUID_FEAT_EDX_FPU          = 1 << 0,  
     CPUID_FEAT_EDX_VME          = 1 << 1,  
     CPUID_FEAT_EDX_DE           = 1 << 2,  
@@ -104,15 +106,17 @@ enum cpu_id_features {
     CPUID_FEAT_EDX_PBE          = 1 << 31
 };
 
+
+
 struct cpuid_version_info {
     uint8_t stepping_id;
-    uint8_t model;
-    uint8_t family_id;
+    uint32_t model_id;
+    uint32_t family_id;
     uint8_t processor_type;
-    uint8_t reserved1;
-    uint8_t extended_model_id;
-    uint16_t extended_family_id;
-    uint8_t reserved2;
+    uint8_t brand_id;
+    uint8_t cache_line_size;
+    uint8_t cpu_count;
+    uint8_t local_apic_id;
 };
 
 // Processor types
@@ -127,7 +131,7 @@ bool cpuid_has_cpuid(void);
 void cpuid_get_vendor_name(char* vendor_name);
 void cpuid_get_version_info(cpuid_version_info* version_info);
 void cpuid_get_serial_number(char* serial_number);
-bool cpuid_has_features(cpu_id_features features);
+bool cpuid_has_features(cpu_id_features_ecx features);
 
 
 
