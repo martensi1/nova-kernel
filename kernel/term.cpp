@@ -11,6 +11,11 @@ void term_initialize() {
 
     vga_driver.enable_cursor();
     vga_driver.update_cursor();
+
+    term_write_str("\n\n");
+    term_write_str("Terminal initialized(");
+    term_write_str(vga_driver.name);
+    term_write_str(")\n");
 }
 
 void term_clear() {

@@ -8,15 +8,8 @@
 #endif
 
 
-void print_cpu_info() {
-    char vendor_name[CPUID_MAX_STR_LENGTH+1];
-    char serial_number[CPUID_MAX_STR_LENGTH+1];
-    struct cpuid_version_info version_info;
-
-    cpuid_get_vendor_name(vendor_name);
-    cpuid_get_serial_number(serial_number);
-    cpuid_get_version_info(&version_info);
-
+void print_cpu_info(cpuinfo_x86* cpuinfo) {
+    #define CPUID_MAX_STR_LENGTH 32
     char s_stepping_id[CPUID_MAX_STR_LENGTH+1];
     char s_model_id[CPUID_MAX_STR_LENGTH+1];
     char s_family_id[CPUID_MAX_STR_LENGTH+1];
@@ -26,14 +19,14 @@ void print_cpu_info() {
     char s_cpu_count[CPUID_MAX_STR_LENGTH+1];
     char s_local_apic_id[CPUID_MAX_STR_LENGTH+1];
 
-    uint8_t stepping_id = version_info.stepping_id;
-    uint32_t model_id = version_info.model_id;
-    uint8_t family_id = version_info.family_id;
-    uint8_t processor_type = version_info.processor_type;
-    uint8_t brand_id = version_info.brand_id;
-    uint8_t cache_line_size = version_info.cache_line_size;
-    uint8_t cpu_count = version_info.cpu_count;
-    uint8_t local_apic_id = version_info.local_apic_id;
+    uint8_t stepping_id = cpuinfo->stepping;
+    uint32_t model_id = cpuinfo->model_id;
+    uint8_t family_id = cpuinfo->family_id;
+    uint8_t processor_type = cpuinfo->processor_type;
+    uint8_t brand_id = cpuinfo->brand_id;
+    uint8_t cache_line_size = cpuinfo->cache_line_size;
+    uint8_t cpu_count = cpuinfo->cpu_count;
+    uint8_t local_apic_id = cpuinfo->local_apic_id;
 
     itoa(stepping_id, s_stepping_id, 10);
     itoa(model_id, s_model_id, 10);
@@ -45,7 +38,7 @@ void print_cpu_info() {
     itoa(local_apic_id, s_local_apic_id, 10);
 
     term_write_str("Using CPU of type ");
-    term_write_str(vendor_name);
+    term_write_str(cpuinfo->vendor_name);
     term_write_str(" (Family: ");
     term_write_str(s_family_id);
     term_write_str(", Model: ");
@@ -69,11 +62,11 @@ void print_cpu_info() {
 extern "C" {
     void kmain() {
         term_initialize();
-        term_write_str("\n\n\n");
-        term_write_str("Using VGA text mode\n");
-        term_write_str("Loading Simux kernel...\n");
 
-        print_cpu_info();
+        cpuinfo_x86 cpuinfo;
+        cpuid_identify_cpu(cpuinfo);
+
+        print_cpu_info(&cpuinfo);
 
         while (true) {
             //term_write(&c, 1);

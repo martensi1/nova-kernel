@@ -2,7 +2,6 @@
 #define __SIMUX_CPU_ID_H__
 
 #include <stdint.h>
-#define CPUID_MAX_STR_LENGTH 16
 
 
 // Processor vendor ID strings
@@ -39,6 +38,13 @@
 #define CPUID_VENDOR_QNX           " QNXQVMBSQG "
 #define CPUID_PROJECT_ACRN         "ACRNACRNACRN"
 
+// Processor types
+#define CPUID_PROCESSOR_TYPE_ORIGINAL_OEM_PROCESSOR 0
+#define CPUID_PROCESSOR_TYPE_INTEL_OVERDRIVE_PROCESSOR 1
+#define CPUID_PROCESSOR_TYPE_DUAL_PROCESSOR 2
+#define CPUID_PROCESSOR_TYPE_RESERVED 3
+
+// Processor features
 enum cpu_id_features_ecx {
     CPUID_FEAT_ECX_SSE3         = 1 << 0, 
     CPUID_FEAT_ECX_PCLMUL       = 1 << 1,
@@ -107,9 +113,13 @@ enum cpu_id_features_edx {
 };
 
 
+struct cpuinfo_x86 {
+    uint8_t level;
 
-struct cpuid_version_info {
-    uint8_t stepping_id;
+    #define CPUID_STRING_SIZE 12
+    char vendor_name[CPUID_STRING_SIZE+1];
+    
+    uint16_t stepping;
     uint32_t model_id;
     uint32_t family_id;
     uint8_t processor_type;
@@ -117,22 +127,14 @@ struct cpuid_version_info {
     uint8_t cache_line_size;
     uint8_t cpu_count;
     uint8_t local_apic_id;
+
+    uint32_t features_ecx;
+    uint32_t features_edx;
 };
 
-// Processor types
-#define CPUID_PROCESSOR_TYPE_ORIGINAL_OEM_PROCESSOR 0
-#define CPUID_PROCESSOR_TYPE_INTEL_OVERDRIVE_PROCESSOR 1
-#define CPUID_PROCESSOR_TYPE_DUAL_PROCESSOR 2
-#define CPUID_PROCESSOR_TYPE_RESERVED 3
 
-
-bool cpuid_has_cpuid(void);
-
-void cpuid_get_vendor_name(char* vendor_name);
-void cpuid_get_version_info(cpuid_version_info* version_info);
-void cpuid_get_serial_number(char* serial_number);
-bool cpuid_has_features(cpu_id_features_ecx features);
-
+void cpuid_identify_cpu(cpuinfo_x86& cpuinfo);
+bool cpuid_has_feature(const uint32_t features, uint32_t feature);
 
 
 #endif // __SIMUX_CPU_ID_H__
