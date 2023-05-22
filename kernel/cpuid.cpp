@@ -10,6 +10,7 @@
 #include <simux/cpuid.h>
 #include <simux/flgreg.h>
 #include <simux/stdio.h>
+#include <simux/panic.h>
 #include <stdint.h>
 
 
@@ -23,7 +24,6 @@ enum cpu_id_requests {
 static inline bool has_cpuid(void)
 {
     cpu_flag flag = CPUFLAG_ID;
-    return true;
     return flagreg_test_if_changeable(flag);
 }
 
@@ -111,8 +111,8 @@ static void fill_version_and_features(cpuinfo_x86* cpuinfo)
 void cpuid_identify_cpu(cpuinfo_x86& cpuinfo)
 {
     if (!has_cpuid()) {
-        // Abort if CPUID is not supported
-        return;
+        // CPUID instruction is not supported, panic for now
+        kpanic("CPUID instruction is not supported!");
     }
 
     fill_vendor_and_max_input(&cpuinfo);
