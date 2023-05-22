@@ -8,9 +8,8 @@
  *    https://www.felixcloutier.com/x86/cpuid
 */
 #include <simux/cpuid.h>
-#include <simux/atoi.h>
-#include <simux/term.h>
 #include <simux/flgreg.h>
+#include <simux/stdio.h>
 #include <stdint.h>
 
 
@@ -23,18 +22,19 @@ enum cpu_id_requests {
 
 static inline bool has_cpuid(void)
 {
-    cpu_flag flag = CPUFLAG_ID; 
+    cpu_flag flag = CPUFLAG_ID;
+    return true;
     return flagreg_test_if_changeable(flag);
 }
 
 static inline void get_cpuid(uint32_t request, uint32_t* eax, uint32_t* ebx, uint32_t* ecx, uint32_t* edx)
 {
-    *eax = request;
-    *ecx = 0;
+    uint32_t cpuid_eax = request;
+    uint32_t cpuid_ecx = 0;
 
     asm volatile("cpuid"
         : "=a" (*eax), "=b" (*ebx), "=c" (*ecx), "=d" (*edx)
-        : "a" (eax), "c" (ecx)
+        : "a" (cpuid_eax), "c" (cpuid_ecx)
     );
 }
 
@@ -94,7 +94,6 @@ static void fill_version_and_features(cpuinfo_x86* cpuinfo)
     // If family ID is 6 (0x6) or 15 (0xF), add extended model ID to model ID
     if (cpuinfo->family_id == 0xF || cpuinfo->family_id == 0x6) {
         uint8_t extended_model_id = (eax >> 16) & 0xF;
-        term_write_str("Hej!\n");
         cpuinfo->model_id = cpuinfo->model_id + (extended_model_id << 4);
     }
 

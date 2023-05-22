@@ -1,4 +1,4 @@
-#include <simux/atoi.h>
+#include <simux/stdlib.h>
 
 
 int atoi(const char* c)

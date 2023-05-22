@@ -2,24 +2,27 @@
 #include <simux/string.h>
 
 
+extern struct console_driver dummy_driver;
 extern struct console_driver vga_driver;
+
+struct console_driver* current_driver = &vga_driver;
 
 
 void term_initialize() {
-    vga_driver.initialize();
-    vga_driver.clear();
+    current_driver->initialize();
+    current_driver->clear();
 
-    vga_driver.enable_cursor();
-    vga_driver.update_cursor();
+    current_driver->enable_cursor();
+    current_driver->update_cursor();
 
-    term_write_str("\n\n");
-    term_write_str("Terminal initialized(");
-    term_write_str(vga_driver.name);
+    term_write_str("\n\n\n\n\n");
+    term_write_str("Terminal initialized (");
+    term_write_str(current_driver->name);
     term_write_str(")\n");
 }
 
 void term_clear() {
-    vga_driver.clear();
+    current_driver->clear();
 }
 
 void term_write(const char* data, size_t size) {
@@ -27,14 +30,14 @@ void term_write(const char* data, size_t size) {
         char c  = data[i];
 
         if (c == '\n') {
-            vga_driver.write_line_feed();
+            current_driver->write_line_feed();
             continue;
         }
 
-        vga_driver.write_char(c);
+        current_driver->write_char(c);
     }
 
-    vga_driver.update_cursor();
+    current_driver->update_cursor();
 }
 
 void term_write_str(const char* str) {

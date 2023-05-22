@@ -5,8 +5,9 @@
 
 
 struct console_driver {
-    char name[8];
-
+    char name[10];
+    
+    bool (*is_available)();
     void (*initialize)();
     void (*write_char)(const char c);
     void (*write_line_feed)();

@@ -5,7 +5,6 @@ http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
 */
 #include <simux/sysbus.h>
 #include <simux/condrv.h>
-#include <simux/atoi.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -108,7 +107,7 @@ static inline void disable_cursor(void)
     write_register(VGA_REGISTER_CURSOR_START, value);
 }
 
-static void scroll_up() {
+static void scroll_up(void) {
     for (size_t y = 1; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
             const size_t index = y * VGA_WIDTH + x;
@@ -125,6 +124,11 @@ static void set_write_color(vga_color foreground, vga_color background)
 }
 
 
+
+bool vga_is_available(void)
+{
+    return true;
+}
 
 void vga_initialize(void)
 {
@@ -158,7 +162,7 @@ void vga_write_char(const char c)
     }
 }
 
-void vga_enable_cursor()
+void vga_enable_cursor(void)
 {
     enable_cursor(
         VGA_CURSOR_START_SCANLINE,
@@ -166,12 +170,12 @@ void vga_enable_cursor()
     );
 }
 
-void vga_update_cursor()
+void vga_update_cursor(void)
 {
     set_cursor_pos(vga_column, vga_row);
 }
 
-void vga_disable_cursor()
+void vga_disable_cursor(void)
 {
     disable_cursor();
 }
@@ -189,6 +193,7 @@ void vga_clear(void)
 // Define driver
 struct console_driver vga_driver = {
     "vgacon",             // name
+    vga_is_available,     // is_available
     vga_initialize,       // initialize
     vga_write_char,       // write_char
     vga_write_line_feed,  // write_line_feed
