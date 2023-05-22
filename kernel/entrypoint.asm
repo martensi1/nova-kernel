@@ -4,20 +4,19 @@ extern kmain
 extern ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
 
 
-
 section .multiboot
 
 # The executable must start with a multiboot header to be loaded by GRUB
 # See specification (https://www.gnu.org/software/grub/manual/multiboot/multiboot.html)
 %define MULTIBOOT_HEADER_MAGIC 0x1BADB002
 %define MULTIBOOT_HEADER_FLAGS 0x00000003
-%define MULTIBOOT_CHECKSUM -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
+%define MULTIBOOT_HEADER_CHECKSUM -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
+%define MULTIBOOT_EAX_MAGIC 0x2BADB002
 
 align 4
 dd MULTIBOOT_HEADER_MAGIC
 dd MULTIBOOT_HEADER_FLAGS
-dd MULTIBOOT_CHECKSUM
-
+dd MULTIBOOT_HEADER_CHECKSUM
 
 
 section .bss
@@ -28,7 +27,6 @@ align 16
 
 stack:
     resb STACK_SIZE
-
 
 
 section .text
@@ -42,15 +40,20 @@ run_ctors:
     add ebx, 4
 .next:
     cmp ebx, ctors_end_addr
-    jp .run
+    jne .run
+    ret
 
-# Main entrypoint, run kernel main function!
+# Main entrypoint
 entrypoint:
-    push eax
-    push ebx
+    cmp eax, MULTIBOOT_EAX_MAGIC
+    jne halt
 
     mov esp, stack + STACK_SIZE
+
+    call run_ctors
     call kmain
+    call run_dtors
+    call halt
 
 # Run C++ global destructors after main
 run_dtors:
@@ -61,9 +64,11 @@ run_dtors:
     add ebx, 4
 .next:
     cmp ebx, dtors_end_addr
-    jp .run
+    jne .run
+    ret
 
 # Halt the CPU (go to sleep)
-cli
-hlt
-jmp 1b
+halt:
+    cli
+    hlt
+    jmp 1b
