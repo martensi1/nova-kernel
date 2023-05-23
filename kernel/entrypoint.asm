@@ -1,7 +1,7 @@
 global entrypoint
 
 extern kmain
-extern ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
+extern kernel_start, ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
 
 
 section .multiboot
@@ -43,7 +43,7 @@ section .text
         ; Call the kernel's main function
         mov eax, [boot_handover_eax]
         push eax
-        
+
         call kmain
         add esp, 4
 

@@ -19,6 +19,7 @@ The reason for this is to avoid conflicts with the bootloader and other system c
 */
 SECTIONS {
     . = 0x100000;
+    kernel_start = .;
 
     .text : {
         *(.multiboot)
