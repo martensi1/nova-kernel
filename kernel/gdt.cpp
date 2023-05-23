@@ -84,36 +84,67 @@ void gdt_initialize(void)
     #define GDT_LOCATION 0x0800
     void* destination = (void*)GDT_LOCATION;
 
-    printf("%d\n", destination);
+    uint8_t* dest8 = (uint8_t*)destination;
+    int i = 0;
+
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+
+    dest8[i++] = 0xFF;
+    dest8[i++] = 0xFF;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x92;
+    dest8[i++] = 0xCF;
+    dest8[i++] = 0x00;
+
+    dest8[i++] = 0xFF;
+    dest8[i++] = 0xFF;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x00;
+    dest8[i++] = 0x9A;
+    dest8[i++] = 0xCF;
+    dest8[i++] = 0x00;
+
+    destination = (void*)(dest8 + i);
+
+    goto kor;
 
     // Create a GDT segment descriptor for the null segment
     destination = write_descriptor(destination, 0, 0, 0);
 
-    printf("%d\n", destination);
-
     // Create GDT segment descriptors for the code and data segments
     destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL0);
-    printf("%d\n", destination);
+    //printf("%d\n", destination);
     destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL0);
-    printf("%d\n", destination);
+    //printf("%d\n", destination);
     destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
-    printf("%d\n", destination);
+    //printf("%d\n", destination);
     destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
-
-    printf("%d\n", destination);
-    return;
 
     printf("GDT initialized at 0x%x\n", GDT_LOCATION);
 
     // Load the GDT
+    kor:
     struct gdtr gdtr;
-    gdtr.size = 0; // (uint16_t)((uint32_t)destination - GDT_LOCATION - 1);
+    gdtr.size = (uint16_t)((uint32_t)destination - GDT_LOCATION);
     gdtr.offset = GDT_LOCATION;
+
+    printf("Size: %d\n", gdtr.size);
+    printf("Offset: %x\n", gdtr.offset);
+    printf("Destination: %x\n", destination);
+    printf("Location: %x\n", GDT_LOCATION);
 
     asm volatile("cli");
     asm volatile("lgdt %0" : : "m" (gdtr));
-
-    return;
 
     asm volatile("mov $0x10, %ax\n \
                   mov %ax, %ds\n \

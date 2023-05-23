@@ -5,11 +5,16 @@ all:
 
 package:
 	@echo "Packaging kernel..."
-	@sudo sh gen-bootable.sh
+	@sudo sh build-image.sh
 
 emulate:
 	@echo "Running QEMU..."
 	@sudo sh start-qemu.sh
 
+emulate-debug:
+	@echo "Running QEMU in debug mode..."
+	@sudo sh start-qemu.sh -debug-deamon
+
 test: all package emulate
+debug: all package emulate-debug
 

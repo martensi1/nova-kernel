@@ -3,7 +3,10 @@
 # Setup
 cd "$(dirname "$0")"
 
-IMAGE_PATH="./bin/kernel.img"
+ELF_FILE="./kernel/bin/simux_kernel.elf"
+OUTPUT_DIR="./bin"
+
+IMAGE_PATH="($OUTPUT_DIR)/kernel.img"
 IMAGE_SIZE="8M"
 
 DISK_GEOMETRY_HEADS="16"
@@ -69,7 +72,7 @@ grub-install --version
 grub-install --target "$GRUB_TARGET" --no-floppy --root-directory="$MOUNT_DIR" "$LOOP_DEVICE" --modules "$GRUB_MODULES"
 
 # Install kernel
-cp kernel/bin/simux_kernel.elf "$MOUNT_DIR/boot/"
+cp "$ELF_FILE" "$MOUNT_DIR/boot/"
 grub-file --is-x86-multiboot "$MOUNT_DIR/boot/simux_kernel.elf"
 
 if [ $? -ne 0 ]; then
@@ -93,6 +96,9 @@ sleep 0.1
 # Show image info
 fdisk -l -u "$IMAGE_PATH"
 md5sum "$IMAGE_PATH"
+
+# Copy ELF to output directory for debugging
+cp "$ELF_FILE" "$OUTPUT_DIR/"
 
 echo "Done!"
 
