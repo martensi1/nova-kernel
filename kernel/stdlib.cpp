@@ -14,7 +14,7 @@ int atoi(const char* c)
     return n;
 }
 
-char * itoa( int value, char * str, int base )
+char * itoa(int value, char * str, int base)
 {
     char * rc;
     char * ptr;

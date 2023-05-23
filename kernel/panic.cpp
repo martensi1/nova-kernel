@@ -1,5 +1,6 @@
 #include <simux/panic.h>
 #include <simux/term.h>
+#include <simux/stdio.h>
 
 
 static void khalt(void)
@@ -10,16 +11,15 @@ static void khalt(void)
     }
 }
 
-void kpanic(const char* message)
+void kpanic(const char* message, uint32_t data)
 {
     asm volatile("cli");
 
     term_clear();
-    term_write_str("Kernel panic!\n");
 
-    term_write_str("Message: ");
-    term_write_str(message);
-    term_write_str("\n");
+    printf("Kernel panic!\n");
+    printf("Message: %s\n", message);
+    printf("Data: 0x%x\n", data);
 
     khalt();
 }
