@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 ELF_FILE="./kernel/bin/simux_kernel.elf"
 OUTPUT_DIR="./bin"
 
-IMAGE_PATH="($OUTPUT_DIR)/kernel.img"
+IMAGE_PATH="$OUTPUT_DIR/kernel.img"
 IMAGE_SIZE="8M"
 
 DISK_GEOMETRY_HEADS="16"

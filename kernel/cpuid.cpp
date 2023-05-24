@@ -9,8 +9,7 @@
 */
 #include <simux/cpuid.h>
 #include <simux/flgreg.h>
-#include <simux/stdio.h>
-#include <simux/panic.h>
+#include <simux/kernel.h>
 #include <stdint.h>
 
 

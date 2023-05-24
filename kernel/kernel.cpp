@@ -1,12 +1,32 @@
-#include <simux/stdio.h>
-#include <simux/stdlib.h>
-#include <simux/string.h>
-#include <simux/term.h>
+#include <simux/kernel.h>
+#include <simux/tty.h>
+#include <libc/stdlib.h>
+#include <libc/string.h>
 #include <stdarg.h>
 
 
+void khalt(void)
+{
+    while (true) {
+        asm volatile("cli");
+        asm volatile("hlt");
+    }
+}
 
-int printf(const char* format, ...)
+void kpanic(const char* message, uint32_t data)
+{
+    asm volatile("cli");
+
+    term_clear();
+
+    printk("Kernel panic!\n");
+    printk("Message: %s\n", message);
+    printk("Data: 0x%x\n", data);
+
+    khalt();
+}
+
+int printk(const char* format, ...)
 {
     if (format == NULL) {
         return 0;

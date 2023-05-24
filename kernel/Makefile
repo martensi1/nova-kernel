@@ -1,5 +1,4 @@
 # Architectire, compiler and flags
-ARCH := x86
 TARGET := simux_kernel.elf
 
 CC := g++
@@ -9,44 +8,47 @@ CPP_FLAGS := -O2 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stac
 LD_FLAGS = -m elf_i386 -T linker.ld
 
 # Define source and object directories
-INC_DIR := ../include
+INC_DIR := -I include -I ../libc/include/
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin
 
 ASM_FILES := $(wildcard $(SRC_DIR)/*.asm)
+ASM_FILES += $(wildcard $(SRC_DIR)/*/*.asm)
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+CPP_FILES += $(wildcard $(SRC_DIR)/*/*.cpp)
 
 ASM_OBJS := $(patsubst ./%.asm, $(OBJ_DIR)/%.o, $(ASM_FILES))
 CPP_OBJS := $(patsubst ./%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))
+LIBC_STATIC := ../libc/bin/libc.a
 
 OUTPUT := $(BIN_DIR)/$(TARGET)
 
 
-# Build rule for assembly files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.asm
-	@mkdir -p $(OBJ_DIR)
-	$(AS) $(ASM_FLAGS) $< -o $@
+# Targets
+.PHONY: all clean
 
-# Build rule for C++ files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CPP_FLAGS) -c $< -o $@ -I $(INC_DIR)
-
-# Default target
 all: $(OUTPUT)
 
 $(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
 	@echo "-> Linking object files"
-	@mkdir -p $(BIN_DIR)
-	$(LD) $(LD_FLAGS) -o $@ $^
+	$(LD) $(LD_FLAGS) -o $@ $^ $(LIBC_STATIC)
 
-	@echo "-> Printing binary information:"
+	@echo "-> Binary information:"
 	nm -n $(OUTPUT)
 
 	@echo "-> Done!"
 
+$(OBJ_DIR)/%.o: %.asm
+	@mkdir -p $(OBJ_DIR)/$(dir $*)
+	$(AS) $(ASM_FLAGS) $< -o $(OBJ_DIR)/$*.o
 
-# Clean rule
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(OBJ_DIR)/$(dir $*)
+
+	@echo "-> Compiling $<"
+	$(CC) $(CPP_FLAGS) $(INC_DIR) -c $< -o $(OBJ_DIR)/$*.o
+
+
 clean:
-	rm -rf $(OBJ_DIR)/*.o $(BIN_DIR)/*
+	rm -rf $(OBJ_DIR)/* $(BIN_DIR)/*

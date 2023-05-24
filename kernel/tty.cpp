@@ -1,5 +1,5 @@
-#include <simux/term.h>
-#include <simux/string.h>
+#include <simux/tty.h>
+#include <libc/string.h>
 
 
 extern struct console_driver dummy_driver;

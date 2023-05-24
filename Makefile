@@ -1,5 +1,7 @@
 all: 
 	@echo "Compiling kernel..."
+	make -C ./libc clean
+	make -C ./libc all
 	make -C ./kernel clean
 	make -C ./kernel all
 

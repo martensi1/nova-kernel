@@ -1,7 +1,6 @@
-#include <simux/term.h>
+#include <simux/tty.h>
 #include <simux/cpuid.h>
-#include <simux/stdio.h>
-#include <simux/panic.h>
+#include <simux/kernel.h>
 #include <simux/gdt.h>
 
 
@@ -19,7 +18,7 @@ static void check_if_multiboot_loaded(uint32_t boot_handover_eax) {
 
     if (boot_handover_eax == MULTIBOOT_SPEC_MAGIC_BYTE)
     {
-        printf("Boot handover from multiboot compliant bootloader\n");
+        printk("Boot handover from multiboot compliant bootloader\n");
     }
     else 
     {
@@ -29,7 +28,7 @@ static void check_if_multiboot_loaded(uint32_t boot_handover_eax) {
 
 void check_start_address(void) {
     extern uint32_t kernel_start;
-    printf("Kernel start address: 0x%x\n", &kernel_start);
+    printk("Kernel start address: 0x%x\n", &kernel_start);
 }
 
 void check_cpu_mode(void) {
@@ -37,7 +36,7 @@ void check_cpu_mode(void) {
     asm volatile("mov %%cr0, %0" : "=r" (cr0));
 
     if (cr0 & 0x1) {
-        printf("CPU in 32-bit protected mode!\n");
+        printk("CPU in 32-bit protected mode!\n");
     }
     else {
         kpanic("CPU is not in 32-bit protected mode");
@@ -45,7 +44,7 @@ void check_cpu_mode(void) {
 }
 
 void print_cpu_info(cpuinfo_x86* cpuinfo) {
-    printf("Using CPU of type %s (Family: %d, Model: %d, Stepping: %d, Processor type: %d, Brand ID: %d, Cache line size: %d, CPU count: %d, Local APIC ID: %d)\n",
+    printk("Using CPU of type %s (Family: %d, Model: %d, Stepping: %d, Processor type: %d, Brand ID: %d, Cache line size: %d, CPU count: %d, Local APIC ID: %d)\n",
         cpuinfo->vendor_name,
         cpuinfo->family_id,
         cpuinfo->model_id,
@@ -68,7 +67,7 @@ extern "C" {
         check_start_address();
         check_cpu_mode();
 
-        gdt_initialize();
+        //gdt_initialize();
 
         cpuinfo_x86 cpuinfo;
         cpuid_identify_cpu(cpuinfo);

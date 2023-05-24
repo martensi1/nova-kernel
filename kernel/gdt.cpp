@@ -1,6 +1,6 @@
 #include <simux/gdt.h>
-#include <simux/memory.h>
-#include <simux/stdio.h>
+#include <simux/kernel.h>
+#include <libc/string.h>
 #include <stdint.h>
 
 
@@ -130,7 +130,7 @@ void gdt_initialize(void)
     //printf("%d\n", destination);
     destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
 
-    printf("GDT initialized at 0x%x\n", GDT_LOCATION);
+    printk("GDT initialized at 0x%x\n", GDT_LOCATION);
 
     // Load the GDT
     kor:
@@ -138,10 +138,10 @@ void gdt_initialize(void)
     gdtr.size = (uint16_t)((uint32_t)destination - GDT_LOCATION);
     gdtr.offset = GDT_LOCATION;
 
-    printf("Size: %d\n", gdtr.size);
-    printf("Offset: %x\n", gdtr.offset);
-    printf("Destination: %x\n", destination);
-    printf("Location: %x\n", GDT_LOCATION);
+    printk("Size: %d\n", gdtr.size);
+    printk("Offset: %x\n", gdtr.offset);
+    printk("Destination: %x\n", destination);
+    printk("Location: %x\n", GDT_LOCATION);
 
     asm volatile("cli");
     asm volatile("lgdt %0" : : "m" (gdtr));
