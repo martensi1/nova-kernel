@@ -25,6 +25,7 @@ all: $(OUTPUT)
 
 $(OUTPUT): $(C_OBJS)
 	@echo "-> Linking object files"
+	@mkdir -p $(BIN_DIR)
 	$(LD) $(LD_FLAGS) -o $@ $^
 
 	@echo "-> Binary information:"

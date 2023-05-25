@@ -32,6 +32,7 @@ all: $(OUTPUT)
 
 $(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
 	@echo "-> Linking object files"
+	@mkdir -p $(BIN_DIR)
 	$(LD) $(LD_FLAGS) -o $@ $^ $(LIBC_STATIC)
 
 	@echo "-> Binary information:"
