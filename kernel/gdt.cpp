@@ -4,17 +4,11 @@
 #include <stdint.h>
 
 
-#define GDT_LOCATION 0x0800
-
-// NOT NEEDED FOR NOW
-//#if BITS_BIG_ENDIAN == 1
-//   #pragma reverse_bitfields on
-//#endif
-
 // NOTE!
 // The following code is based on the following assumptions:
 // - Endianness is little endian
 // - Bit fields for individual bytes are ordered from left to right (MSB to LSB)
+// If not, code will need to be changed accordingly (with #pragma reverse_bitfields on?)
 #define SEGMENT_PRESENT(x)          (((x) & 0x01) << 0x07) // Present
 #define SEGMENT_PRIVILEGE(x)        (((x) & 0x03) << 0x05) // Privilege level (0 - 3)
 #define SEGMENT_DESCRIPTOR_TYPE(x)  (((x) & 0x01) << 0x04) // Descriptor type (0 for system, 1 for code/data)
@@ -69,7 +63,7 @@ static void* write_descriptor(void* dest, uint32_t base, uint32_t limit, uint16_
 
     // Write pres, priv, desc type, etc
     dest8[i++] = flags & 0xFF;
-    dest8[i++] = ((flags >> 8) & 0xF0) & ((limit >> 16) & 0x0F);
+    dest8[i++] = ((flags >> 8) & 0xF0) | ((limit >> 16) & 0x0F);
     
     // Write base (bit 24-31)
     dest8[i++] = (base >> 24) & 0xFF;
@@ -78,82 +72,60 @@ static void* write_descriptor(void* dest, uint32_t base, uint32_t limit, uint16_
     return (void*)dest8;
 }
 
+static void create_gdt_table(struct gdtr* gdtr)
+{
+    #define GDT_LOCATION 0x0800
+    void* dest = (void*)GDT_LOCATION;
+
+    // We want to use paging and not segmentation, so we define 
+    // 4 large overlapping segments that cover the entire 4GB address space
+    dest = write_descriptor(dest, 0, 0, 0);
+    dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL0);
+    dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL0);
+    dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
+    dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
+
+    gdtr->size = (uint16_t)((uint32_t)dest - GDT_LOCATION);
+    gdtr->offset = GDT_LOCATION;
+
+    printk("Global Descriptor Table created at 0x%x\n", GDT_LOCATION);
+}
+
+static void set_gdtr_register(struct gdtr* gdtr_value)
+{
+    // Disable interrupts and tell the CPU where the GDT is
+    asm volatile("cli");
+    asm volatile("lgdt %0" : : "m" (*gdtr_value));
+
+    // Now when we have a new GDT, we need to set the segment registers
+    // to point to the correct segments (for us kernel code and data segments)
+    //
+    // The segment registers are 16 bits, and the first 13 bits are the index
+    // of the segment in the GDT, and the last 3 bits are if it's a GDT or LDT
+    // and the privilege level
+    // 0x08 -> kernel code segment (index 1, GDT, privilege level 0)
+    // 0x10 -> kernel data segment (index 2, GDT, privilege level 0)
+    asm volatile("\
+        mov $0x10, %ax\n \
+        mov %ax, %ds\n \
+        mov %ax, %es\n \
+        mov %ax, %fs\n \
+        mov %ax, %gs\n \
+        mov %ax, %ss\n \
+        jmp $0x08, $gdt_jump\n \
+        gdt_jump:\n \
+        ");
+    
+    printk("GDTR register set, reloaded segment descriptors\n");
+}
+
 
 void gdt_initialize(void)
 {
-    #define GDT_LOCATION 0x0800
-    void* destination = (void*)GDT_LOCATION;
+    struct gdtr gdtr_value;
 
-    uint8_t* dest8 = (uint8_t*)destination;
-    int i = 0;
-
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-
-    dest8[i++] = 0xFF;
-    dest8[i++] = 0xFF;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x92;
-    dest8[i++] = 0xCF;
-    dest8[i++] = 0x00;
-
-    dest8[i++] = 0xFF;
-    dest8[i++] = 0xFF;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x00;
-    dest8[i++] = 0x9A;
-    dest8[i++] = 0xCF;
-    dest8[i++] = 0x00;
-
-    destination = (void*)(dest8 + i);
-
-    goto kor;
-
-    // Create a GDT segment descriptor for the null segment
-    destination = write_descriptor(destination, 0, 0, 0);
-
-    // Create GDT segment descriptors for the code and data segments
-    destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL0);
-    //printf("%d\n", destination);
-    destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL0);
-    //printf("%d\n", destination);
-    destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
-    //printf("%d\n", destination);
-    destination = write_descriptor(destination, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
-
-    printk("GDT initialized at 0x%x\n", GDT_LOCATION);
-
-    // Load the GDT
-    kor:
-    struct gdtr gdtr;
-    gdtr.size = (uint16_t)((uint32_t)destination - GDT_LOCATION);
-    gdtr.offset = GDT_LOCATION;
-
-    printk("Size: %d\n", gdtr.size);
-    printk("Offset: %x\n", gdtr.offset);
-    printk("Destination: %x\n", destination);
-    printk("Location: %x\n", GDT_LOCATION);
-
-    asm volatile("cli");
-    asm volatile("lgdt %0" : : "m" (gdtr));
-
-    asm volatile("mov $0x10, %ax\n \
-                  mov %ax, %ds\n \
-                  mov %ax, %es\n \
-                  mov %ax, %fs\n \
-                  mov %ax, %gs\n \
-                  mov %ax, %ss\n \
-                  ljmp $0x08, $next\n \
-                  next:");
+    create_gdt_table(&gdtr_value);
+    set_gdtr_register(&gdtr_value);
 }
 
 

@@ -1,9 +1,10 @@
-all: 
-	@echo "Compiling kernel..."
-	make -C ./libc clean
+build-release:
 	make -C ./libc all
-	make -C ./kernel clean
 	make -C ./kernel all
+
+build-debug:
+	make -C ./libc all DEBUG=1
+	make -C ./kernel all DEBUG=1
 
 package:
 	@echo "Packaging kernel..."
@@ -17,6 +18,11 @@ emulate-debug:
 	@echo "Running QEMU in debug mode..."
 	@sudo sh start-qemu.sh -debug-deamon
 
-test: all package emulate
-debug: all package emulate-debug
+clean:
+	@echo "Cleaning kernel..."
+	make -C ./libc clean
+	make -C ./kernel clean
+
+test: clean build-release package emulate
+debug: clean build-debug package emulate-debug
 

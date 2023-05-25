@@ -3,8 +3,15 @@ TARGET := libc.a
 
 CC := g++
 ASM_FLAGS := -f elf32
-CPP_FLAGS := -O2 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror
+CPP_FLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror
 LD_FLAGS = -m elf_i386
+
+ifeq ($(DEBUG), 1)
+	CPP_FLAGS += -g
+	LD_FLAGS += -g
+else
+	CPP_FLAGS += -O2
+endif
 
 # Define source and object directories
 INC_DIR := -I include

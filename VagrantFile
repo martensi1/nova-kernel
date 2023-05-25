@@ -5,18 +5,23 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
     # Box to use (Ubuntu 16)
     config.vm.box = "ubuntu/xenial32"
     config.vm.box_version = "20211001.0.0"
+
+    # Dependencies for building the kernel
+    package_list = [
+        "nasm",              # assembler
+        "make",              # build automation tool
+        "build-essential",   # C/C++ compiler
+        "grub2",             # bootloader
+        "qemu",              # emulator for testing the kernel
+        "zip",               # for packaging the kernel
+        "ntp",               # for time synchronization (to avoid problems with certificates and clock skew compiler warnings)
+        "gdb"                # debugger
+    ]
     
-    # Install dependencies for building the kernel
-    # nasm: assembler
-    # make: build automation tool
-    # build-essential: C/C++ compiler
-    # grub2: bootloader
-    # qemu: emulator for testing the kernel
-    # zip: for packaging the kernel
-    # ntp: for time synchronization (to avoid problems with certificates and clock skew compiler warnings)
+    # Install dependencies
     $script = %Q{
         sudo apt-get update
-        sudo apt-get install -y nasm make build-essential grub2 qemu zip ntp
+        sudo apt-get install -y #{package_list.join(" ")}
     }
     config.vm.provision :shell, :inline => $script
     
@@ -25,6 +30,9 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
         v.memory = 2048
         v.cpus = 2
     end
+
+    # Port forward for GDB debugging
+    config.vm.network "forwarded_port", guest: 1234, host: 1234
 
     # Automatically navigate to vagrant synced folder on SSH login
     config.ssh.extra_args = ["-t", "cd /vagrant; bash --login"]
