@@ -17,8 +17,10 @@ Currently supports:
 ## Setup
 
 1. Install Vagrant and VirtualBox
-2. Clone repository and run `vagrant up --provision` to setup a new development environment
-3. Run `vagrant ssh` to SSH into the VM instance
+2. Clone repository. Be sure that the checked out files have unix-style line endings, `LF`)
+   Example: `git clone --config core.autocrlf=false --config core.eol lf <repo-url>`
+3. Run `vagrant up --provision` to setup a new development environment
+4. Run `vagrant ssh` to SSH into the VM instance
 
 ## Run OS
 
