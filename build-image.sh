@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Setup
 cd "$(dirname "$0")"
 
