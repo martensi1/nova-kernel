@@ -2,6 +2,7 @@
 #include <simux/tty.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
+#include <libc/ctype.h>
 #include <stdarg.h>
 
 
@@ -26,86 +27,107 @@ void kpanic(const char* message, uint32_t data)
     khalt();
 }
 
-int printk(const char* format, ...)
+int printk(const char* fmt, ...)
 {
-    if (format == NULL) {
+    if (fmt == NULL) {
         return 0;
     }
 
-    char output[200];
+    char buffer[200];
     char temp[20];
 
-    int format_idx = 0;
-    int output_idx = 0;
+    char* out = buffer;
+    char c = 0;
 
     va_list args;
-    va_start(args, format);
+    va_start(args, fmt);
 
     while (true)
     {
-        char c = format[format_idx];
-        format_idx++;
+        c = *fmt++;
 
-        if (c == 0)
+        if (c == '\0')
         {
             break;
         }
 
         if (c != '%')
         {
-            output[output_idx] = c;
-            output_idx++;
+            *out++ = c;
             continue;
         }
-        else
-        {
-            c = format[format_idx];
-            format_idx++;
 
-            switch (c)
+        c = *fmt++;
+        char padchar = ' ';
+        int padlen = 0;
+
+        if (c == '0')
+        {
+            padchar = '0';
+            c = *fmt++;
+        }
+
+        while (isdigit(c))
+        {
+            padlen = padlen * 10 + c - '0';
+            c = *fmt++;
+        }
+
+        switch (c)
+        {
+            case 'c':
             {
-                case 'c':
-                {
-                    char ch = (char)va_arg(args, int);
-                    output[output_idx++] = ch;
-                    break;
-                }
-                case 'd':
-                {
-                    int num = va_arg(args, int);
-                    itoa(num, temp, 10);
-                    strcpy(output + output_idx, temp);
-                    output_idx += strlen(temp);
-                    break;
-                }
-                case 'x':
-                {
-                    int num = va_arg(args, int);
-                    itoa(num, temp, 16);
-                    strcpy(output + output_idx, temp);
-                    output_idx += strlen(temp);
-                    break;
-                }
-                case 's':
-                {
-                    char* str = va_arg(args, char*);
-                    strcpy(output + output_idx, str);
-                    output_idx += strlen(str);
-                    break;
-                }
-                default:
-                {
-                    output[output_idx++] = c;
-                    break;
-                }
+                char ch = (char)va_arg(args, int);
+                *out++ = ch;
+                break;
+            }
+            case 'd':
+            {
+                int num = va_arg(args, int);
+                itoa(num, temp, 10);
+                break;
+            }
+            case 'x':
+            {
+                int num = va_arg(args, int);
+                itoa(num, temp, 16);
+                break;
+            }
+            case 's':
+            {
+                char* str = va_arg(args, char*);
+                strcpy(out, str);
+                out += strlen(str);
+                break;
+            }
+            default:
+            {
+                *out++ = c;
+                break;;
             }
         }
+
+        int temp_len = strlen(temp);
+        if (temp_len > 0)
+        {
+            padlen = padlen - temp_len;
+
+            for (uint8_t i = 0; i < padlen; i++)
+            {
+                *out++ = padchar;
+            }
+
+            strcpy(out, temp);
+            out += temp_len;
+        }
+
+        temp[0] = '\0';
     }
 
     va_end(args);
 
-    output[output_idx] = 0;
-    term_write_str(output);
+    *out = 0;
+    term_write_str(buffer);
 
-    return output_idx;
+    return out - buffer;
 }
