@@ -93,7 +93,8 @@ static void create_gdt_table(struct gdtr* gdtr)
 
 static void set_gdtr_register(struct gdtr* gdtr_value)
 {
-    // Disable interrupts and tell the CPU where the GDT is
+    // Disable interrupts and update the GDTR register to
+    // point to our new GDT
     asm volatile("cli");
     asm volatile("lgdt %0" : : "m" (*gdtr_value));
 
