@@ -1,6 +1,7 @@
 #include <simux/tty.h>
 #include <simux/cpu/cpuid.h>
 #include <simux/cpu/gdt.h>
+#include <simux/cpu/sysbus.h>
 #include <simux/cpu/isr.h>
 #include <simux/kernel.h>
 #include <simux/hbit.h>
@@ -15,7 +16,15 @@
 #endif
 
 
-void setup_descriptor_tables()
+static void on_key_pressed(void)
+{
+    u8 scancode = sysbus_io_in(0x60);
+
+    logk("Key pressed %d!\n", scancode);
+}
+
+
+static void setup_descriptor_tables()
 {
     #define GDT_LOCATION 0x800
 
@@ -23,9 +32,8 @@ void setup_descriptor_tables()
     const u32 idt_location = GDT_LOCATION + gdt_size + 1;
 
     isr_install(idt_location);
+    isr_add_interrupt_handler(IRQ1, (irq_handler)on_key_pressed);
 }
-
-
 
 extern "C" {
     void kmain(u32 boot_handover_eax) 
@@ -39,7 +47,7 @@ extern "C" {
         cpuid_identify_cpu(cpuinfo);
 
         while (true) {
-            //term_write(&c, 1);
+            asm volatile("hlt");
         }
     }
 }

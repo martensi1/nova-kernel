@@ -22,6 +22,7 @@ typedef void* (*irq_handler)(void);
 
 void isr_install(const u32 idt_location);
 void isr_add_interrupt_handler(irq_number irq, irq_handler handler);
+void isr_remove_interrupt_handler(irq_number irq);
 
 
 #endif // __SIMUX_ISR_H__

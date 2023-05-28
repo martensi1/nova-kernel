@@ -144,6 +144,17 @@ void isr_add_interrupt_handler(irq_number irq, irq_handler handler)
 }
 
 
+void isr_remove_interrupt_handler(irq_number irq)
+{
+    if (irq < 0 || irq >= IRQ_COUNT)
+    {
+        kpanic("IRQ out of range", irq);
+    }
+
+    irq_handlers[irq] = NULL;
+}
+
+
 // Called by the assembly interrupt handler
 extern "C" void on_exception_interrupt(u32 error_code, u32 interrupt_index)
 {
