@@ -16,7 +16,7 @@ void khalt(void)
     }
 }
 
-void kpanic(const char* message, const UInt32 data)
+void kpanic(const char* message, const u32 data)
 {
     asm volatile("cli");
     term_clear();
@@ -113,7 +113,7 @@ int printk(const char* fmt, ...)
         {
             padlen = padlen - temp_len;
 
-            for (UInt8 i = 0; i < padlen; i++)
+            for (u8 i = 0; i < padlen; i++)
             {
                 *out++ = padchar;
             }

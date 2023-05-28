@@ -6,13 +6,13 @@
 
 
 struct idtr {
-    UInt16 size;
-    UInt32 offset;
+    u16 size;
+    u32 offset;
 } __attribute__((packed));
 
 struct idt_entry {
-    UInt8 flags;
-    UInt32 offset;
+    u8 flags;
+    u32 offset;
 } __attribute__((packed));
 
 
@@ -23,10 +23,10 @@ static idt_entry idt_table[IDT_SIZE];
 
 
 
-static void write_descriptor(void* dest, UInt32 offset, UInt16 segment_selector, UInt8 flags)
+static void write_descriptor(void* dest, u32 offset, u16 segment_selector, u8 flags)
 {
-    UInt8* dest8 = (UInt8*)dest;
-    UInt8 i = 0;
+    u8* dest8 = (u8*)dest;
+    u8 i = 0;
 
     // Write offset (bit 0-15)
     dest8[i++] = offset & 0xFF;
@@ -47,9 +47,9 @@ static void write_descriptor(void* dest, UInt32 offset, UInt16 segment_selector,
     dest8[i++] = (offset >> 24) & 0xFF;
 }
 
-static void write_idt_table(const UInt32 location, struct idtr* idtr_value)
+static void write_idt_table(const u32 location, struct idtr* idtr_value)
 {
-    for (UInt16 i = 0; i < IDT_SIZE; i++) {
+    for (u16 i = 0; i < IDT_SIZE; i++) {
         void* dest = (void*)(location + (i * IDT_ENTRY_SIZE));
 
         // If no function is specified, write a null descriptor
@@ -64,8 +64,8 @@ static void write_idt_table(const UInt32 location, struct idtr* idtr_value)
 
             /*
             printk("IDT entry %d %x: ", i, entry->offset);
-            for (UInt8 j = 0; j < IDT_ENTRY_SIZE; j++) {
-                printk("%02x ", *((UInt8*)dest + j));
+            for (u8 j = 0; j < IDT_ENTRY_SIZE; j++) {
+                printk("%02x ", *((u8*)dest + j));
             }
             printk("\n");
             */
@@ -97,14 +97,14 @@ void idt_reset_gates(void)
 }
 
 
-void idt_set_gate(const UInt8 index, const UInt32 offset, const UInt16 flags)
+void idt_set_gate(const u8 index, const u32 offset, const u16 flags)
 {
     idt_table[index].flags = flags;
     idt_table[index].offset = offset;
 }
 
 
-void idt_write_and_load(const UInt32 location)
+void idt_write_and_load(const u32 location)
 {
     struct idtr idtr_value;
 

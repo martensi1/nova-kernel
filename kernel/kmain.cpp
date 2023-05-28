@@ -34,8 +34,8 @@ void setup_descriptor_tables()
 {
     #define GDT_LOCATION 0x800
 
-    const UInt16 gdt_size = gdt_initialize(GDT_LOCATION);
-    const UInt32 idt_location = GDT_LOCATION + gdt_size + 1;
+    const u16 gdt_size = gdt_initialize(GDT_LOCATION);
+    const u32 idt_location = GDT_LOCATION + gdt_size + 1;
 
     isr_install(idt_location);
 }
@@ -43,7 +43,7 @@ void setup_descriptor_tables()
 
 
 extern "C" {
-    void kmain(uint32_t boot_handover_eax) 
+    void kmain(u32 boot_handover_eax) 
     {
         term_initialize();
         sbit_run(boot_handover_eax);

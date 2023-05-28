@@ -29,10 +29,10 @@ http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
 static const size_t VGA_WIDTH = VGA_TEXT_MODE_WIDTH;
 static const size_t VGA_HEIGHT = VGA_TEXT_MODE_HEIGHT;
 
-static uint16_t* vga_buffer;
+static u16* vga_buffer;
 static size_t vga_column;
 static size_t vga_row;
-static uint8_t vga_write_color;
+static u8 vga_write_color;
 
 
 enum vga_color {
@@ -56,27 +56,27 @@ enum vga_color {
 
 
 
-static inline uint8_t read_register(uint8_t index)
+static inline u8 read_register(u8 index)
 {
     sysbus_io_out(VGA_INDEX_PORT, index);
     return sysbus_io_in(VGA_DATA_PORT);
 }
 
-static inline void write_register(uint8_t index, uint8_t value)
+static inline void write_register(u8 index, u8 value)
 {
     sysbus_io_out(VGA_INDEX_PORT, index);
     sysbus_io_out(VGA_DATA_PORT, value);
 }
 
-static inline void write_video_memory(char c, uint8_t color, size_t x, size_t y)
+static inline void write_video_memory(char c, u8 color, size_t x, size_t y)
 {
     const size_t offset = y * VGA_WIDTH + x;
-    uint16_t byte = (uint16_t)c | (uint16_t)color << 8;
+    u16 byte = (u16)c | (u16)color << 8;
 
     vga_buffer[offset] = byte;
 }
 
-static inline void set_mode(uint8_t mode)
+static inline void set_mode(u8 mode)
 {
     write_register(VGA_REGISTER_MODE, mode);
 }
@@ -85,14 +85,14 @@ static inline void set_cursor_pos(size_t x, size_t y)
 {
     size_t offset = y * VGA_WIDTH + x;
 
-    write_register(VGA_REGISTER_CURSOR_HIGH, (uint8_t)(offset >> 8));
-    write_register(VGA_REGISTER_CURSOR_LOW, (uint8_t)(offset & 0xFF));
+    write_register(VGA_REGISTER_CURSOR_HIGH, (u8)(offset >> 8));
+    write_register(VGA_REGISTER_CURSOR_LOW, (u8)(offset & 0xFF));
 }
 
-static inline void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
+static inline void enable_cursor(u8 cursor_start, u8 cursor_end)
 {
-    uint8_t start_value = read_register(VGA_REGISTER_CURSOR_START);
-    uint8_t end_value = read_register(VGA_REGISTER_CURSOR_END);
+    u8 start_value = read_register(VGA_REGISTER_CURSOR_START);
+    u8 end_value = read_register(VGA_REGISTER_CURSOR_END);
 
     start_value = (start_value & 0xC0) | (cursor_start & 0x0F);
     end_value = (end_value & 0xE0) | (cursor_end & 0x0F);
@@ -103,7 +103,7 @@ static inline void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
 
 static inline void disable_cursor(void)
 {
-    uint8_t value = 0x01 << 5;
+    u8 value = 0x01 << 5;
     write_register(VGA_REGISTER_CURSOR_START, value);
 }
 
@@ -125,7 +125,7 @@ static void scroll_up(void) {
 
 static void set_write_color(vga_color foreground, vga_color background)
 {
-    uint8_t color_byte = foreground | background << 4;
+    u8 color_byte = foreground | background << 4;
     vga_write_color = color_byte;
 }
 
@@ -141,7 +141,7 @@ void vga_initialize(void)
     vga_column = 0;
     vga_row = 0;
 
-    vga_buffer = (uint16_t*)VGA_TEXT_BUFFER_ADDRESS;
+    vga_buffer = (u16*)VGA_TEXT_BUFFER_ADDRESS;
     
     set_mode(0x03);
     set_write_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);

@@ -26,10 +26,10 @@ static inline bool has_cpuid(void)
     return flagreg_test_if_changeable(flag);
 }
 
-static inline void get_cpuid(uint32_t request, uint32_t* eax, uint32_t* ebx, uint32_t* ecx, uint32_t* edx)
+static inline void get_cpuid(u32 request, u32* eax, u32* ebx, u32* ecx, u32* edx)
 {
-    uint32_t cpuid_eax = request;
-    uint32_t cpuid_ecx = 0;
+    u32 cpuid_eax = request;
+    u32 cpuid_ecx = 0;
 
     asm volatile("cpuid"
         : "=a" (*eax), "=b" (*ebx), "=c" (*ecx), "=d" (*edx)
@@ -38,7 +38,7 @@ static inline void get_cpuid(uint32_t request, uint32_t* eax, uint32_t* ebx, uin
 }
 
 
-static void registers_to_string(uint32_t ebx, uint32_t ecx, uint32_t edx, char* result)
+static void registers_to_string(u32 ebx, u32 ecx, u32 edx, char* result)
 {
     result[0] = ebx & 0xFF;
     result[1] = (ebx >> 8) & 0xFF;
@@ -61,7 +61,7 @@ static void registers_to_string(uint32_t ebx, uint32_t ecx, uint32_t edx, char* 
 
 static void fill_vendor_and_max_input(cpuinfo_x86* cpuinfo)
 {
-    uint32_t eax, ebx, ecx, edx;
+    u32 eax, ebx, ecx, edx;
     get_cpuid(CPUID_LEVEL_AND_VENDOR, &eax, &ebx, &ecx, &edx);
 
     cpuinfo->level = eax;
@@ -76,7 +76,7 @@ static void fill_version_and_features(cpuinfo_x86* cpuinfo)
         return;
     }
 
-    uint32_t eax, ebx, ecx, edx;
+    u32 eax, ebx, ecx, edx;
     get_cpuid(CPUID_VERSION_AND_FEATURES, &eax, &ebx, &ecx, &edx);
 
     cpuinfo->stepping = eax & 0xF;
@@ -86,13 +86,13 @@ static void fill_version_and_features(cpuinfo_x86* cpuinfo)
 
     // If family ID is 15 (0xF), add extended family ID to family ID
     if (cpuinfo->family_id == 0xF) {
-        uint8_t extended_family_id = (eax >> 20) & 0xFF;
+        u8 extended_family_id = (eax >> 20) & 0xFF;
         cpuinfo->family_id = cpuinfo->family_id + extended_family_id;
     }
 
     // If family ID is 6 (0x6) or 15 (0xF), add extended model ID to model ID
     if (cpuinfo->family_id == 0xF || cpuinfo->family_id == 0x6) {
-        uint8_t extended_model_id = (eax >> 16) & 0xF;
+        u8 extended_model_id = (eax >> 16) & 0xF;
         cpuinfo->model_id = cpuinfo->model_id + (extended_model_id << 4);
     }
 
@@ -118,7 +118,7 @@ void cpuid_identify_cpu(cpuinfo_x86& cpuinfo)
     fill_version_and_features(&cpuinfo);
 }
 
-bool cpuid_has_feature(const uint32_t features, uint32_t feature)
+bool cpuid_has_feature(const u32 features, u32 feature)
 {
     return (features & feature) != 0;
 }

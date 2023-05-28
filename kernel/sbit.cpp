@@ -2,7 +2,7 @@
 #include <simux/kernel.h>
 
 
-static void check_if_multiboot_loaded(uint32_t boot_handover_eax)
+static void check_if_multiboot_loaded(u32 boot_handover_eax)
 {
     #define MULTIBOOT_SPEC_MAGIC_BYTE 0x2BADB002
 
@@ -18,7 +18,7 @@ static void check_if_multiboot_loaded(uint32_t boot_handover_eax)
 
 static void check_cpu_mode(void) 
 {
-    uint32_t cr0;
+    u32 cr0;
     asm volatile("mov %%cr0, %0" : "=r" (cr0));
 
     if (cr0 & 0x1) {
@@ -31,17 +31,17 @@ static void check_cpu_mode(void)
 
 static void check_start_address(void)
 {
-    extern uint32_t kernel_start;
+    extern u32 kernel_start;
     #define EXPECTED_KERNEL_START_ADDRESS 0x100000
 
-    if (&kernel_start != (uint32_t*)EXPECTED_KERNEL_START_ADDRESS)
+    if (&kernel_start != (u32*)EXPECTED_KERNEL_START_ADDRESS)
     {
-        kpanic("Kernel start address is not 0x100000", (uint32_t)&kernel_start);
+        kpanic("Kernel start address is not 0x100000", (u32)&kernel_start);
     }
 }
 
 
-void sbit_run(uint32_t boot_handover_eax)
+void sbit_run(u32 boot_handover_eax)
 {
     printk("Running SBIT (Start-up Buildt-in Test)\n");
 

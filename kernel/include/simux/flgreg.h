@@ -14,10 +14,10 @@ enum cpu_flag {
 /// @return True if flag is changeable, false otherwise
 inline bool flagreg_test_if_changeable(cpu_flag flag)
 {
-	uint32_t flags_1 = 0;
-    uint32_t flags_2 = 0;
+	u32 flags_1 = 0;
+    u32 flags_2 = 0;
 
-    uint32_t mask = 1 << (uint32_t)flag;
+    u32 mask = 1 << (u32)flag;
 
     // 1. Push CPU flags onto the stack
     // 2. Pop flags to flags_1, also copy to flags_2
@@ -39,7 +39,7 @@ inline bool flagreg_test_if_changeable(cpu_flag flag)
 		: "ir" (mask)
     );
 
-	uint32_t nonzero_if_different = flags_1 ^ flags_2;
+	u32 nonzero_if_different = flags_1 ^ flags_2;
 	return nonzero_if_different != 0;
 }
 

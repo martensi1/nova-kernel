@@ -20,7 +20,7 @@ This file contains functions that are used to configure and manage the PIC (spec
 #define PIC_COMMAND_EOI 0x20 // End of Interrupt
 
 
-void pic_initialize(UInt8 irq_base)
+void pic_initialize(u8 irq_base)
 {
     // The PIC initialization sequence is done by sending a sequence of 
     // ICWs (Initialization Command Words) to the PIC.
@@ -54,7 +54,7 @@ void pic_disable_irqs(void)
     sysbus_io_out(SECONDARY_PIC_DATA_PORT, 0xFF);
 }
 
-void pic_send_eoi(UInt8 irq)
+void pic_send_eoi(u8 irq)
 {
     if (irq >= 8)
     {

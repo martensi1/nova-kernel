@@ -48,7 +48,7 @@
 #define DS_KERNEL 0x10
 
 
-UInt16 gdt_initialize(const UInt32 location);
+u16 gdt_initialize(const u32 location);
 
 
 #endif // __SIMUX_GDT_H__

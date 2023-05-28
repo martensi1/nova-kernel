@@ -6,13 +6,13 @@
 
 
 
-extern "C" void on_exception_interrupt(UInt32 error_code, UInt32 interrupt_index)
+extern "C" void on_exception_interrupt(u32 error_code, u32 interrupt_index)
 {
     static_cast<void>(error_code);
     kpanic("CPU exception", interrupt_index);
 }
 
-extern "C" void on_irq_interrupt(UInt32 irq_number, UInt32 interrupt_index)
+extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
 {
     printk("IRQ handler called! irq: %d, interrupt: %d\n", irq_number, interrupt_index);
     pic_send_eoi(irq_number);
@@ -21,10 +21,10 @@ extern "C" void on_irq_interrupt(UInt32 irq_number, UInt32 interrupt_index)
 
 // Find 
 #define LOCATE_EXCEPTION_ISR(x) extern "C" void cpuex_##x(void);
-#define INSTALL_EXCEPTION_ISR(x) idt_set_gate(x, (UInt32)cpuex_##x, IDT_TRAP_GATE_PL0);
+#define INSTALL_EXCEPTION_ISR(x) idt_set_gate(x, (u32)cpuex_##x, IDT_TRAP_GATE_PL0);
 
 #define LOCATE_IRQ_ISR(x) extern "C" void irq_##x(void);
-#define INSTALL_IRQ_ISR(x) idt_set_gate(x + 32, (UInt32)irq_##x, IDT_INTERRUPT_GATE_PL0);
+#define INSTALL_IRQ_ISR(x) idt_set_gate(x + 32, (u32)irq_##x, IDT_INTERRUPT_GATE_PL0);
 
 
 // CPU exceptions
@@ -74,7 +74,7 @@ LOCATE_IRQ_ISR(8);
 
 
 
-void isr_install(const UInt32 idt_location)
+void isr_install(const u32 idt_location)
 {
     idt_reset_gates();
 

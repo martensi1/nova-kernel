@@ -4,14 +4,14 @@
 #include <stdint.h>
 
 
-typedef int8_t SInt8;
-typedef int16_t SInt16;
-typedef int32_t SInt32;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
 
 
-typedef uint8_t UInt8;
-typedef uint16_t UInt16;
-typedef uint32_t UInt32;
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
 
 
 #endif // __SIMUX_DATA_TYPES_H__

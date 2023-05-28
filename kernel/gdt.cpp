@@ -5,16 +5,16 @@
 
 
 struct gdtr {
-    UInt16 size;
-    UInt32 offset;
+    u16 size;
+    u32 offset;
 } __attribute__((packed));
 
 
 
-static void* write_descriptor(void* dest, UInt32 base, UInt32 limit, UInt16 flags)
+static void* write_descriptor(void* dest, u32 base, u32 limit, u16 flags)
 {
-    uint8_t* dest8 = (uint8_t*)dest;
-    uint8_t i = 0;
+    u8* dest8 = (u8*)dest;
+    u8 i = 0;
 
     // Write limit (bit 0-15)
     dest8[i++] = limit & 0xFF;
@@ -36,7 +36,7 @@ static void* write_descriptor(void* dest, UInt32 base, UInt32 limit, UInt16 flag
     return (void*)dest8;
 }
 
-static void create_gdt_table(const UInt32 location, struct gdtr* gdtr_value)
+static void create_gdt_table(const u32 location, struct gdtr* gdtr_value)
 {
     void* dest = (void*)location;
 
@@ -48,7 +48,7 @@ static void create_gdt_table(const UInt32 location, struct gdtr* gdtr_value)
     dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
     dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
 
-    gdtr_value->size = (UInt16)((UInt32)dest - location);
+    gdtr_value->size = (u16)((u32)dest - location);
     gdtr_value->offset = location;
 
     printk("Global Descriptor Table created at 0x%x\n", location);
@@ -78,7 +78,7 @@ static void set_gdtr_register(struct gdtr* gdtr_value)
 }
 
 
-UInt16 gdt_initialize(const UInt32 location)
+u16 gdt_initialize(const u32 location)
 {
     struct gdtr gdtr_value;
 

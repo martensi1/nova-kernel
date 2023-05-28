@@ -22,9 +22,9 @@
 
 
 void idt_reset_gates(void);
-void idt_set_gate(const UInt8 index, const UInt32 offset, const UInt16 flags);
+void idt_set_gate(const u8 index, const u32 offset, const u16 flags);
 
-void idt_write_and_load(const UInt32 location);
+void idt_write_and_load(const u32 location);
 
 
 #endif // __SIMUX_IDT_H__

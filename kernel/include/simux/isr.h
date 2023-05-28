@@ -4,7 +4,7 @@
 #include <simux/types.h>
 
 
-void isr_install(const UInt32 idt_location);
+void isr_install(const u32 idt_location);
 
 
 #endif // __SIMUX_ISR_H__

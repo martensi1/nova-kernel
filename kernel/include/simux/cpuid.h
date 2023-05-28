@@ -1,7 +1,7 @@
 #ifndef __SIMUX_CPU_ID_H__
 #define __SIMUX_CPU_ID_H__
 
-#include <stdint.h>
+#include <simux/types.h>
 
 
 // Processor vendor ID strings
@@ -114,27 +114,27 @@ enum cpu_id_features_edx {
 
 
 struct cpuinfo_x86 {
-    uint8_t level;
+    u8 level;
 
     #define CPUID_STRING_SIZE 12
     char vendor_name[CPUID_STRING_SIZE+1];
     
-    uint16_t stepping;
-    uint32_t model_id;
-    uint32_t family_id;
-    uint8_t processor_type;
-    uint8_t brand_id;
-    uint8_t cache_line_size;
-    uint8_t cpu_count;
-    uint8_t local_apic_id;
+    u16 stepping;
+    u32 model_id;
+    u32 family_id;
+    u8 processor_type;
+    u8 brand_id;
+    u8 cache_line_size;
+    u8 cpu_count;
+    u8 local_apic_id;
 
-    uint32_t features_ecx;
-    uint32_t features_edx;
+    u32 features_ecx;
+    u32 features_edx;
 };
 
 
 void cpuid_identify_cpu(cpuinfo_x86& cpuinfo);
-bool cpuid_has_feature(const uint32_t features, uint32_t feature);
+bool cpuid_has_feature(const u32 features, u32 feature);
 
 
 #endif // __SIMUX_CPU_ID_H__
