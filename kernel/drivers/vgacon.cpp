@@ -108,11 +108,11 @@ static inline void disable_cursor(void)
 }
 
 static void scroll_up(void) {
-    for (size_t y = 1; y < VGA_HEIGHT; y++) {
+    for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
             const size_t index = y * VGA_WIDTH + x;
-            const size_t prev_index = (y - 1) * VGA_WIDTH + x;
-            vga_buffer[prev_index] = vga_buffer[index];
+            const size_t next_index = (y + 1) * VGA_WIDTH + x;
+            vga_buffer[index] = vga_buffer[next_index];
         }
     }
 }
@@ -145,7 +145,7 @@ void vga_write_line_feed(void)
 {
     vga_column = 0;
 
-    if (vga_row == VGA_HEIGHT && false) {
+    if (vga_row == VGA_HEIGHT) {
         scroll_up();
     }
     else {
