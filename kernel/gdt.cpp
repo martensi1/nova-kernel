@@ -4,11 +4,10 @@
 #include <stdint.h>
 
 
-// NOTE!
-// The following code is based on the following assumptions:
+// Note! The following code is based on the following assumptions:
 // - Endianness is little endian
 // - Bit fields for individual bytes are ordered from left to right (MSB to LSB)
-// If not, code will need to be changed accordingly (with #pragma reverse_bitfields on?)
+// - If not, code will need to be changed accordingly (with #pragma reverse_bitfields on?)
 #define SEGMENT_PRESENT(x)          (((x) & 0x01) << 0x07) // Present
 #define SEGMENT_PRIVILEGE(x)        (((x) & 0x03) << 0x05) // Privilege level (0 - 3)
 #define SEGMENT_DESCRIPTOR_TYPE(x)  (((x) & 0x01) << 0x04) // Descriptor type (0 for system, 1 for code/data)
@@ -41,13 +40,13 @@
 
 
 struct gdtr {
-    uint16_t size;
-    uint32_t offset;
+    UInt16 size;
+    UInt32 offset;
 } __attribute__((packed));
 
 
 
-static void* write_descriptor(void* dest, uint32_t base, uint32_t limit, uint16_t flags)
+static void* write_descriptor(void* dest, UInt32 base, UInt32 limit, UInt16 flags)
 {
     uint8_t* dest8 = (uint8_t*)dest;
     uint8_t i = 0;
@@ -72,10 +71,9 @@ static void* write_descriptor(void* dest, uint32_t base, uint32_t limit, uint16_
     return (void*)dest8;
 }
 
-static void create_gdt_table(struct gdtr* gdtr)
+static void create_gdt_table(const UInt32 location, struct gdtr* gdtr_value)
 {
-    #define GDT_LOCATION 0x0800
-    void* dest = (void*)GDT_LOCATION;
+    void* dest = (void*)location;
 
     // We want to use paging and not segmentation, so we define 
     // 4 large overlapping segments that cover the entire 4GB address space
@@ -85,10 +83,10 @@ static void create_gdt_table(struct gdtr* gdtr)
     dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
     dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
 
-    gdtr->size = (uint16_t)((uint32_t)dest - GDT_LOCATION);
-    gdtr->offset = GDT_LOCATION;
+    gdtr_value->size = (UInt16)((UInt32)dest - location);
+    gdtr_value->offset = location;
 
-    printk("Global Descriptor Table created at 0x%x\n", GDT_LOCATION);
+    printk("Global Descriptor Table created at 0x%x\n", location);
 }
 
 static void set_gdtr_register(struct gdtr* gdtr_value)
@@ -121,12 +119,14 @@ static void set_gdtr_register(struct gdtr* gdtr_value)
 }
 
 
-void gdt_initialize(void)
+UInt16 gdt_initialize(const UInt32 location)
 {
     struct gdtr gdtr_value;
 
-    create_gdt_table(&gdtr_value);
+    create_gdt_table(location, &gdtr_value);
     set_gdtr_register(&gdtr_value);
+
+    return gdtr_value.size;
 }
 
 

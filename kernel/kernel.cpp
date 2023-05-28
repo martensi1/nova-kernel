@@ -1,5 +1,6 @@
 #include <simux/kernel.h>
 #include <simux/tty.h>
+#include <simux/types.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
 #include <libc/ctype.h>
@@ -8,16 +9,16 @@
 
 void khalt(void)
 {
+    asm volatile("cli");
+
     while (true) {
-        asm volatile("cli");
         asm volatile("hlt");
     }
 }
 
-void kpanic(const char* message, uint32_t data)
+void kpanic(const char* message, const UInt32 data)
 {
     asm volatile("cli");
-
     term_clear();
 
     printk("Kernel panic!\n");
@@ -112,7 +113,7 @@ int printk(const char* fmt, ...)
         {
             padlen = padlen - temp_len;
 
-            for (uint8_t i = 0; i < padlen; i++)
+            for (UInt8 i = 0; i < padlen; i++)
             {
                 *out++ = padchar;
             }
