@@ -4,41 +4,6 @@
 #include <stdint.h>
 
 
-// Note! The following code is based on the following assumptions:
-// - Endianness is little endian
-// - Bit fields for individual bytes are ordered from left to right (MSB to LSB)
-// - If not, code will need to be changed accordingly (with #pragma reverse_bitfields on?)
-#define SEGMENT_PRESENT(x)          (((x) & 0x01) << 0x07) // Present
-#define SEGMENT_PRIVILEGE(x)        (((x) & 0x03) << 0x05) // Privilege level (0 - 3)
-#define SEGMENT_DESCRIPTOR_TYPE(x)  (((x) & 0x01) << 0x04) // Descriptor type (0 for system, 1 for code/data)
-#define SEGMENT_GRANULARITY(x)      (((x) & 0x01) << 0x0F) // Granularity (limit unit, 0 for bytes, 1 for 4KB pages)
-#define SEGMENT_SIZE(x)             (((x) & 0x01) << 0x0E) // Size (0 for 16-bit protected mode segment, 1 for 32-bit protected mode segment)
-#define SEGMENT_LONG_MODE(x)        (((x) & 0x01) << 0x0D) // Long mode (1 for 64-bit code segment, 0 otherwise)
-
-#define SEGMENT_DATA_RD             0x00 // Read-Only
-#define SEGMENT_DATA_RDEXPD         0x04 // Read-Only, expand-Down
-#define SEGMENT_DATA_RDWR           0x02 // Read/Write
-#define SEGMENT_DATA_RDWREXPD       0x06 // Read/Write, expand-Down
-#define SEGMENT_CODE_EX             0x08 // Execute-Only
-#define SEGMENT_CODE_EXC            0x0C // Execute-Only, conforming
-#define SEGMENT_CODE_EXRD           0x0A // Execute/Read
-#define SEGMENT_CODE_EXRDC          0x0E // Execute/Read, conforming
-
-
-// Defined segments
-#define GDT_SEGMENT_CODE_PL0 SEGMENT_PRESENT(1)     | SEGMENT_PRIVILEGE(0) | SEGMENT_DESCRIPTOR_TYPE(1) | \
-                             SEGMENT_GRANULARITY(1) | SEGMENT_SIZE(1)      | SEGMENT_LONG_MODE(0) | SEGMENT_CODE_EXRD
-
-#define GDT_SEGMENT_DATA_PL0 SEGMENT_PRESENT(1)     | SEGMENT_PRIVILEGE(0) | SEGMENT_DESCRIPTOR_TYPE(1) | \
-                             SEGMENT_GRANULARITY(1) | SEGMENT_SIZE(1)      | SEGMENT_LONG_MODE(0) | SEGMENT_DATA_RDWR
-
-#define GDT_SEGMENT_CODE_PL3 SEGMENT_PRESENT(1)     | SEGMENT_PRIVILEGE(3) | SEGMENT_DESCRIPTOR_TYPE(1) | \
-                             SEGMENT_GRANULARITY(1) | SEGMENT_SIZE(1)      | SEGMENT_LONG_MODE(0) | SEGMENT_CODE_EXRD
-
-#define GDT_SEGMENT_DATA_PL3 SEGMENT_PRESENT(1)     | SEGMENT_PRIVILEGE(3) | SEGMENT_DESCRIPTOR_TYPE(1) | \
-                             SEGMENT_GRANULARITY(1) | SEGMENT_SIZE(1)      | SEGMENT_LONG_MODE(0) | SEGMENT_DATA_RDWR
-
-
 struct gdtr {
     UInt16 size;
     UInt32 offset;
@@ -98,22 +63,16 @@ static void set_gdtr_register(struct gdtr* gdtr_value)
 
     // Now when we have a new GDT, we need to set the segment registers
     // to point to the correct segments (for us kernel code and data segments)
-    //
-    // The segment registers are 16 bits, and the first 13 bits are the index
-    // of the segment in the GDT, and the last 3 bits are if it's a GDT or LDT
-    // and the privilege level
-    // 0x08 -> kernel code segment (index 1, GDT, privilege level 0)
-    // 0x10 -> kernel data segment (index 2, GDT, privilege level 0)
     asm volatile("\
-        mov $0x10, %ax\n \
-        mov %ax, %ds\n \
-        mov %ax, %es\n \
-        mov %ax, %fs\n \
-        mov %ax, %gs\n \
-        mov %ax, %ss\n \
-        jmp $0x08, $gdt_jump\n \
+        mov %0, %%ax\n \
+        mov %%ax, %%ds\n \
+        mov %%ax, %%es\n \
+        mov %%ax, %%fs\n \
+        mov %%ax, %%gs\n \
+        mov %%ax, %%ss\n \
+        jmp %1, $gdt_jump\n \
         gdt_jump:\n \
-        ");
+        " : : "i" (DS_KERNEL), "i" (CS_KERNEL));
     
     printk("GDTR register set, reloaded segment descriptors\n");
 }

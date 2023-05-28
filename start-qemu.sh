@@ -5,11 +5,29 @@ ELF_FILE="./bin/simux_kernel.elf"
 sh ./kill-qemu.sh
 
 if [ $1 = "-debug-deamon" ]; then
-    qemu-system-i386 -m $QEMU_MEMORY -drive "$QEMU_DRIVE" -s -S -vnc :5 -daemonize
+    qemu-system-i386 \
+    -m $QEMU_MEMORY \
+    -drive "$QEMU_DRIVE" \
+    -s \
+    -S \
+    -vnc :5 \
+    -daemonize
+
     sleep 1
-    gdb -ex "target remote localhost:1234" -ex "symbol-file ./bin/simux_kernel.elf" -ex "break kmain" -ex "continue"
+
+    gdb \
+    -ex "target remote localhost:1234" \
+    -ex "symbol-file ./bin/simux_kernel.elf" \
+    -ex "break kmain" \
+    -ex "continue"
 else
-    qemu-system-i386 -m $QEMU_MEMORY -drive "$QEMU_DRIVE" -curses -serial /dev/tty
+    qemu-system-i386 \
+    -m $QEMU_MEMORY \
+    -drive "$QEMU_DRIVE" \
+    -curses \
+    -serial /dev/tty \
+    -usbdevice mouse \
+    -usbdevice keyboard
 fi
 
 sh ./kill-qemu.sh

@@ -116,6 +116,11 @@ static void scroll_up(void) {
             vga_buffer[next_index] = 0;
         }
     }
+
+    for (size_t x = 0; x < VGA_WIDTH; x++) {
+        const size_t index = (VGA_HEIGHT - 1) * VGA_WIDTH + x;
+        vga_buffer[index] = 0;
+    }
 }
 
 static void set_write_color(vga_color foreground, vga_color background)
@@ -188,6 +193,9 @@ void vga_clear(void)
             write_video_memory(' ', vga_write_color, x, y);
         }
     }
+
+    vga_column = 0;
+    vga_row = 0;
 }
 
 

@@ -27,14 +27,14 @@ inline bool flagreg_test_if_changeable(cpu_flag flag)
 	// 6. Pop flags to flags_1
 	// 7. Compare flags_1 and flags_2, if they are different, then the flag is changeable  
 	asm volatile (
-		"pushfl		\n\t"
-		"popl %0		\n\t"
-		"movl %0, %1	\n\t"
-		"xorl %2, %0	\n\t"
-		"pushl %0		\n\t"
-		"popfl		\n\t"
-		"pushfl		\n\t"
-		"popl %0		\n\t"
+		"pushfl		 \n"
+		"popl %0     \n"
+		"movl %0, %1 \n"
+		"xorl %2, %0 \n"
+		"pushl %0	 \n"
+		"popfl		 \n"
+		"pushfl		 \n"
+		"popl %0	 \n"
 		: "=&r" (flags_1), "=&r" (flags_2)
 		: "ir" (mask)
     );

@@ -21,7 +21,7 @@ void kpanic(const char* message, const UInt32 data)
     asm volatile("cli");
     term_clear();
 
-    printk("Kernel panic!\n");
+    printk("\n\nKernel panic!\n");
     printk("Message: %s\n", message);
     printk("Data: 0x%x\n", data);
 
