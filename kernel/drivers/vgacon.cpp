@@ -113,6 +113,7 @@ static void scroll_up(void) {
             const size_t index = y * VGA_WIDTH + x;
             const size_t next_index = (y + 1) * VGA_WIDTH + x;
             vga_buffer[index] = vga_buffer[next_index];
+            vga_buffer[next_index] = 0;
         }
     }
 }
