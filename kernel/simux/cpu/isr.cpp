@@ -127,5 +127,5 @@ void isr_install(const u32 idt_location)
     pic_initialize(32);
     pic_enable_irqs();
 
-    asm volatile("sti");
+    // asm volatile("sti");
 }

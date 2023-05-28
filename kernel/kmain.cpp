@@ -3,7 +3,7 @@
 #include <simux/cpu/gdt.h>
 #include <simux/cpu/isr.h>
 #include <simux/kernel.h>
-#include <simux/sbit.h>
+#include <simux/hbit.h>
 
 
 #if !defined(__i386__)
@@ -46,7 +46,7 @@ extern "C" {
     void kmain(u32 boot_handover_eax) 
     {
         term_initialize();
-        sbit_run(boot_handover_eax);
+        hbit_run(boot_handover_eax);
 
         setup_descriptor_tables();
 
