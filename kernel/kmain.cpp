@@ -1,9 +1,9 @@
 #include <simux/tty.h>
-#include <simux/cpuid.h>
+#include <simux/cpu/cpuid.h>
+#include <simux/cpu/gdt.h>
+#include <simux/cpu/isr.h>
 #include <simux/kernel.h>
 #include <simux/sbit.h>
-#include <simux/gdt.h>
-#include <simux/isr.h>
 
 
 #if !defined(__i386__)

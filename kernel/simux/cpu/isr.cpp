@@ -1,6 +1,6 @@
-#include <simux/isr.h>
-#include <simux/idt.h>
-#include <simux/pic.h>
+#include <simux/cpu/isr.h>
+#include <simux/cpu/idt.h>
+#include <simux/pic/pic.h>
 #include <simux/kernel.h>
 #include <libc/string.h>
 

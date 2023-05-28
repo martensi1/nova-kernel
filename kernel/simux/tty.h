@@ -1,7 +1,7 @@
 #ifndef __SIMUX_TERMINAL_H__
 #define __SIMUX_TERMINAL_H__
 
-#include <simux/condrv.h>
+#include <simux/drivers/condrv.h>
 
 
 void term_initialize();

@@ -7,8 +7,8 @@
  *    https://wiki.osdev.org/CPUID
  *    https://www.felixcloutier.com/x86/cpuid
 */
-#include <simux/cpuid.h>
-#include <simux/flgreg.h>
+#include <simux/cpu/cpuid.h>
+#include <simux/cpu/flgreg.h>
 #include <simux/kernel.h>
 #include <stdint.h>
 

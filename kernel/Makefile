@@ -15,15 +15,17 @@ else
 endif
 
 # Define source and object directories
-INC_DIR := -I include -I ../libc/include/
+INC_DIR := -I . -I ../libc/include/
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin
 
 ASM_FILES := $(wildcard $(SRC_DIR)/*.asm)
 ASM_FILES += $(wildcard $(SRC_DIR)/*/*.asm)
+ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*.asm)
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 CPP_FILES += $(wildcard $(SRC_DIR)/*/*.cpp)
+CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*.cpp)
 
 ASM_OBJS := $(patsubst ./%.asm, $(OBJ_DIR)/%.o, $(ASM_FILES))
 CPP_OBJS := $(patsubst ./%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))

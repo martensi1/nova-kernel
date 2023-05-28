@@ -2,8 +2,8 @@
 PIC (Programmable Interrupt Controller) is a chip that is used to manage interrupts.
 This file contains functions that are used to configure and manage the PIC (specifically the 8259 chip).
 */
-#include <simux/pic.h>
-#include <simux/sysbus.h>
+#include <simux/pic/pic.h>
+#include <simux/cpu/sysbus.h>
 
 
 #define PRIMARY_PIC_COMMAND_PORT 0x20

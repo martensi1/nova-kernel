@@ -3,8 +3,8 @@ VGA console driver
 https://wiki.osdev.org/Text_Mode_Cursor
 http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
 */
-#include <simux/sysbus.h>
-#include <simux/condrv.h>
+#include <simux/cpu/sysbus.h>
+#include <simux/drivers/condrv.h>
 #include <stdint.h>
 #include <string.h>
 

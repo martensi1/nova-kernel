@@ -1,4 +1,4 @@
-#include <simux/gdt.h>
+#include <simux/cpu/gdt.h>
 #include <simux/kernel.h>
 #include <libc/string.h>
 #include <stdint.h>

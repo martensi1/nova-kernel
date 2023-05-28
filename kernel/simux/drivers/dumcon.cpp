@@ -2,8 +2,8 @@
 Dummy console driver
 Used if no other console driver is available
 */
-#include <simux/sysbus.h>
-#include <simux/condrv.h>
+#include <simux/cpu/sysbus.h>
+#include <simux/drivers/condrv.h>
 #include <stdint.h>
 #include <string.h>
 
