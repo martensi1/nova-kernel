@@ -7,30 +7,10 @@
 #include <stdarg.h>
 
 
-void khalt(void)
+// -- Private functions --
+int _printk(const char* fmt, va_list args)
 {
-    asm volatile("cli");
-
-    while (true) {
-        asm volatile("hlt");
-    }
-}
-
-void kpanic(const char* message, const u32 data)
-{
-    asm volatile("cli");
-    term_clear();
-
-    printk("\n\nKernel panic!\n");
-    printk("Message: %s\n", message);
-    printk("Data: 0x%x\n", data);
-
-    khalt();
-}
-
-int printk(const char* fmt, ...)
-{
-    if (fmt == NULL) {
+     if (fmt == NULL) {
         return 0;
     }
 
@@ -39,9 +19,6 @@ int printk(const char* fmt, ...)
 
     char* out = buffer;
     char c = 0;
-
-    va_list args;
-    va_start(args, fmt);
 
     while (true)
     {
@@ -125,10 +102,59 @@ int printk(const char* fmt, ...)
         temp[0] = '\0';
     }
 
-    va_end(args);
-
     *out = 0;
     term_write_str(buffer);
 
     return out - buffer;
+}
+
+
+// -- Public functions --
+
+void khalt(void)
+{
+    asm volatile("cli");
+
+    while (true) {
+        asm volatile("hlt");
+    }
+}
+
+void kpanic(const char* message, const u32 data)
+{
+    asm volatile("cli");
+    term_clear();
+
+    logk("\n\nKernel panic!\n");
+    logk("Message: %s\n", message);
+    logk("Data: 0x%x\n", data);
+
+    khalt();
+}
+
+void logk(const char* fmt, ...)
+{
+    if (fmt == NULL) {
+        return;
+    }
+
+    char buffer[300];
+    
+    strcpy(buffer, "[Kernel]: ");
+    strcat(buffer, fmt);
+
+    va_list args;
+    va_start(args, fmt);
+    _printk(buffer, args);
+    va_end(args);
+}
+
+int printk(const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    int ret = _printk(fmt, args);
+    va_end(args);
+
+    return ret;
 }

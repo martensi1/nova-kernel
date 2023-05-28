@@ -105,17 +105,42 @@ static void fill_version_and_features(cpuinfo_x86* cpuinfo)
     cpuinfo->features_edx = edx;
 }
 
+static void print_cpu_info(cpuinfo_x86* cpuinfo)
+{
+    return;
+
+    logk(
+        "CPUID information: Level: %d, Vendor: \"%s\", Family ID: %d, Model ID: %d, Stepping: %d, Processor Type: %d, Brand ID: %d, Cache Line Size: %d, CPU Count: %d, Local APIC ID: %d, Features ECX: %08x, Features EDX: %08x)\n",
+        cpuinfo->vendor_name,
+        cpuinfo->family_id,
+        cpuinfo->model_id,
+        cpuinfo->stepping,
+        cpuinfo->processor_type,
+        cpuinfo->brand_id,
+        cpuinfo->cache_line_size,
+        cpuinfo->cpu_count,
+        cpuinfo->local_apic_id,
+        cpuinfo->features_ecx,
+        cpuinfo->features_edx
+    );
+}
+
 
 
 void cpuid_identify_cpu(cpuinfo_x86& cpuinfo)
 {
     if (!has_cpuid()) {
         // CPUID instruction is not supported, panic for now
-        kpanic("CPUID instruction is not supported!");
+        kpanic("CPUID is not supported by the processor");
     }
+
+    logk("Gathering CPUID information...\n");
 
     fill_vendor_and_max_input(&cpuinfo);
     fill_version_and_features(&cpuinfo);
+
+    print_cpu_info(&cpuinfo);
+    logk("CPUID information successfully obtained\n");
 }
 
 bool cpuid_has_feature(const u32 features, u32 feature)

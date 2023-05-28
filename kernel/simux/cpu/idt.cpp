@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 
+// -- Data --
 struct idtr {
     u16 size;
     u32 offset;
@@ -15,13 +16,10 @@ struct idt_entry {
     u32 offset;
 } __attribute__((packed));
 
-
-#define IDT_SIZE 256
-#define IDT_ENTRY_SIZE 8
-
 static idt_entry idt_table[IDT_SIZE];
 
 
+// -- Private functions --
 
 static void write_descriptor(void* dest, u32 offset, u16 segment_selector, u8 flags)
 {
@@ -61,41 +59,29 @@ static void write_idt_table(const u32 location, struct idtr* idtr_value)
         {
             idt_entry* entry = &idt_table[i];
             write_descriptor(dest, entry->offset, CS_KERNEL, entry->flags);
-
-            /*
-            printk("IDT entry %d %x: ", i, entry->offset);
-            for (u8 j = 0; j < IDT_ENTRY_SIZE; j++) {
-                printk("%02x ", *((u8*)dest + j));
-            }
-            printk("\n");
-            */
         }
     }
     
     idtr_value->size = (IDT_SIZE * IDT_ENTRY_SIZE) - 1;
     idtr_value->offset = location;
 
-    printk("Interrupt Descriptor Table created at 0x%x\n", location);
+    logk("Interrupt Descriptor Table (IDT) successfully written to memory\n");
 }
 
 static void set_idtr_register(struct idtr* idtr_value)
 {
+    logk("Loading IDT into processor...\n");
+
     // Disable interrupts and update the IDTR register to
     // point to our new IDT
     asm volatile("cli");
     asm volatile("lidt %0" : : "m" (*idtr_value));
     
-    printk("IDTR register set\n");
+    logk("IDT loaded and activated\n");
 }
 
 
-
-void idt_reset_gates(void)
-{
-    void* dest = (void*)&idt_table;
-    memset(dest, 0, sizeof(idt_entry) * IDT_SIZE);
-}
-
+// -- Public functions --
 
 void idt_set_gate(const u8 index, const u32 offset, const u16 flags)
 {
@@ -103,6 +89,11 @@ void idt_set_gate(const u8 index, const u32 offset, const u16 flags)
     idt_table[index].offset = offset;
 }
 
+void idt_clear_gates(void)
+{
+    void* dest = (void*)&idt_table;
+    memset(dest, 0, sizeof(idt_entry) * IDT_SIZE);
+}
 
 void idt_write_and_load(const u32 location)
 {

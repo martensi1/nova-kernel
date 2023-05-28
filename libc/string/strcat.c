@@ -6,13 +6,14 @@ char* strcat(char* destination, const char* source)
 {
     char* dest = destination;
 
-    while (*dest) {
+    while (*dest != '\0') {
         dest++;
     }
 
-    while (*source) {
+    while (*source != '\0') {
         *dest++ = *source++;
     }
 
+    *dest = '\0';
     return destination;
 }

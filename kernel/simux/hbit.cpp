@@ -7,9 +7,13 @@ For example if the bootloader is multiboot compliant, if the CPU is in 32-bit pr
 #include <simux/kernel.h>
 
 
-#define TEST_OK(description) printk(" [OK]: %s\n", description)
+// --- Macros ---
+
+#define TEST_OK(description) logk(" [OK]: %s\n", description)
 #define TEST_FAIL(description, data) kpanic(description, data)
 
+
+// --- Private functions ---
 
 static void check_if_multiboot_loaded(u32 boot_handover_eax)
 {
@@ -54,13 +58,15 @@ static void check_start_address(void)
 }
 
 
+// --- Public functions ---
+
 void hbit_run(u32 boot_handover_eax)
 {
-    printk("Running HBIT (Handover Buildt-in Test)\n");
+    logk("Running HBIT (Handover Buildt-in Test)\n");
 
     check_if_multiboot_loaded(boot_handover_eax);
     check_cpu_mode();
     check_start_address();
 
-    printk("HBIT passed!\n");
+    logk("HBIT passed!\n");
 }

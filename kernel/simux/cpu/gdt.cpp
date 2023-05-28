@@ -51,11 +51,13 @@ static void create_gdt_table(const u32 location, struct gdtr* gdtr_value)
     gdtr_value->size = (u16)((u32)dest - location);
     gdtr_value->offset = location;
 
-    printk("Global Descriptor Table created at 0x%x\n", location);
+    logk("Global Descriptor Table (GDT) successfully written to memory\n");
 }
 
 static void set_gdtr_register(struct gdtr* gdtr_value)
 {
+    logk("Loading GDT into processor...\n");
+
     // Disable interrupts and update the GDTR register to
     // point to our new GDT
     asm volatile("cli");
@@ -74,7 +76,8 @@ static void set_gdtr_register(struct gdtr* gdtr_value)
         gdt_jump:\n \
         " : : "i" (DS_KERNEL), "i" (CS_KERNEL));
     
-    printk("GDTR register set, reloaded segment descriptors\n");
+
+    logk("GDT loaded and activated\n");
 }
 
 

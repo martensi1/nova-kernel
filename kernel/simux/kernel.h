@@ -7,6 +7,7 @@
 void khalt(void);
 void kpanic(const char* message, u32 data = 0x00000000);
 
+void logk(const char* format, ...);
 int printk(const char* format, ...);
 
 
