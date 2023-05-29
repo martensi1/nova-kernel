@@ -6,17 +6,17 @@
 
 // -- Macros --
 #define IRQ_BASE 32
-#define IRQ_COUNT IDT_SIZE - IRQ_BASE
+#define IRQ_COUNT IDT_NUM_ENTRIES - IRQ_BASE
 
 
 // -- Data --
 static irq_handler irq_handlers[IRQ_COUNT] = { 0 };
 
 #define LOCATE_EXCEPTION_ISR(x) extern "C" void cpuex_##x(void);
-#define ADD_EXCEPTION_ISR(x) idt_set_gate(x, (u32)cpuex_##x, IDT_TRAP_GATE_PL0);
+#define ADD_EXCEPTION_ISR(x) idt_setup_gate(x, (u32)cpuex_##x, IDT_TRAP_GATE_PL0);
 
 #define LOCATE_IRQ_ISR(x) extern "C" void irq_##x(void);
-#define ADD_IRQ_ISR(x) idt_set_gate(x + IRQ_BASE, (u32)irq_##x, IDT_INTERRUPT_GATE_PL0);
+#define ADD_IRQ_ISR(x) idt_setup_gate(x + IRQ_BASE, (u32)irq_##x, IDT_INTERRUPT_GATE_PL0);
 
 LOCATE_EXCEPTION_ISR(0);
 LOCATE_EXCEPTION_ISR(1);
@@ -110,7 +110,7 @@ static void setup_idt(const u32 idt_location)
     ADD_IRQ_ISR(7);
     ADD_IRQ_ISR(8);
 
-    idt_write_and_load(idt_location);
+    idt_initialize(idt_location);
 }
 
 
@@ -169,6 +169,8 @@ extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
 {
     pic_send_eoi(irq_number);
     static_cast<void>(interrupt_index);
+
+    logk("IRQ interrupt %d\n", irq_number);
 
     if (irq_handlers[irq_number] != NULL)
     {

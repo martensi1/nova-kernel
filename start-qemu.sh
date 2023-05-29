@@ -25,9 +25,7 @@ else
     -m $QEMU_MEMORY \
     -drive "$QEMU_DRIVE" \
     -curses \
-    -serial /dev/tty \
-    -usbdevice mouse \
-    -usbdevice keyboard
+    -serial /dev/tty
 fi
 
 sh ./kill-qemu.sh

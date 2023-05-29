@@ -1,9 +1,14 @@
+/*
+flgreg.h
+Functionality for interacting with the CPU's FLAGS registry
+*/
 #ifndef __SIMUX_FLAGS_REGISTRY_H__
 #define __SIMUX_FLAGS_REGISTRY_H__
 
-#include <stdint.h>
+#include <simux/types.h>
 
 
+/// @brief List of FLAGS registry flags
 enum cpu_flag {
 	CPUFLAG_ID = 21,
 };
@@ -12,7 +17,7 @@ enum cpu_flag {
 /// @brief Tests if specified CPU flag is changeable
 /// @param flag Flag to test
 /// @return True if flag is changeable, false otherwise
-inline bool flagreg_test_if_changeable(cpu_flag flag)
+inline bool flagreg_test_if_changeable(const cpu_flag flag)
 {
 	u32 flags_1 = 0;
     u32 flags_2 = 0;

@@ -41,15 +41,13 @@ void pic_initialize(u8 irq_base)
     sysbus_io_out(PRIMARY_PIC_DATA_PORT, ICW4_8086);
     sysbus_io_out(SECONDARY_PIC_DATA_PORT, ICW4_8086);
 
-    // Mask all interrupts
-    sysbus_io_out(PRIMARY_PIC_DATA_PORT, 0xFF);
-    sysbus_io_out(SECONDARY_PIC_DATA_PORT, 0xFF);
+    pic_disable_irqs();
 }
 
 void pic_enable_irqs(void)
 {
-    sysbus_io_out(PRIMARY_PIC_DATA_PORT, ~(0x2));
-    // sysbus_io_out(SECONDARY_PIC_DATA_PORT, 0x00);
+    sysbus_io_out(PRIMARY_PIC_DATA_PORT, 0x00);
+    sysbus_io_out(SECONDARY_PIC_DATA_PORT, 0x00);
 }
 
 void pic_disable_irqs(void)

@@ -1,0 +1,6 @@
+CPUID:
+https://en.wikipedia.org/wiki/CPUID
+https://wiki.osdev.org/CPUID
+https://www.felixcloutier.com/x86/cpuid
+
+

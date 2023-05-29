@@ -1,13 +1,15 @@
+/*
+gdt.h
+Responisble for setting up the Global Descriptor Table (GDT)
+The following code is not portable to other architectures
+*/
 #ifndef __SIMUX_GDT_H__
 #define __SIMUX_GDT_H__
 
 #include <simux/types.h>
 
 
-// Note! The following code is based on the following assumptions:
-// - Endianness is little endian
-// - Bit fields for individual bytes are ordered from left to right (MSB to LSB)
-// - If not, code will need to be changed accordingly (with #pragma reverse_bitfields on?)
+// GDT entries
 #define GDT_SEGMENT_PRESENT(x)          (((x) & 0x01) << 0x07) // Present
 #define GDT_SEGMENT_PRIVILEGE(x)        (((x) & 0x03) << 0x05) // Privilege level (0 - 3)
 #define GDT_SEGMENT_DESCRIPTOR_TYPE(x)  (((x) & 0x01) << 0x04) // Descriptor type (0 for system, 1 for code/data)
@@ -24,8 +26,6 @@
 #define GDT_SEGMENT_CODE_EXRD           0x0A // Execute/Read
 #define GDT_SEGMENT_CODE_EXRDC          0x0E // Execute/Read, conforming
 
-
-// Defined segments
 #define GDT_SEGMENT_CODE_PL0 GDT_SEGMENT_PRESENT(1)     | GDT_SEGMENT_PRIVILEGE(0) | GDT_SEGMENT_DESCRIPTOR_TYPE(1) | \
                              GDT_SEGMENT_GRANULARITY(1) | GDT_SEGMENT_SIZE(1)      | GDT_SEGMENT_LONG_MODE(0) | GDT_SEGMENT_CODE_EXRD
 

@@ -1,3 +1,8 @@
+/**
+ * cpuid.h
+ * Implementation of CPUID instruction for CPU identification (only x86)
+ * Get vendor name, serial number, version info, features, etc
+*/
 #ifndef __SIMUX_CPU_ID_H__
 #define __SIMUX_CPU_ID_H__
 
@@ -113,6 +118,7 @@ enum cpu_id_features_edx {
 };
 
 
+/// @brief CPU information structure
 struct cpuinfo_x86 {
     u8 level;
 

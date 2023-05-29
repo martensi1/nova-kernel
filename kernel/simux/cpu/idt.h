@@ -1,12 +1,16 @@
+/*
+idt.h
+Responisble for setting up the Interrupt Descriptor Table (IDT)
+The following code is not portable to other architectures
+*/
 #ifndef __SIMUX_IDT_H__
 #define __SIMUX_IDT_H__
 
 #include <simux/types.h>
 
 
-// Constants
-#define IDT_SIZE 256
-#define IDT_ENTRY_SIZE 8
+#define IDT_NUM_ENTRIES 256
+#define IDT_ENTRY_SIZE_BYTES 8
 
 
 // Gate types
@@ -23,10 +27,9 @@
 #define IDT_TRAP_GATE_PL0      IDT_GATE_PRESENT(1) | IDT_GATE_PRIVILEGE(0) | IDT_GATE_TYPE_32BIT_TRAP
 
 
-void idt_set_gate(const u8 index, const u32 offset, const u16 flags);
 void idt_clear_gates(void);
-
-void idt_write_and_load(const u32 location);
+void idt_setup_gate(const u8 index, const u32 offset, const u8 gate_type);
+void idt_initialize(const u32 location);
 
 
 #endif // __SIMUX_IDT_H__

@@ -1,8 +1,6 @@
 #ifndef __SIMUX_CONSOLE_DRIVER_H__
 #define __SIMUX_CONSOLE_DRIVER_H__
 
-#include <stddef.h>
-
 
 struct console_driver {
     char name[10];

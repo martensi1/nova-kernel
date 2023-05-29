@@ -1,4 +1,5 @@
 #include <simux/tty.h>
+#include <simux/console/condrv.h>
 #include <libc/string.h>
 
 
@@ -7,8 +8,25 @@ extern struct console_driver vga_driver;
 
 struct console_driver* current_driver = &vga_driver;
 
+// -- Private functions --
 
-void term_initialize() {
+static void choose_driver()
+{
+    if (vga_driver.is_available()) {
+        current_driver = &vga_driver;
+    }
+    else {
+        current_driver = &dummy_driver;
+    }
+}
+
+
+// -- Public functions --
+
+void term_initialize()
+{
+    choose_driver();
+
     current_driver->initialize();
     current_driver->clear();
 
@@ -21,11 +39,13 @@ void term_initialize() {
     term_write_str(")\n");
 }
 
-void term_clear() {
+void term_clear()
+{
     current_driver->clear();
 }
 
-void term_write(const char* data, size_t size) {
+void term_write(const char* data, size_t size)
+{
     for (size_t i = 0; i < size; i++) {
         char c  = data[i];
 
@@ -40,7 +60,8 @@ void term_write(const char* data, size_t size) {
     current_driver->update_cursor();
 }
 
-void term_write_str(const char* str) {
+void term_write_str(const char* str)
+{
     size_t length = strlen(str);
     term_write(str, length);
 }

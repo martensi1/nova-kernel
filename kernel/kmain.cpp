@@ -5,6 +5,7 @@
 #include <simux/cpu/isr.h>
 #include <simux/kernel.h>
 #include <simux/hbit.h>
+#include <simux/keybrd.h>
 
 
 #if !defined(__i386__)
@@ -16,14 +17,6 @@
 #endif
 
 
-static void on_key_pressed(void)
-{
-    u8 scancode = sysbus_io_in(0x60);
-
-    logk("Key pressed %d!\n", scancode);
-}
-
-
 static void setup_descriptor_tables()
 {
     #define GDT_LOCATION 0x800
@@ -32,7 +25,6 @@ static void setup_descriptor_tables()
     const u32 idt_location = GDT_LOCATION + gdt_size + 1;
 
     isr_install(idt_location);
-    isr_add_interrupt_handler(IRQ1, (irq_handler)on_key_pressed);
 }
 
 extern "C" {
@@ -45,6 +37,8 @@ extern "C" {
 
         cpuinfo_x86 cpuinfo;
         cpuid_identify_cpu(cpuinfo);
+
+        // keyboard_initialize();
 
         while (true) {
             asm volatile("hlt");

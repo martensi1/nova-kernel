@@ -2,6 +2,7 @@
 #define __SIMUX_DATA_TYPES_H__
 
 #include <stdint.h>
+#include <stddef.h>
 
 
 typedef int8_t s8;

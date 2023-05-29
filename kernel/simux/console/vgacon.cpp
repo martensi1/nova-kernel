@@ -4,7 +4,7 @@ https://wiki.osdev.org/Text_Mode_Cursor
 http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
 */
 #include <simux/cpu/sysbus.h>
-#include <simux/drivers/condrv.h>
+#include <simux/console/condrv.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -136,7 +136,7 @@ bool vga_is_available(void)
     return true;
 }
 
-void vga_initialize(void)
+static void vga_initialize(void)
 {
     vga_column = 0;
     vga_row = 0;
@@ -147,7 +147,7 @@ void vga_initialize(void)
     set_write_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 }
 
-void vga_write_line_feed(void)
+static void vga_write_line_feed(void)
 {
     vga_column = 0;
 
@@ -159,7 +159,7 @@ void vga_write_line_feed(void)
     }
 }
 
-void vga_write_char(const char c)
+static void vga_write_char(const char c)
 {
     write_video_memory(c, vga_write_color, vga_column, vga_row);
 
@@ -168,7 +168,7 @@ void vga_write_char(const char c)
     }
 }
 
-void vga_enable_cursor(void)
+static void vga_enable_cursor(void)
 {
     enable_cursor(
         VGA_CURSOR_START_SCANLINE,
@@ -176,17 +176,17 @@ void vga_enable_cursor(void)
     );
 }
 
-void vga_update_cursor(void)
+static void vga_update_cursor(void)
 {
     set_cursor_pos(vga_column, vga_row);
 }
 
-void vga_disable_cursor(void)
+static void vga_disable_cursor(void)
 {
     disable_cursor();
 }
 
-void vga_clear(void)
+static void vga_clear(void)
 {
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
