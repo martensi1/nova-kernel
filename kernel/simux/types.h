@@ -1,3 +1,7 @@
+/**
+ * types.h
+ * Defines common data types
+*/
 #ifndef __SIMUX_DATA_TYPES_H__
 #define __SIMUX_DATA_TYPES_H__
 

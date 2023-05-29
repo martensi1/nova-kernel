@@ -1,7 +1,7 @@
-/*
-hbit.h
-HBIT (Handover Built-in Test) is a test that checks if the kernel was handovered correctly by the bootloader.
-For example if the bootloader is multiboot compliant, if the CPU is in 32-bit protected mode, etc.
+/**
+ * hbit.h
+ * HBIT (Handover Built-in Test) is a test that checks if the kernel was handovered correctly by the bootloader.
+ * For example if the bootloader is multiboot compliant, if the CPU is in 32-bit protected mode, etc.
 */
 #ifndef __SIMUX_HANDOVER_HBIT_H__
 #define __SIMUX_HANDOVER_HBIT_H__

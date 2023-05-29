@@ -1,7 +1,7 @@
-/*
-gdt.h
-Responisble for setting up the Global Descriptor Table (GDT)
-The following code is not portable to other architectures
+/**
+ * gdt.h
+ * Responisble for setting up the Global Descriptor Table (GDT)
+ * The following code is not portable to other architectures
 */
 #ifndef __SIMUX_GDT_H__
 #define __SIMUX_GDT_H__

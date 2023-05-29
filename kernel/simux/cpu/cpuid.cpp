@@ -6,7 +6,6 @@
 #include <simux/cpu/cpuid.h>
 #include <simux/cpu/flgreg.h>
 #include <simux/kernel.h>
-#include <stdint.h>
 
 
 enum cpu_id_requests {

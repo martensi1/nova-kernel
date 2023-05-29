@@ -1,7 +1,7 @@
-/*
-gdt.cpp
-Responisble for setting up the Global Descriptor Table (GDT)
-The following code is not portable to other architectures
+/**
+ * gdt.cpp
+ * Responisble for setting up the Global Descriptor Table (GDT)
+ * The following code is not portable to other architectures
 */
 #include <simux/cpu/gdt.h>
 #include <simux/kernel.h>

@@ -1,7 +1,7 @@
-/*
-idt.cpp
-Responisble for setting up the Interrupt Descriptor Table (IDT)
-The following code is not portable to other architectures
+/**
+ * idt.cpp
+ * Responisble for setting up the Interrupt Descriptor Table (IDT)
+ * The following code is not portable to other architectures
 */
 #include <simux/cpu/idt.h>
 #include <simux/cpu/gdt.h>

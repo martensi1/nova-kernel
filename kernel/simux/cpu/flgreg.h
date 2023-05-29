@@ -1,6 +1,6 @@
-/*
-flgreg.h
-Functionality for interacting with the CPU's FLAGS registry
+/**
+ * flgreg.h
+ * Functionality for interacting with the CPU's FLAGS registry
 */
 #ifndef __SIMUX_FLAGS_REGISTRY_H__
 #define __SIMUX_FLAGS_REGISTRY_H__

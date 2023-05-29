@@ -1,7 +1,7 @@
-/*
-idt.h
-Responisble for setting up the Interrupt Descriptor Table (IDT)
-The following code is not portable to other architectures
+/**
+ * idt.h
+ * Responisble for setting up the Interrupt Descriptor Table (IDT)
+ * The following code is not portable to other architectures
 */
 #ifndef __SIMUX_IDT_H__
 #define __SIMUX_IDT_H__
