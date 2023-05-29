@@ -9,8 +9,13 @@
 #include <simux/types.h>
 
 
-#define IDT_NUM_ENTRIES 256
 #define IDT_ENTRY_SIZE_BYTES 8
+#define IDT_NUM_ENTRIES 256
+
+#define IDT_EXCEPTIONS_START 0
+#define IDT_EXCEPTIONS_END 31
+#define IDT_INTERRUPTS_START 32
+#define IDT_INTERRUPTS_END 255
 
 
 // Gate types

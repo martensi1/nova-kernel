@@ -1,3 +1,5 @@
+; isrs.asm
+; Defines the interrupt service routines for the CPU exceptions and IRQs
 extern on_exception_interrupt
 extern on_irq_interrupt
 

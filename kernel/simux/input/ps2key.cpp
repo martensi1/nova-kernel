@@ -1,6 +1,6 @@
 #include <simux/input/keydrv.h>
 #include <simux/input/keycode.h>
-#include <simux/cpu/isr.h>
+#include <simux/cpu/irq.h>
 #include <simux/cpu/sysbus.h>
 #include <simux/kernel.h>
 
@@ -26,7 +26,7 @@ static bool ps2key_is_available()
 
 static void ps2key_initialize()
 {
-    isr_add_interrupt_handler(IRQ1, (irq_handler)on_key_pressed);
+    irq_add_handler(IRQ1, (irq_handler)on_key_pressed);
 }
 
 static void ps2key_on_key_pressed(key_handler callback)
