@@ -134,7 +134,7 @@ void isr_add_interrupt_handler(irq_number irq, irq_handler handler)
         kpanic("IRQ out of range", irq);
     }
 
-    irq_handler* dest = &irq_handlers[irq - IRQ_BASE];
+    irq_handler* dest = &irq_handlers[irq];
 
     if (*dest != NULL) {
         kpanic("IRQ handler already set", irq);
@@ -144,14 +144,17 @@ void isr_add_interrupt_handler(irq_number irq, irq_handler handler)
 }
 
 
-void isr_remove_interrupt_handler(irq_number irq)
+irq_handler isr_remove_interrupt_handler(irq_number irq)
 {
     if (irq < 0 || irq >= IRQ_COUNT)
     {
         kpanic("IRQ out of range", irq);
     }
 
+    irq_handler handler = irq_handlers[irq];
     irq_handlers[irq] = NULL;
+
+    return handler;
 }
 
 

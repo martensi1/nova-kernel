@@ -125,9 +125,9 @@ void kpanic(const char* message, const u32 data)
     asm volatile("cli");
     term_clear();
 
-    logk("\n\nKernel panic!\n");
-    logk("Message: %s\n", message);
-    logk("Data: 0x%x\n", data);
+    printk("\n\nKernel panic!\n");
+    printk("Message: %s\n", message);
+    printk("Data: 0x%x\n", data);
 
     khalt();
 }

@@ -10,7 +10,7 @@ http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
 
 
 #define VGA_TEXT_MODE_WIDTH 80
-#define VGA_TEXT_MODE_HEIGHT 25
+#define VGA_TEXT_MODE_HEIGHT 20
 #define VGA_TEXT_BUFFER_ADDRESS 0xB8000
 
 #define VGA_INDEX_PORT 0x3D4
@@ -108,7 +108,7 @@ static inline void disable_cursor(void)
 }
 
 static void scroll_up(void) {
-    for (size_t y = 0; y < VGA_HEIGHT; y++) {
+    for (size_t y = 0; y < (VGA_HEIGHT - 1); y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
             const size_t index = y * VGA_WIDTH + x;
             const size_t next_index = (y + 1) * VGA_WIDTH + x;
@@ -151,7 +151,7 @@ void vga_write_line_feed(void)
 {
     vga_column = 0;
 
-    if (vga_row == VGA_HEIGHT) {
+    if (vga_row == (VGA_HEIGHT - 1)) {
         scroll_up();
     }
     else {
