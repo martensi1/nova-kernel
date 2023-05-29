@@ -1,3 +1,7 @@
+/**
+ * driver.h
+ * Defines the console driver interface
+*/
 #ifndef __SIMUX_CONSOLE_DRIVER_H__
 #define __SIMUX_CONSOLE_DRIVER_H__
 

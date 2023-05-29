@@ -1,17 +1,16 @@
 #include <simux/tty.h>
-#include <simux/console/condrv.h>
+#include <simux/console/driver.h>
 #include <libc/string.h>
 
 
-extern struct console_driver dummy_driver;
-extern struct console_driver vga_driver;
+struct console_driver* current_driver = NULL;
 
-struct console_driver* current_driver = &vga_driver;
-
-// -- Private functions --
 
 static void choose_driver()
 {
+    extern struct console_driver dummy_driver;
+    extern struct console_driver vga_driver;
+
     if (vga_driver.is_available()) {
         current_driver = &vga_driver;
     }

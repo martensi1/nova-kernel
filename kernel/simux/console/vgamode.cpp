@@ -1,12 +1,9 @@
-/*
-VGA console driver
-https://wiki.osdev.org/Text_Mode_Cursor
-http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
+/**
+ * vgamode.cpp
+ * VGA mode console driver
 */
+#include <simux/console/driver.h>
 #include <simux/cpu/sysbus.h>
-#include <simux/console/condrv.h>
-#include <stdint.h>
-#include <string.h>
 
 
 #define VGA_TEXT_MODE_WIDTH 80
@@ -68,17 +65,18 @@ static inline void write_register(u8 index, u8 value)
     sysbus_io_out(VGA_DATA_PORT, value);
 }
 
+
+static inline void set_operation_mode(u8 mode)
+{
+    write_register(VGA_REGISTER_MODE, mode);
+}
+
 static inline void write_video_memory(char c, u8 color, size_t x, size_t y)
 {
     const size_t offset = y * VGA_WIDTH + x;
     u16 byte = (u16)c | (u16)color << 8;
 
     vga_buffer[offset] = byte;
-}
-
-static inline void set_mode(u8 mode)
-{
-    write_register(VGA_REGISTER_MODE, mode);
 }
 
 static inline void set_cursor_pos(size_t x, size_t y)
@@ -143,7 +141,7 @@ static void vga_initialize(void)
 
     vga_buffer = (u16*)VGA_TEXT_BUFFER_ADDRESS;
     
-    set_mode(0x03);
+    set_operation_mode(0x03);
     set_write_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 }
 

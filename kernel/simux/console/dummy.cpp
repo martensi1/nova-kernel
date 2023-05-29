@@ -1,43 +1,41 @@
-/*
-Dummy console driver
-Used if no other console driver is available
+/**
+ * dummy.cpp
+ * Dummy console driver, used if no other console driver is available
 */
+#include <simux/console/driver.h>
 #include <simux/cpu/sysbus.h>
-#include <simux/console/condrv.h>
-#include <stdint.h>
-#include <string.h>
 
 
-bool dummy_con_is_available(void)
+static bool dummy_con_is_available(void)
 {
     return true;
 }
 
-void dummy_con_initialize(void)
+static void dummy_con_initialize(void)
 {
 }
 
-void dummy_con_write_line_feed(void)
+static void dummy_con_write_line_feed(void)
 {
 }
 
-void dummy_con_write_char(const char)
+static void dummy_con_write_char(const char)
 {
 }
 
-void dummy_con_enable_cursor(void)
+static void dummy_con_enable_cursor(void)
 {
 }
 
-void dummy_con_update_cursor(void)
+static void dummy_con_update_cursor(void)
 {
 }
 
-void dummy_con_disable_cursor(void)
+static void dummy_con_disable_cursor(void)
 {
 }
 
-void dummy_con_clear(void)
+static void dummy_con_clear(void)
 {
 }
 
