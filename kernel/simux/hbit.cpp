@@ -7,13 +7,9 @@
 #include <simux/kernel.h>
 
 
-// --- Macros ---
-
 #define TEST_OK(description) logk(" [OK]: %s\n", description)
 #define TEST_FAIL(description, data) kpanic(description, data)
 
-
-// --- Private functions ---
 
 static void check_if_multiboot_loaded(u32 boot_handover_eax)
 {
@@ -58,8 +54,8 @@ static void check_start_address(void)
 }
 
 
-// --- Public functions ---
-
+/// @brief Runs the HBIT (Handover Built-in Test)
+/// @param boot_handover_eax The value of the EAX register when the bootloader handed over control to the kernel
 void hbit_run(u32 boot_handover_eax)
 {
     logk("Running HBIT (Handover Buildt-in Test)\n");
