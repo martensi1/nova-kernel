@@ -1,9 +1,11 @@
 #include <simux/tty.h>
+#include <simux/spinlock.h>
 #include <simux/console/driver.h>
 #include <libc/string.h>
 
 
 struct console_driver* current_driver = NULL;
+static spinlock_t write_lock = SPINLOCK_UNLOCKED;
 
 
 static void choose_driver()
@@ -45,6 +47,8 @@ void term_clear()
 
 void term_write(const char* data, size_t size)
 {
+    spin_lock_irqsave(write_lock);
+
     for (size_t i = 0; i < size; i++) {
         char c  = data[i];
 
@@ -57,6 +61,7 @@ void term_write(const char* data, size_t size)
     }
 
     current_driver->update_cursor();
+    spin_unlock_irqrestore(write_lock);
 }
 
 void term_write_str(const char* str)
