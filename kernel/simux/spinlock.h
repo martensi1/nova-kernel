@@ -1,3 +1,8 @@
+/**
+ * spinlock.h
+ * Locks that are used to protect critical sections of code from being executed
+ * at the same time by multiple threads. Includes both reentrant and non-reentrant locking
+*/
 #ifndef __SIMUX_SPINLOCK_H__
 #define __SIMUX_SPINLOCK_H__
 

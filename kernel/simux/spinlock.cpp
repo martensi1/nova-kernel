@@ -1,3 +1,8 @@
+/**
+ * spinlock.cpp
+ * Locks that are used to protect critical sections of code from being executed
+ * at the same time by multiple threads. Includes both reentrant and non-reentrant locking
+*/
 #include <simux/spinlock.h>
 #include <simux/cpu/flgreg.h>
 #include <simux/cpu/irq.h>
@@ -20,8 +25,6 @@ void spinlock_release_irq_save(spinlock_t& lock, const unsigned long& flags)
         irq_enable_interrupts();
     }
 }
-
-
 
 void spinlock_aqquire(spinlock_t& lock)
 {
