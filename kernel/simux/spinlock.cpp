@@ -1,7 +1,8 @@
 /**
  * spinlock.cpp
- * Locks that are used to protect critical sections of code from being executed
- * at the same time by multiple threads. Includes both reentrant and non-reentrant locking
+ * Spinlocks are small and simple locks with minimal overhead. They are used to protect critical
+ * sections of code from being executed at the same time by multiple threads. Includes both
+ * non-reentrant and reentrant locking (interrupt safe)
 */
 #include <simux/spinlock.h>
 #include <simux/cpu/flgreg.h>
