@@ -17,7 +17,7 @@ enum cpu_id_requests {
 
 static inline bool has_cpuid(void)
 {
-    cpu_flag flag = CPUFLAG_ID;
+    cpu_flag_t flag = CPUFLAG_ID;
     return flagreg_test_if_changeable(flag);
 }
 
@@ -54,7 +54,7 @@ static void registers_to_string(u32 ebx, u32 ecx, u32 edx, char* result)
 }
 
 
-static void fill_vendor_and_max_input(cpuinfo_x86* cpuinfo)
+static void fill_vendor_and_max_input(cpuinfo_x86_t* cpuinfo)
 {
     u32 eax, ebx, ecx, edx;
     get_cpuid(CPUID_LEVEL_AND_VENDOR, &eax, &ebx, &ecx, &edx);
@@ -63,7 +63,7 @@ static void fill_vendor_and_max_input(cpuinfo_x86* cpuinfo)
     registers_to_string(ebx, ecx, edx, cpuinfo->vendor_name);
 }
 
-static void fill_version_and_features(cpuinfo_x86* cpuinfo)
+static void fill_version_and_features(cpuinfo_x86_t* cpuinfo)
 {
     if (cpuinfo->level <= 0) {
         // Max input value to CPUID is 0
@@ -103,7 +103,7 @@ static void fill_version_and_features(cpuinfo_x86* cpuinfo)
 
 /// @brief Gather CPUID information
 /// @param cpuinfo Information structure to fill
-void cpuid_identify_cpu(cpuinfo_x86& cpuinfo)
+void cpuid_identify_cpu(cpuinfo_x86_t& cpuinfo)
 {
     if (!has_cpuid()) {
         kpanic("CPUID is not supported by the processor");

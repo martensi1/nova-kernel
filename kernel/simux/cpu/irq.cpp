@@ -6,6 +6,7 @@
 #include <simux/cpu/idt.h>
 #include <simux/pic/pic.h>
 #include <simux/kernel.h>
+#include <simux/spinlock.h>
 
 
 #define LOCATE_ISR(x) extern "C" void irq_##x(void);
@@ -22,10 +23,12 @@ LOCATE_ISR(8);
 
 
 #define IRQ_MAX IDT_NUM_ENTRIES - IDT_INTERRUPTS_START
-static irq_handler irq_handlers[IRQ_MAX] = { 0 };
+
+static irq_handler_t irq_handlers[IRQ_MAX] = { 0 };
+static spinlock_t irq_handlers_lock = SPINLOCK_UNLOCKED;
 
 
-static inline void check_bounds(irq_number irq)
+static inline void check_bounds(irq_number_t irq)
 {
     if (irq < 0 || irq >= IRQ_MAX)
     {
@@ -50,42 +53,51 @@ void irq_setup_gates(void)
     SETUP_GATE(8);
 }
 
+/// @brief Acknowledges the given IRQ (sends an EOI to the PIC)
+/// @param irq IRQ number
+void irq_ack(irq_number_t irq)
+{
+    pic_send_eoi(irq);
+}
+
 /// @brief Adds an interrupt handler for the given IRQ
 /// @param irq IRQ number
 /// @param handler Handler function
-void irq_add_handler(irq_number irq, irq_handler handler)
+void irq_add_handler(irq_number_t irq, irq_handler_t handler)
 {
     check_bounds(irq);
-    irq_handler* dest = &irq_handlers[irq];
+    spin_lock_irqsave(irq_handlers_lock);
+
+    irq_handler_t* dest = &irq_handlers[irq];
 
     if (*dest != NULL) {
         kpanic("IRQ handler already set", irq);
     }
 
     *dest = handler;
+
+    spin_unlock_irqrestore(irq_handlers_lock);
 }
 
 /// @brief Removes the interrupt handler for the given IRQ
 /// @param irq IRQ number
 /// @return The removed handler function
-irq_handler irq_remove_handler(irq_number irq)
+irq_handler_t irq_remove_handler(irq_number_t irq)
 {
     check_bounds(irq);
+    spin_lock_irqsave(irq_handlers_lock);
 
-    irq_handler handler = irq_handlers[irq];
+    irq_handler_t handler = irq_handlers[irq];
     irq_handlers[irq] = NULL;
 
+    spin_unlock_irqrestore(irq_handlers_lock);
     return handler;
 }
-
 
 // Called from assembly ISRs
 extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
 {
-    pic_send_eoi(irq_number);
     static_cast<void>(interrupt_index);
-
-    logk("IRQ interrupt %d\n", irq_number);
 
     if (irq_handlers[irq_number] != NULL)
     {

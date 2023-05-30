@@ -9,44 +9,35 @@
 
 
 /// @brief List of FLAGS registry flags
-enum cpu_flag {
-	CPUFLAG_ID = 21,
-};
+typedef enum {
+	CPUFLAG_IF = 9,  // Interrupt enable flag
+	CPUFLAG_ID = 21, // CPUID instruction available flag
+} cpu_flag_t;
+
+
+/// @brief Dumps all CPU flags to a long
+/// @return Long containing all CPU flags (bitfield)
+inline unsigned long flagreg_dump(void)
+{
+	long flags = 0;
+	asm volatile ("pushfl; popl %0" : "=r" (flags));
+	return flags;
+}
+
+
+/// @brief Checks if specified CPU flag is set (from a dump)
+/// @param flags Dumped CPU flags
+/// @return True if flag is set, false otherwise
+inline bool flagreg_dump_check_bit(const unsigned long& flags)
+{
+	return flags & (1 << (u32)CPUFLAG_IF);
+}
 
 
 /// @brief Tests if specified CPU flag is changeable
 /// @param flag Flag to test
 /// @return True if flag is changeable, false otherwise
-inline bool flagreg_test_if_changeable(const cpu_flag flag)
-{
-	u32 flags_1 = 0;
-    u32 flags_2 = 0;
-
-    u32 mask = 1 << (u32)flag;
-
-    // 1. Push CPU flags onto the stack
-    // 2. Pop flags to flags_1, also copy to flags_2
-	// 3. Flip specified flag in flags_1
-	// 4. Push flags_1 onto the stack and pop from stack to CPU flags
-	// 5. Push CPU flags onto the stack again
-	// 6. Pop flags to flags_1
-	// 7. Compare flags_1 and flags_2, if they are different, then the flag is changeable  
-	asm volatile (
-		"pushfl		 \n"
-		"popl %0     \n"
-		"movl %0, %1 \n"
-		"xorl %2, %0 \n"
-		"pushl %0	 \n"
-		"popfl		 \n"
-		"pushfl		 \n"
-		"popl %0	 \n"
-		: "=&r" (flags_1), "=&r" (flags_2)
-		: "ir" (mask)
-    );
-
-	u32 nonzero_if_different = flags_1 ^ flags_2;
-	return nonzero_if_different != 0;
-}
+bool flagreg_test_if_changeable(const cpu_flag_t flag);
 
 
 #endif // __SIMUX_FLAGS_REGISTRY_H__

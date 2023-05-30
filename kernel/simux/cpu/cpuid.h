@@ -119,7 +119,7 @@ enum cpu_id_features_edx {
 
 
 /// @brief CPU information structure
-struct cpuinfo_x86 {
+typedef struct {
     u8 level;
 
     #define CPUID_STRING_SIZE 12
@@ -136,10 +136,10 @@ struct cpuinfo_x86 {
 
     u32 features_ecx;
     u32 features_edx;
-};
+} cpuinfo_x86_t;
 
 
-void cpuid_identify_cpu(cpuinfo_x86& cpuinfo);
+void cpuid_identify_cpu(cpuinfo_x86_t& cpuinfo);
 bool cpuid_has_feature(const u32 features, u32 feature);
 
 

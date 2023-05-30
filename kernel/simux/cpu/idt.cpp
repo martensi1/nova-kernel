@@ -9,17 +9,17 @@
 #include <libc/string.h>
 
 
-struct idt_entry {
+typedef struct __attribute__((packed)) {
     u8 gate_type;
     u32 offset;
-} __attribute__((packed));
+} idt_entry_t;
 
-struct idtr {
+typedef struct __attribute__((packed)) {
     u16 size;
     u32 offset;
-} __attribute__((packed));
+} idtr_t;
 
-static idt_entry idt_table[IDT_NUM_ENTRIES];
+static idt_entry_t idt_table[IDT_NUM_ENTRIES];
 
 
 static void write_descriptor(void* dest, const u32 offset, const u16 segment_selector, const u8 flags)
@@ -46,7 +46,7 @@ static void write_descriptor(void* dest, const u32 offset, const u16 segment_sel
     dest8[i++] = (offset >> 24) & 0xFF;
 }
 
-static void write_idt_table(const u32 location, struct idtr* idtr_value)
+static void write_idt_table(const u32 location, idtr_t* idtr_value)
 {
     for (u16 i = 0; i < IDT_NUM_ENTRIES; i++) {
         void* dest = (void*)(location + (i * IDT_ENTRY_SIZE_BYTES));
@@ -57,7 +57,7 @@ static void write_idt_table(const u32 location, struct idtr* idtr_value)
         }
         else
         {
-            idt_entry* entry = &idt_table[i];
+            idt_entry_t* entry = &idt_table[i];
             write_descriptor(dest, entry->offset, CS_KERNEL, entry->gate_type);
         }
     }
@@ -68,7 +68,7 @@ static void write_idt_table(const u32 location, struct idtr* idtr_value)
     logk("Interrupt Descriptor Table (IDT) successfully written to memory\n");
 }
 
-static void load_idt_table(struct idtr* idtr_value)
+static void load_idt_table(idtr_t* idtr_value)
 {
     logk("Loading IDT into processor...\n");
 
@@ -85,7 +85,7 @@ static void load_idt_table(struct idtr* idtr_value)
 void idt_clear_gates(void)
 {
     void* dest = (void*)&idt_table;
-    size_t size = sizeof(idt_entry) * IDT_ENTRY_SIZE_BYTES;
+    size_t size = sizeof(idt_entry_t) * IDT_ENTRY_SIZE_BYTES;
 
     memset(dest, 0, size);
 }
@@ -104,7 +104,7 @@ void idt_setup_gate(const u8 index, const u32 isr_offset, const u8 gate_type)
 /// @param location The location in memory to write the IDT to
 void idt_initialize(const u32 location)
 {
-    struct idtr idtr_value;
+    idtr_t idtr_value;
 
     write_idt_table(location, &idtr_value);
     load_idt_table(&idtr_value);

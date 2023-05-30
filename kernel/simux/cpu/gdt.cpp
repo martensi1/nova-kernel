@@ -8,10 +8,10 @@
 #include <libc/string.h>
 
 
-struct gdtr {
+typedef struct __attribute__((packed)) {
     u16 size;
     u32 offset;
-} __attribute__((packed));
+} gdtr_t;
 
 
 
@@ -40,7 +40,7 @@ static void* write_descriptor(void* dest, u32 base, u32 limit, u16 flags)
     return (void*)dest8;
 }
 
-static void write_gdt_table(const u32 location, struct gdtr* gdtr_value)
+static void write_gdt_table(const u32 location, gdtr_t* gdtr_value)
 {
     void* dest = (void*)location;
 
@@ -58,7 +58,7 @@ static void write_gdt_table(const u32 location, struct gdtr* gdtr_value)
     logk("Global Descriptor Table (GDT) successfully written to memory\n");
 }
 
-static void load_gdt_table(struct gdtr* gdtr_value)
+static void load_gdt_table(gdtr_t* gdtr_value)
 {
     logk("Loading GDT into processor...\n");
 
@@ -89,7 +89,7 @@ static void load_gdt_table(struct gdtr* gdtr_value)
 /// @return Size of the GDT
 u16 gdt_initialize(const u32 location)
 {
-    struct gdtr gdtr_value;
+    gdtr_t gdtr_value;
 
     write_gdt_table(location, &gdtr_value);
     load_gdt_table(&gdtr_value);

@@ -2,7 +2,6 @@
 #include <simux/cpu/setup.h>
 #include <simux/kernel.h>
 #include <simux/hbit.h>
-#include <simux/keybrd.h>
 
 
 #if !defined(__i386__)
@@ -21,8 +20,6 @@ extern "C" {
         
         hbit_run(boot_handover_eax);
         cpu_setup();
-
-        // keyboard_initialize();
 
         while (true) {
             asm volatile("hlt");

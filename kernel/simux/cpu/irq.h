@@ -6,10 +6,10 @@
 #define __SIMUX_IRQ_H__
 
 
-typedef void* (*irq_handler)(void);
+typedef void* (*irq_handler_t)(void);
 
 // IRQ types
-enum irq_number {
+typedef enum {
     IRQ0 = 0x00, // PIT
     IRQ1 = 0x01, // Keyboard
     IRQ2 = 0x02, // Cascade
@@ -19,13 +19,24 @@ enum irq_number {
     IRQ6 = 0x06, // Floppy
     IRQ7 = 0x07, // LPT1
     IRQ8 = 0x08, // CMOS RTC
-};
+} irq_number_t;
 
 
 void irq_setup_gates(void);
+void irq_ack(irq_number_t irq);
 
-void irq_add_handler(irq_number irq, irq_handler handler);
-irq_handler irq_remove_handler(irq_number irq);
+void irq_add_handler(irq_number_t irq, irq_handler_t handler);
+irq_handler_t irq_remove_handler(irq_number_t irq);
+
+inline void irq_enable_interrupts(void)
+{
+    asm volatile("sti");
+}
+
+inline void irq_disable_interrupts(void)
+{
+    asm volatile("cli");
+}
 
 
 #endif // __SIMUX_IRQ_H__

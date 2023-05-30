@@ -35,7 +35,7 @@ static inline void setup_pic(void)
 
 static inline void identify_cpu(void)
 {
-    cpuinfo_x86 cpuinfo;
+    cpuinfo_x86_t cpuinfo;
     cpuid_identify_cpu(cpuinfo);
 }
 
