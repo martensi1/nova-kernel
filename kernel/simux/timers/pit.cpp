@@ -74,10 +74,15 @@ static void set_reload_value(u8 port, u16 value)
 }
 
 
-/// @brief Sets up the Channel 0 of the PIT to generate interrupts at the specified frequency
+/// @brief Sets up the Channel 0 of the PIT to generate interrupts (IRQ0) at the specified frequency
 /// @param frequency The frequency at which to generate interrupts (the nearest possible frequency will be used)
 void pic_setup_interrupt_generator(const u32 frequency)
 {
+    if (frequency == 0)
+    {
+        kpanic("PIC setup failed: frequency cannot be 0");
+    }
+
     u32 reload_value = PIT_TIMER_FREQUENCY / frequency;
     u32 actual_frequency = PIT_TIMER_FREQUENCY / reload_value;
 
@@ -91,7 +96,5 @@ void pic_setup_interrupt_generator(const u32 frequency)
     );
 
     set_reload_value(PIT_CHANNEL0_DATA_PORT, reload_value);
-
-    configure_channel
-    logk("PIC setup: frequency = %d Hz\n", actual_frequency);
+    logk("PIC setup: frequency = %d Hz", actual_frequency);
 }

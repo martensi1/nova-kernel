@@ -65,19 +65,19 @@ static void write_idt_table(const u32 location, idtr_t* idtr_value)
     idtr_value->size = (IDT_NUM_ENTRIES * IDT_ENTRY_SIZE_BYTES) - 1;
     idtr_value->offset = location;
 
-    logk("Interrupt Descriptor Table (IDT) successfully written to memory\n");
+    logk("Interrupt Descriptor Table (IDT) successfully written to memory");
 }
 
 static void load_idt_table(idtr_t* idtr_value)
 {
-    logk("Loading IDT into processor...\n");
+    logk("Loading IDT into processor...");
 
     // Disable interrupts and update the IDTR register to
     // point to our new IDT
     asm volatile("cli");
     asm volatile("lidt %0" : : "m" (*idtr_value));
     
-    logk("IDT loaded and activated\n");
+    logk("IDT loaded and activated");
 }
 
 

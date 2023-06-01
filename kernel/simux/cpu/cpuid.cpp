@@ -109,12 +109,12 @@ void cpuid_identify_cpu(cpuinfo_x86_t& cpuinfo)
         kpanic("CPUID is not supported by the processor");
     }
 
-    logk("Gathering CPUID information...\n");
+    logk("Gathering CPUID information...");
 
     fill_vendor_and_max_input(&cpuinfo);
     fill_version_and_features(&cpuinfo);
 
-    logk("CPUID information successfully obtained\n");
+    logk("CPUID information successfully obtained");
 }
 
 /// @brief Check if the CPU has a specific feature

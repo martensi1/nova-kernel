@@ -55,12 +55,12 @@ static void write_gdt_table(const u32 location, gdtr_t* gdtr_value)
     gdtr_value->size = (u16)((u32)dest - location);
     gdtr_value->offset = location;
 
-    logk("Global Descriptor Table (GDT) successfully written to memory\n");
+    logk("Global Descriptor Table (GDT) successfully written to memory");
 }
 
 static void load_gdt_table(gdtr_t* gdtr_value)
 {
-    logk("Loading GDT into processor...\n");
+    logk("Loading GDT into processor...");
 
     // Disable interrupts and update the GDTR register to
     // point to our new GDT
@@ -81,7 +81,7 @@ static void load_gdt_table(gdtr_t* gdtr_value)
         " : : "i" (DS_KERNEL), "i" (CS_KERNEL));
     
 
-    logk("GDT loaded and activated\n");
+    logk("GDT loaded and activated");
 }
 
 /// @brief Initializes the Global Descriptor Table (GDT)
