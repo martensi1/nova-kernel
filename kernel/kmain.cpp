@@ -2,6 +2,7 @@
 #include <simux/cpu/setup.h>
 #include <simux/kernel.h>
 #include <simux/hbit.h>
+#include <simux/timers/pit.h>
 
 
 #if !defined(__i386__)
@@ -19,6 +20,7 @@ extern "C" {
         term_initialize();
         
         hbit_run(boot_handover_eax);
+        pic_setup_interrupt_generator(200);
         cpu_setup();
 
         while (true) {

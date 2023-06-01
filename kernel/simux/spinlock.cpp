@@ -17,7 +17,7 @@ void spinlock_aqquire_irq_save(spinlock_t& lock, unsigned long& flags)
     spinlock_aqquire(lock);
 }
 
-void spinlock_release_irq_save(spinlock_t& lock, const unsigned long& flags)
+void spinlock_release_irq_restore(spinlock_t& lock, const unsigned long& flags)
 {
     spinlock_release(lock);
 

@@ -99,6 +99,12 @@ extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
 {
     static_cast<void>(interrupt_index);
 
+    if (irq_number == 0)
+    {
+        logk("IRQ0\n");
+        irq_ack(IRQ0);
+    }
+
     if (irq_handlers[irq_number] != NULL)
     {
         irq_handlers[irq_number]();
