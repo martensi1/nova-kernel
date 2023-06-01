@@ -142,6 +142,7 @@ void logk(const char* fmt, ...)
     
     strcpy(buffer, "[Kernel]: ");
     strcat(buffer, fmt);
+    strcat(buffer, "\n");
 
     va_list args;
     va_start(args, fmt);

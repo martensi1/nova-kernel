@@ -12,7 +12,7 @@
 void spinlock_aqquire_irq_save(spinlock_t& lock, unsigned long& flags)
 {
     flags = flagreg_dump();
-    irq_disable_interrupts();
+    irq_disable();
 
     spinlock_aqquire(lock);
 }
@@ -23,7 +23,7 @@ void spinlock_release_irq_restore(spinlock_t& lock, const unsigned long& flags)
 
     if (flagreg_dump_check_bit(flags))
     {
-        irq_enable_interrupts();
+        irq_enable();
     }
 }
 

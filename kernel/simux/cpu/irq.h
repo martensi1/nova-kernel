@@ -5,6 +5,8 @@
 #ifndef __SIMUX_IRQ_H__
 #define __SIMUX_IRQ_H__
 
+#include <simux/cpu/flgreg.h>
+
 
 typedef void* (*irq_handler_t)(void);
 
@@ -28,15 +30,19 @@ void irq_ack(irq_number_t irq);
 void irq_add_handler(irq_number_t irq, irq_handler_t handler);
 irq_handler_t irq_remove_handler(irq_number_t irq);
 
-inline void irq_enable_interrupts(void)
+
+/// @brief Enables hardware interrupts. Does not effect
+///        non-maskable interrupts (NMI)
+inline void irq_enable(void)
 {
     asm volatile("sti");
 }
 
-inline void irq_disable_interrupts(void)
+/// @brief Disables hardware interrupts. Does not effect
+///        non-maskable interrupts (NMI)
+inline void irq_disable(void)
 {
     asm volatile("cli");
 }
-
 
 #endif // __SIMUX_IRQ_H__
