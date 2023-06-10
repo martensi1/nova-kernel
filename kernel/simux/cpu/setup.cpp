@@ -20,6 +20,7 @@ static inline void setup_descriptor_tables()
     const u32 idt_location = GDT_LOCATION + gdt_size + 1;
 
     idt_clear_gates();
+    irq_initialize();
 
     exceptions_setup_gates();
     irq_setup_gates();

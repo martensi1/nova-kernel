@@ -7,8 +7,7 @@
 #include <stdarg.h>
 
 
-// -- Private functions --
-int _printk(const char* fmt, va_list args)
+static int _printk(const char* fmt, va_list args)
 {
      if (fmt == NULL) {
         return 0;
@@ -42,6 +41,7 @@ int _printk(const char* fmt, va_list args)
         if (c == '0')
         {
             padchar = '0';
+            static_cast<void>(padchar);
             c = *fmt++;
         }
 
@@ -60,15 +60,28 @@ int _printk(const char* fmt, va_list args)
                 break;
             }
             case 'd':
-            {
-                int num = va_arg(args, int);
-                itoa(num, temp, 10);
-                break;
-            }
             case 'x':
             {
                 int num = va_arg(args, int);
-                itoa(num, temp, 16);
+                int base = c == 'd' ? 10 : 16;
+
+                itoa(num, temp, base);
+
+                int temp_len = strlen(temp);
+
+                if (padlen > temp_len)
+                {
+                    padlen = padlen - temp_len;
+
+                    for (u8 i = 0; i < padlen; i++)
+                    {
+                        *out++ = padchar;
+                    }
+                }
+
+                strcpy(out, temp);
+                out += strlen(temp);
+
                 break;
             }
             case 's':
@@ -80,36 +93,18 @@ int _printk(const char* fmt, va_list args)
             }
             default:
             {
-                *out++ = c;
-                break;;
+                break;
             }
         }
-
-        int temp_len = strlen(temp);
-        if (temp_len > 0)
-        {
-            padlen = padlen - temp_len;
-
-            for (u8 i = 0; i < padlen; i++)
-            {
-                *out++ = padchar;
-            }
-
-            strcpy(out, temp);
-            out += temp_len;
-        }
-
-        temp[0] = '\0';
     }
 
-    *out = 0;
+    *out = '\0';
     term_write_str(buffer);
 
     return out - buffer;
 }
 
 
-// -- Public functions --
 
 void khalt(void)
 {

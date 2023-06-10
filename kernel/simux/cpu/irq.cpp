@@ -7,6 +7,7 @@
 #include <simux/pic/pic.h>
 #include <simux/kernel.h>
 #include <simux/spinlock.h>
+#include <libc/string.h>
 
 
 #define LOCATE_ISR(x) extern "C" void irq_##x(void);
@@ -36,6 +37,10 @@ static inline void check_bounds(irq_number_t irq)
     }
 }
 
+void irq_initialize(void)
+{
+    memset(irq_handlers, 0, sizeof(irq_handlers));
+}
 
 /// @brief Sets up the IDT gates for the interrupts (IRQs)
 void irq_setup_gates(void)
@@ -53,18 +58,15 @@ void irq_setup_gates(void)
     SETUP_GATE(8);
 }
 
-/// @brief Acknowledges the given IRQ (sends an EOI to the PIC)
-/// @param irq IRQ number
-void irq_ack(irq_number_t irq)
-{
-    pic_send_eoi(irq);
-}
-
 /// @brief Adds an interrupt handler for the given IRQ
 /// @param irq IRQ number
 /// @param handler Handler function
 void irq_add_handler(irq_number_t irq, irq_handler_t handler)
 {
+    if (handler == NULL) {
+        return;
+    }
+
     check_bounds(irq);
     spin_lock_irqsave(irq_handlers_lock);
 
@@ -99,8 +101,14 @@ extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
 {
     static_cast<void>(interrupt_index);
 
-    if (irq_handlers[irq_number] != NULL)
+    spin_lock_irqsave(irq_handlers_lock);
+    irq_handler_t handler = irq_handlers[irq_number];
+    spin_unlock_irqrestore(irq_handlers_lock);
+
+    if (handler != NULL)
     {
-        irq_handlers[irq_number]();
+        handler();
     }
+
+    pic_send_eoi(irq_number);
 }

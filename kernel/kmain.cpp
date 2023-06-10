@@ -2,6 +2,7 @@
 #include <simux/cpu/setup.h>
 #include <simux/kernel.h>
 #include <simux/hbit.h>
+#include <simux/sbit.h>
 #include <simux/timers/pit.h>
 
 
@@ -22,6 +23,8 @@ extern "C" {
         hbit_run(boot_handover_eax);
         pic_setup_interrupt_generator(200);
         cpu_setup();
+
+        sbit_run();
 
         while (true) {
             asm volatile("hlt");

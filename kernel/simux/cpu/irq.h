@@ -24,8 +24,8 @@ typedef enum {
 } irq_number_t;
 
 
+void irq_initialize(void);
 void irq_setup_gates(void);
-void irq_ack(irq_number_t irq);
 
 void irq_add_handler(irq_number_t irq, irq_handler_t handler);
 irq_handler_t irq_remove_handler(irq_number_t irq);
