@@ -16,7 +16,9 @@ static inline void setup_descriptor_tables()
 {
     #define GDT_LOCATION 0x800
 
-    const u16 gdt_size = gdt_initialize(GDT_LOCATION);
+    u16 gdt_size;
+    GDT::setup(GDT_LOCATION, gdt_size);
+    
     const u32 idt_location = GDT_LOCATION + gdt_size + 1;
 
     idt_clear_gates();

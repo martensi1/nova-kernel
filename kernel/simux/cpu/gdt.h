@@ -9,7 +9,6 @@
 #include <simux/types.h>
 
 
-// GDT entries
 #define GDT_SEGMENT_PRESENT(x)          (((x) & 0x01) << 0x07) // Present
 #define GDT_SEGMENT_PRIVILEGE(x)        (((x) & 0x03) << 0x05) // Privilege level (0 - 3)
 #define GDT_SEGMENT_DESCRIPTOR_TYPE(x)  (((x) & 0x01) << 0x04) // Descriptor type (0 for system, 1 for code/data)
@@ -38,17 +37,38 @@
 #define GDT_SEGMENT_DATA_PL3 GDT_SEGMENT_PRESENT(1)     | GDT_SEGMENT_PRIVILEGE(3) | GDT_SEGMENT_DESCRIPTOR_TYPE(1) | \
                              GDT_SEGMENT_GRANULARITY(1) | GDT_SEGMENT_SIZE(1)      | GDT_SEGMENT_LONG_MODE(0) | GDT_SEGMENT_DATA_RDWR
 
-// Define segment register values
-// The segment registers are 16 bits, and the first 13 bits are the index
-// of the segment in the GDT, and the last 3 bits are if it's a GDT or LDT
-// and the privilege level
-// 0x08 -> kernel code segment (index 1, GDT, privilege level 0)
-// 0x10 -> kernel data segment (index 2, GDT, privilege level 0)
-#define CS_KERNEL 0x08
-#define DS_KERNEL 0x10
+
+typedef struct __attribute__((packed)) {
+    u16 size;
+    u32 offset;
+} GDTR;
 
 
-u16 gdt_initialize(const u32 location);
+class GDT
+{
+public:
+    /// @brief Initializes the Global Descriptor Table (GDT)
+    /// @param write_address Location in memory where the GDT should be written
+    /// @param gdt_size Size of the GDT in bytes (will be set by the function)
+    static void setup(const u32 write_address, u16& gdt_size);
+
+    // Define possible segment register values (16 bit)
+    // The first 13 bits are the index of the segment in the GDT
+    // Last 3 bits are if it's a GDT or LDT and the privilege level
+    // 0x08 -> kernel code segment (index 1, GDT, privilege level 0)
+    // 0x10 -> kernel data segment (index 2, GDT, privilege level 0)
+    enum SegmentRegisterValues : u16 {
+        KERNEL_CODE_SEGMENT = 0x08,
+        KERNEL_DATA_SEGMENT = 0x10,
+    };
+
+private:
+    static void writeTable(u32 write_address, GDTR& gdtr);
+    static void loadTable(const GDTR& gdtr);
+
+    static void* writeDescriptor(void* dest, u32 base, u32 limit, u16 flags);
+
+};
 
 
 #endif // __SIMUX_GDT_H__

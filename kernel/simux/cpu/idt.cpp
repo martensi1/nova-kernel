@@ -58,7 +58,7 @@ static void write_idt_table(const u32 location, idtr_t* idtr_value)
         else
         {
             idt_entry_t* entry = &idt_table[i];
-            write_descriptor(dest, entry->offset, CS_KERNEL, entry->gate_type);
+            write_descriptor(dest, entry->offset, GDT::KERNEL_CODE_SEGMENT, entry->gate_type);
         }
     }
     

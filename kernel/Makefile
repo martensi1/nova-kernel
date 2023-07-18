@@ -4,7 +4,7 @@ TARGET := simux_kernel.elf
 CC := g++
 AS := nasm
 ASM_FLAGS := -f elf32
-CPP_FLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror
+CPP_FLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror -std=c++11
 LD_FLAGS = -m elf_i386 -T linker.ld
 
 ifeq ($(DEBUG), 1)
