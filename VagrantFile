@@ -2,7 +2,7 @@
 VAGRANT_FILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
-    # Box to use (Ubuntu 16)
+    # Box to use (Debian Bookworm 64-bit)
     config.vm.box = "debian/bookworm64"
     config.vm.box_version = "12.20240212.1"
 
