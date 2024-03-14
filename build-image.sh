@@ -1,7 +1,7 @@
 # Setup
 cd "$(dirname "$0")"
 
-ELF_FILE="./kernel/bin/simux_kernel.elf"
+ELF_FILE="./kernel/bin/nova_kernel.elf"
 OUTPUT_DIR="./bin"
 
 IMAGE_PATH="$OUTPUT_DIR/kernel.img"
@@ -71,7 +71,7 @@ grub-install --target "$GRUB_TARGET" --no-floppy --root-directory="$MOUNT_DIR" "
 
 # Install kernel
 cp "$ELF_FILE" "$MOUNT_DIR/boot/"
-grub-file --is-x86-multiboot "$MOUNT_DIR/boot/simux_kernel.elf"
+grub-file --is-x86-multiboot "$MOUNT_DIR/boot/nova_kernel.elf"
 
 if [ $? -ne 0 ]; then
     echo "Kernel is not multiboot compatible!"

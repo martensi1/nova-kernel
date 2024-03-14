@@ -1,4 +1,4 @@
-# Simux
+# Nova
 
 Hobby project OS written in C++ and C
 

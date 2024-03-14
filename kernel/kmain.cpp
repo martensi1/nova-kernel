@@ -1,9 +1,9 @@
-#include <simux/tty.h>
-#include <simux/cpu/setup.h>
-#include <simux/kernel.h>
-#include <simux/hbit.h>
-#include <simux/sbit.h>
-#include <simux/timers/pit.h>
+#include <nova/tty.h>
+#include <nova/cpu/setup.h>
+#include <nova/kernel.h>
+#include <nova/hbit.h>
+#include <nova/sbit.h>
+#include <nova/timers/pit.h>
 
 
 #if !defined(__i386__)

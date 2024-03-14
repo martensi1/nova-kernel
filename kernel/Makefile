@@ -1,5 +1,5 @@
 # Architectire, compiler and flags
-TARGET := simux_kernel.elf
+TARGET := nova_kernel.elf
 
 CC := g++
 AS := nasm

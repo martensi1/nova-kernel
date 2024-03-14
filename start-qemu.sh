@@ -1,6 +1,6 @@
 QEMU_MEMORY=1024
 QEMU_DRIVE="format=raw,file=./bin/kernel.img"
-ELF_FILE="./bin/simux_kernel.elf"
+ELF_FILE="./bin/nova_kernel.elf"
 
 sh ./kill-qemu.sh
 
@@ -17,7 +17,7 @@ if [ $1 = "-debug-deamon" ]; then
 
     gdb \
     -ex "target remote localhost:1234" \
-    -ex "symbol-file ./bin/simux_kernel.elf" \
+    -ex "symbol-file ./bin/nova_kernel.elf" \
     -ex "break kmain" \
     -ex "continue"
 else

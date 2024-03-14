@@ -1,5 +1,5 @@
-#ifndef __SIMUX_LIBC_STRING_H__
-#define __SIMUX_LIBC_STRING_H__
+#ifndef __NOVA_LIBC_STRING_H__
+#define __NOVA_LIBC_STRING_H__
 
 #include <stddef.h>
 
@@ -17,4 +17,4 @@ char* strncpy(char* destination, const char* source, size_t num);
 size_t strlen(const char* str);
 
 
-#endif // __SIMUX_LIBC_STRING_H__
+#endif // __NOVA_LIBC_STRING_H__
