@@ -16,7 +16,8 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
         "zip",               # for packaging the kernel
         "ntp",               # for time synchronization (to avoid problems with certificates and clock skew compiler warnings)
         "gdb",               # debugger
-        "fdisk"              # disk partitioning utility
+        "fdisk",             # disk partitioning utility
+        "git"                # version handling
     ]
     
     # Install dependencies
