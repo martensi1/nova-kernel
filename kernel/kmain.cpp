@@ -4,6 +4,7 @@
 #include <nova/hbit.h>
 #include <nova/sbit.h>
 #include <nova/timers/pit.h>
+#include <nova/build.h>
 
 
 #if !defined(__i386__)
@@ -19,6 +20,11 @@ extern "C" {
     void kmain(u32 boot_handover_eax) 
     {
         term_initialize();
+
+        logk("==============================");
+        logk("= NOVA OS");
+        logk("==============================");
+        logk("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
         
         hbit_run(boot_handover_eax);
         pic_setup_interrupt_generator(200);
