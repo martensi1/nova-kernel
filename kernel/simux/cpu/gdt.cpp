@@ -55,8 +55,8 @@ void GDT::loadTable(const GDTR& gdtr)
         mov %%ax, %%fs\n \
         mov %%ax, %%gs\n \
         mov %%ax, %%ss\n \
-        jmp %1, $gdt_jump\n \
-        gdt_jump:\n \
+        jmp %1, $gdt_jump_%=\n \
+        gdt_jump_%=:\n \
         " : : "i" (KERNEL_DATA_SEGMENT), "i" (KERNEL_CODE_SEGMENT));
     
 
