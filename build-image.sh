@@ -5,7 +5,7 @@ ELF_FILE="./kernel/bin/simux_kernel.elf"
 OUTPUT_DIR="./bin"
 
 IMAGE_PATH="$OUTPUT_DIR/kernel.img"
-IMAGE_SIZE="8M"
+IMAGE_SIZE="30M"
 
 DISK_GEOMETRY_HEADS="16"
 DISK_GEOMETRY_SECTORS="63"

@@ -76,8 +76,8 @@ static void load_gdt_table(gdtr_t* gdtr_value)
         mov %%ax, %%fs\n \
         mov %%ax, %%gs\n \
         mov %%ax, %%ss\n \
-        jmp %1, $gdt_jump\n \
-        gdt_jump:\n \
+        jmp %1, $gdt_jump_%=\n \
+        gdt_jump_%=:\n \
         " : : "i" (DS_KERNEL), "i" (CS_KERNEL));
     
 

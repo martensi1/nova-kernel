@@ -24,11 +24,11 @@ else
     qemu-system-i386 \
     -m $QEMU_MEMORY \
     -drive "$QEMU_DRIVE" \
-    -curses \
+    -display curses \
     -serial /dev/tty
 fi
 
 sh ./kill-qemu.sh
 
-reset
+#reset
 exit 0

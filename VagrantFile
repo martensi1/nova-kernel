@@ -3,8 +3,8 @@ VAGRANT_FILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
     # Box to use (Ubuntu 16)
-    config.vm.box = "ubuntu/xenial32"
-    config.vm.box_version = "20211001.0.0"
+    config.vm.box = "debian/bookworm64"
+    config.vm.box_version = "12.20240212.1"
 
     # Dependencies for building the kernel
     package_list = [
@@ -12,10 +12,11 @@ Vagrant.configure(VAGRANT_FILE_API_VERSION) do |config|
         "make",              # build automation tool
         "build-essential",   # C/C++ compiler
         "grub2",             # bootloader
-        "qemu",              # emulator for testing the kernel
+        "qemu-system",       # emulator for testing the kernel
         "zip",               # for packaging the kernel
         "ntp",               # for time synchronization (to avoid problems with certificates and clock skew compiler warnings)
-        "gdb"                # debugger
+        "gdb",               # debugger
+        "fdisk"              # disk partitioning utility
     ]
     
     # Install dependencies
