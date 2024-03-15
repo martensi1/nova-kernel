@@ -7,6 +7,8 @@
 #include <nova/build.h>
 #include <nova/serial/serial.h>
 
+using namespace Nova;
+
 
 extern "C" {
     void kmain(u32 boot_handover_eax) 
@@ -18,7 +20,7 @@ extern "C" {
         logk("==============================");
         logk("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
         
-        hbit_run(boot_handover_eax);
+        RunHBIT(boot_handover_eax);
         pic_setup_interrupt_generator(200);
         cpu_setup();
 
