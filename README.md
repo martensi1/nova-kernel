@@ -2,13 +2,13 @@
 
 Hobby project OS written in C++ and C
 
-# Architectures
+## Architectures
 
 Currently supports:
 
 - x86-family
 
-# Structure
+## Structure
 
 - `kernel` - Kernel source code
 - `libc` - libc implementation used by kernel
