@@ -21,6 +21,10 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
+#ifndef NOVA_BUILD_H
+#define NOVA_BUILD_H
+
+
 #define NOVA_DO_STRINGIZE(x) #x
 #define NOVA_STRINGIZE(X) NOVA_DO_STRINGIZE(x)
 
@@ -55,3 +59,5 @@
 #else
     #error "Unknown target arhitecture"
 #endif
+
+#endif // NOVA_BUILD_H
