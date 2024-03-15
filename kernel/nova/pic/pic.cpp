@@ -2,7 +2,7 @@
 PIC (Programmable Interrupt Controller) is a chip that is used to manage interrupts.
 This file contains functions that are used to configure and manage the PIC (specifically the 8259 chip).
 */
-#include <nova/pic/pic.h>
+#include "pic.h"
 #include <nova/cpu/sysbus.h>
 
 

@@ -4,8 +4,8 @@ TARGET := nova_kernel.elf
 CC := g++
 AS := nasm
 ASM_FLAGS := -f elf32
-CPP_FLAGS := -m32 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-rtti -Wall -Wextra -Werror -std=c++11 -DNOVA_ARCH_I386=1
-LD_FLAGS = -m elf_i386 -T linker.ld
+CPP_FLAGS := -m32 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11 -DNOVA_ARCH_I386=1
+LD_FLAGS = -m elf_i386 -T linker.ld -z noexecstack
 
 ifeq ($(DEBUG), 1)
 	CPP_FLAGS += -g
@@ -46,6 +46,7 @@ $(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
 
 	@echo "-> Binary information:"
 	nm -n $(OUTPUT)
+	readelf -S $(OUTPUT)
 
 	@echo "-> Done!"
 

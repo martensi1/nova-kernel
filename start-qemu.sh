@@ -25,7 +25,7 @@ else
     -m $QEMU_MEMORY \
     -drive "$QEMU_DRIVE" \
     -display curses \
-    -serial /dev/tty
+    -serial file:serial.log
 fi
 
 sh ./kill-qemu.sh

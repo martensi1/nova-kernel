@@ -5,15 +5,7 @@
 #include <nova/sbit.h>
 #include <nova/timers/pit.h>
 #include <nova/build.h>
-
-
-#if !defined(__i386__)
-    #error This project must be compiled with an x86-elf compiler!
-#endif
-
-#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
-    #error This project must be compiled with a little endian compiler!
-#endif
+#include <nova/serial/serial.h>
 
 
 extern "C" {
@@ -29,6 +21,15 @@ extern "C" {
         hbit_run(boot_handover_eax);
         pic_setup_interrupt_generator(200);
         cpu_setup();
+
+        Serial::setup(Serial::COM1);
+        //Serial::setup(Serial::COM2);
+        Serial::writeData(Serial::COM1, 'H');
+        Serial::writeData(Serial::COM1, 'H');
+        //Serial::writeData(Serial::COM2, 'H');
+        //Serial::writeData(Serial::COM2, 'H');
+        Serial::flush(Serial::COM1);
+        //Serial::flush(Serial::COM2);
 
         sbit_run();
 

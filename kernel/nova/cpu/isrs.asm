@@ -151,8 +151,8 @@ cpuex_nocode 31; Exception 31: Reserved
 irq_handler 0, 32; IRQ 0: System timer
 irq_handler 1, 33; IRQ 1: Keyboard
 irq_handler 2, 34; IRQ 2: Cascade (used internally by the two PICs. never raised)
-irq_handler 3, 35; IRQ 3: COM2
-irq_handler 4, 36; IRQ 4: COM1
+irq_handler 3, 35; IRQ 3: COM2, COM4
+irq_handler 4, 36; IRQ 4: COM1, COM3
 irq_handler 5, 37; IRQ 5: LPT2
 irq_handler 6, 38; IRQ 6: Floppy disk
 irq_handler 7, 39; IRQ 7: LPT1 / Unreliable "spurious" interrupt (usually)
