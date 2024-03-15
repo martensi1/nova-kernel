@@ -9,19 +9,19 @@
 
 
 
-void GDT::setup(const u32 write_address, u16& gdt_size)
+void GDT::setup(const u32 writeAddress, u16& gdtSize)
 {
     GDTR gdtr;
 
-    writeTable(write_address, gdtr);
+    writeTable(writeAddress, gdtr);
     loadTable(gdtr);
 
-    gdt_size = gdtr.size;
+    gdtSize = gdtr.size;
 }
 
-void GDT::writeTable(u32 write_address, GDTR& gdtr)
+void GDT::writeTable(u32 writeAddress, GDTR& gdtr)
 {
-    void* dest = (void*)write_address;
+    void* dest = (void*)writeAddress;
 
     // We want to use paging and not segmentation, so we define 
     // 4 large overlapping segments that cover the entire 4GB address space
@@ -31,8 +31,8 @@ void GDT::writeTable(u32 write_address, GDTR& gdtr)
     dest = writeDescriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
     dest = writeDescriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
 
-    gdtr.size = (u16)((u32)dest - write_address);
-    gdtr.offset = write_address;
+    gdtr.size = (u16)((u32)dest - writeAddress);
+    gdtr.offset = writeAddress;
 
     logk("Global Descriptor Table (GDT) successfully written to memory");
 }

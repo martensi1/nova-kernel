@@ -53,6 +53,26 @@ static void check_start_address(void)
     }
 }
 
+static bool called = false;
+
+
+__attribute__ ((constructor)) void global_constructor_test() 
+{
+    called = true;
+}
+
+static void check_global_constructors_called(void)
+{
+    if (called)
+    {
+        TEST_OK("Global constructor initialization");
+    }
+    else
+    {
+        TEST_FAIL("Global constructors not initialized", 0);
+    }
+}
+
 
 /// @brief Runs the HBIT (Handover Built-in Test)
 /// @param boot_handover_eax The value of the EAX register when the bootloader handed over control to the kernel
@@ -63,6 +83,7 @@ void hbit_run(u32 boot_handover_eax)
     check_if_multiboot_loaded(boot_handover_eax);
     check_cpu_mode();
     check_start_address();
+    check_global_constructors_called();
 
     logk("HBIT passed!");
 }

@@ -48,9 +48,9 @@ class GDT
 {
 public:
     /// @brief Initializes the Global Descriptor Table (GDT)
-    /// @param write_address Location in memory where the GDT should be written
-    /// @param gdt_size Size of the GDT in bytes (will be set by the function)
-    static void setup(const u32 write_address, u16& gdt_size);
+    /// @param writeAddress Location in memory where the GDT should be written
+    /// @param gdtSize Size of the GDT in bytes (will be set by the function)
+    static void setup(const u32 writeAddress, u16& gdtSize);
 
     // Define possible segment register values (16 bit)
     // The first 13 bits are the index of the segment in the GDT
@@ -63,7 +63,7 @@ public:
     };
 
 private:
-    static void writeTable(u32 write_address, GDTR& gdtr);
+    static void writeTable(u32 writeAddress, GDTR& gdtr);
     static void loadTable(const GDTR& gdtr);
 
     static void* writeDescriptor(void* dest, u32 base, u32 limit, u16 flags);

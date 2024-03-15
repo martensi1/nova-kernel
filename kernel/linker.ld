@@ -26,20 +26,25 @@ SECTIONS {
         *(.text)
     }
 
-
     .data ALIGN (0x1000) : {
         *(.data)
+    }
 
-        /*
-        Arrange global constructors and destructors and specify the start and end addresses
-        The start and end addresses are used in the assembly file to call the constructors and destructors before
-        and after the main function
-        */
+    /*
+    Arrange global constructors and destructors and specify the start and end addresses
+    The start and end addresses are used in the assembly file to call the constructors and destructors before
+    and after the main function
+    */
+    .init_array : {
         ctors_start_addr = .;
-        *(.ctor*)
+        KEEP (*(.init_array))
+        KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*)))
         ctors_end_addr = .;
+    }
+    .fini_array : {
         dtors_start_addr = .;
-        *(.dtor*)
+        KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
+        KEEP (*(.fini_array))
         dtors_end_addr = .;
     }
 
