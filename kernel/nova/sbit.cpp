@@ -12,15 +12,15 @@
 #define TEST_OK(description) logk(" [OK]: %s", description)
 #define TEST_FAIL(description, data) kpanic(description, data)
 
-static spinlock_t irq0_counter_lock = SPINLOCK_UNLOCKED;
+static SpinLock irq0_counter_lock = SpinLock();
 static volatile uint8_t irq0_counter = 0;
 
 
 static void on_irq0()
 {
-    spin_lock_irqsave(irq0_counter_lock);
+    irq0_counter_lock.aqquire();
     irq0_counter++;
-    spin_unlock_irqrestore(irq0_counter_lock);
+    irq0_counter_lock.release();
 }
 
 
@@ -33,16 +33,16 @@ static void check_timer()
 
     for (int i = 0; i < 100; i++) {
         asm volatile("hlt");
-        
-        spin_lock_irqsave(irq0_counter_lock);
+
+        irq0_counter_lock.aqquire();
         
         if (irq0_counter > 10) {
             is_ticking = true;
-            spin_unlock_irqrestore(irq0_counter_lock);
+            irq0_counter_lock.release();
             break;
         }
 
-        spin_unlock_irqrestore(irq0_counter_lock);
+        irq0_counter_lock.release();
     }
 
     static_cast<void>(irq_remove_handler(IRQ0));

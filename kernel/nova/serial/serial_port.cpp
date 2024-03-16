@@ -24,15 +24,13 @@
 #include "serial_port.h"
 #include <nova/cpu/sysbus.h>
 #include <nova/kernel.h>
-#include <nova/spinlock.h>
-
-static spinlock_t serial_lock = SPINLOCK_UNLOCKED;
 
 
 SerialPort::SerialPort(u16 ioPort, u8 divisor) :
     ioPort_(ioPort),
     divisor_(divisor),
-    index_(0)
+    index_(0),
+    lock_()
 {
 }
 
@@ -43,7 +41,7 @@ SerialPort::~SerialPort()
 
 bool SerialPort::initialize()
 {
-    spin_lock_irqsave(serial_lock);
+    lock_.aqquire();
 
     if (divisor_ > 3 || divisor_ < 1)
     {
@@ -59,14 +57,14 @@ bool SerialPort::initialize()
     sysbus_io_out(ioPort_ + 2, 0xC7);     // Enable FIFO, clear them, with 14-byte threshold
     sysbus_io_out(ioPort_ + 4, 0x0B);     // IRQs enabled, RTS/DSR set
 
-    spin_unlock_irqrestore(serial_lock);
+    lock_.release();
 
     return true;
 }
 
 bool SerialPort::doSelfTest()
 {
-    spin_lock_irqsave(serial_lock);
+    lock_.aqquire();
 
     enterLoopbackMode();
     u8 testByte = 0xAE;
@@ -77,14 +75,14 @@ bool SerialPort::doSelfTest()
     bool result = (readData() == testByte);
     exitLoopbackMode();
 
-    spin_unlock_irqrestore(serial_lock);
+    lock_.release();
 
     return result;
 }
 
 void SerialPort::writeData(u8 byte)
 {
-    spin_lock_irqsave(serial_lock);
+    lock_.aqquire();
 
     buffer_[index_] = byte;
     index_++;
@@ -94,7 +92,7 @@ void SerialPort::writeData(u8 byte)
         flush();
     }
 
-    spin_unlock_irqrestore(serial_lock);
+    lock_.release();
 }
 
 void SerialPort::flush()

@@ -28,9 +28,9 @@ inline unsigned long flagreg_dump(void)
 /// @brief Checks if specified CPU flag is set (from a dump)
 /// @param flags Dumped CPU flags
 /// @return True if flag is set, false otherwise
-inline bool flagreg_dump_check_bit(const unsigned long& flags)
+inline bool flagreg_dump_check_bit(const unsigned long& flags, const cpu_flag_t flag)
 {
-	return flags & (1 << (u32)CPUFLAG_IF);
+	return flags & (1 << (u32)flag);
 }
 
 

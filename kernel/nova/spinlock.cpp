@@ -1,42 +1,76 @@
-/**
- * spinlock.cpp
- * Spinlocks are small and simple locks with minimal overhead. They are used to protect critical
- * sections of code from being executed at the same time by multiple threads. Includes both
- * non-reentrant and reentrant locking (interrupt safe)
-*/
-#include <nova/spinlock.h>
+////////////////////////////////////////////////////////////
+//
+// Nova OS
+// Copyright (C) 2024 Simon Mårtensson
+//
+// This software is provided 'as-is', without any express or implied warranty.
+// In no event will the authors be held liable for any damages arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it freely,
+// subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented;
+//    you must not claim that you wrote the original software.
+//    If you use this software in a product, an acknowledgment
+//    in the product documentation would be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such,
+//    and must not be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source distribution.
+//
+////////////////////////////////////////////////////////////
+#include "spinlock.h"
 #include <nova/cpu/flgreg.h>
 #include <nova/cpu/irq.h>
 
 
-void spinlock_aqquire_irq_save(spinlock_t& lock, unsigned long& flags)
-{
-    flags = flagreg_dump();
-    irq_disable();
 
-    spinlock_aqquire(lock);
+SpinLock::SpinLock(bool irqSave) :
+    lock_(0),
+    cpuFlags_(0),
+    irqSave_(irqSave)
+{
 }
 
-void spinlock_release_irq_restore(spinlock_t& lock, const unsigned long& flags)
+SpinLock::~SpinLock()
 {
-    spinlock_release(lock);
+}
 
-    if (flagreg_dump_check_bit(flags))
+
+void SpinLock::aqquire()
+{
+    if (irqSave_)
+    {
+        cpuFlags_ = flagreg_dump();
+        irq_disable();
+    }
+
+    lock();
+}
+
+
+void SpinLock::release()
+{
+    unlock();
+
+    if (irqSave_ && flagreg_dump_check_bit(cpuFlags_, CPUFLAG_IF))
     {
         irq_enable();
     }
 }
 
-void spinlock_aqquire(spinlock_t& lock)
+
+void SpinLock::lock()
 {
-    while (__atomic_test_and_set(&lock, __ATOMIC_ACQUIRE))
+    while (__atomic_test_and_set(&lock_, __ATOMIC_ACQUIRE))
     {
         __builtin_ia32_pause();
     }
 }
 
-void spinlock_release(spinlock_t& lock)
+void SpinLock::unlock()
 {
-    __atomic_clear(&lock, __ATOMIC_RELEASE);
+    __atomic_clear(&lock_, __ATOMIC_RELEASE);
 }
-

@@ -26,7 +26,7 @@ LOCATE_ISR(8);
 #define IRQ_MAX IDT_NUM_ENTRIES - IDT_INTERRUPTS_START
 
 static irq_handler_t irq_handlers[IRQ_MAX] = { 0 };
-static spinlock_t irq_handlers_lock = SPINLOCK_UNLOCKED;
+static SpinLock irq_handlers_lock = SpinLock();
 
 
 static inline void check_bounds(irq_number_t irq)
@@ -68,7 +68,7 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
     }
 
     check_bounds(irq);
-    spin_lock_irqsave(irq_handlers_lock);
+    irq_handlers_lock.aqquire();
 
     irq_handler_t* dest = &irq_handlers[irq];
 
@@ -78,7 +78,7 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
 
     *dest = handler;
 
-    spin_unlock_irqrestore(irq_handlers_lock);
+    irq_handlers_lock.release();
 }
 
 /// @brief Removes the interrupt handler for the given IRQ
@@ -87,12 +87,12 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
 irq_handler_t irq_remove_handler(irq_number_t irq)
 {
     check_bounds(irq);
-    spin_lock_irqsave(irq_handlers_lock);
+    irq_handlers_lock.aqquire();
 
     irq_handler_t handler = irq_handlers[irq];
     irq_handlers[irq] = NULL;
 
-    spin_unlock_irqrestore(irq_handlers_lock);
+    irq_handlers_lock.release();
     return handler;
 }
 
@@ -101,9 +101,9 @@ extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
 {
     static_cast<void>(interrupt_index);
 
-    spin_lock_irqsave(irq_handlers_lock);
+    irq_handlers_lock.aqquire();
     irq_handler_t handler = irq_handlers[irq_number];
-    spin_unlock_irqrestore(irq_handlers_lock);
+    irq_handlers_lock.release();
 
     if (handler != NULL)
     {

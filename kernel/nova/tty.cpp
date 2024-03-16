@@ -5,7 +5,7 @@
 
 
 struct console_driver* current_driver = NULL;
-static spinlock_t write_lock = SPINLOCK_UNLOCKED;
+static SpinLock write_lock = SpinLock();
 
 
 static void choose_driver()
@@ -47,7 +47,7 @@ void term_clear()
 
 void term_write(const char* data, size_t size)
 {
-    spin_lock_irqsave(write_lock);
+    write_lock.aqquire();
 
     for (size_t i = 0; i < size; i++) {
         char c  = data[i];
@@ -61,7 +61,7 @@ void term_write(const char* data, size_t size)
     }
 
     current_driver->update_cursor();
-    spin_unlock_irqrestore(write_lock);
+    write_lock.release();
 }
 
 void term_write_str(const char* str)

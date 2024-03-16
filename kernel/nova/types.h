@@ -19,4 +19,7 @@ typedef uint16_t u16;
 typedef uint32_t u32;
 
 
+#define NOVA_ALWAYS_INLINE inline __attribute__((always_inline))
+
+
 #endif // __NOVA_DATA_TYPES_H__

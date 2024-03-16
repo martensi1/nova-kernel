@@ -25,6 +25,7 @@
 #define NOVA_SERIAL_PORT_H
 
 #include <nova/types.h>
+#include <nova/spinlock.h>
 
 class SerialPort
 {
@@ -56,6 +57,7 @@ private:
     u8 buffer_[256];
     u32 index_;
 
+    SpinLock lock_;
 };
 
 #endif // NOVA_SERIAL_PORT_H
