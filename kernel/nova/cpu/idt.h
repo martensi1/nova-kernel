@@ -6,7 +6,7 @@
 #ifndef __NOVA_IDT_H__
 #define __NOVA_IDT_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 #define IDT_ENTRY_SIZE_BYTES 8

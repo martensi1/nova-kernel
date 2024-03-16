@@ -1,6 +1,5 @@
 #include <nova/kernel.h>
 #include <nova/tty.h>
-#include <nova/types.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
 #include <libc/ctype.h>

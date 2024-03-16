@@ -1,7 +1,7 @@
 #ifndef __NOVA_TERMINAL_H__
 #define __NOVA_TERMINAL_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 void term_initialize();

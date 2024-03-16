@@ -5,7 +5,7 @@ Functionality for writing to and reading from I/O ports on the system's IO bus
 #ifndef __NOVA_SYSTEM_BUS_H__
 #define __NOVA_SYSTEM_BUS_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 /// @brief Writes value to the specified I/O port

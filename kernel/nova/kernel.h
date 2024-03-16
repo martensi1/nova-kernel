@@ -1,7 +1,7 @@
 #ifndef __NOVA_KERNEL_KERNEL_H__
 #define __NOVA_KERNEL_KERNEL_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 void khalt(void);

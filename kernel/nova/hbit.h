@@ -24,7 +24,7 @@
 #ifndef NOVA_HANDOVER_BIT_H
 #define NOVA_HANDOVER_BIT_H
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 namespace Nova
 {

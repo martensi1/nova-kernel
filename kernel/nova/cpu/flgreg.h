@@ -5,7 +5,7 @@
 #ifndef __NOVA_FLAGS_REGISTRY_H__
 #define __NOVA_FLAGS_REGISTRY_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 /// @brief List of FLAGS registry flags

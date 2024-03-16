@@ -6,7 +6,7 @@
 #ifndef __NOVA_GDT_H__
 #define __NOVA_GDT_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 #define GDT_SEGMENT_PRESENT(x)          (((x) & 0x01) << 0x07) // Present

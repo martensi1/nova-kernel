@@ -1,5 +1,5 @@
 #include <nova/tty.h>
-#include <nova/spinlock.h>
+#include <nova/locks.h>
 #include <nova/console/driver.h>
 #include <libc/string.h>
 
@@ -47,7 +47,7 @@ void term_clear()
 
 void term_write(const char* data, size_t size)
 {
-    write_lock.aqquire();
+    SpinGuard guard(write_lock);
 
     for (size_t i = 0; i < size; i++) {
         char c  = data[i];
@@ -61,7 +61,6 @@ void term_write(const char* data, size_t size)
     }
 
     current_driver->update_cursor();
-    write_lock.release();
 }
 
 void term_write_str(const char* str)

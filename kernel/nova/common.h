@@ -21,56 +21,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#include "spinlock.h"
-#include <nova/cpu/flgreg.h>
-#include <nova/cpu/irq.h>
+#ifndef NOVA_COMMON_H
+#define NOVA_COMMON_H
+
+#include <nova/common/types.h>
+#include <nova/common/macros.h>
+#include <nova/sync/spin_lock.h>
+#include <nova/sync/spin_guard.h>
 
 
-
-SpinLock::SpinLock(bool irqSave) :
-    lock_(0),
-    cpuFlags_(0),
-    irqSave_(irqSave)
-{
-}
-
-SpinLock::~SpinLock()
-{
-}
-
-
-void SpinLock::aqquire()
-{
-    if (irqSave_)
-    {
-        cpuFlags_ = flagreg_dump();
-        irq_disable();
-    }
-
-    lock();
-}
-
-
-void SpinLock::release()
-{
-    unlock();
-
-    if (irqSave_ && flagreg_dump_check_bit(cpuFlags_, CPUFLAG_IF))
-    {
-        irq_enable();
-    }
-}
-
-
-void SpinLock::lock()
-{
-    while (__atomic_test_and_set(&lock_, __ATOMIC_ACQUIRE))
-    {
-        __builtin_ia32_pause();
-    }
-}
-
-void SpinLock::unlock()
-{
-    __atomic_clear(&lock_, __ATOMIC_RELEASE);
-}
+#endif // NOVA_COMMON_H

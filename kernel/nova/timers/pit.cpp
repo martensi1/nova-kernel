@@ -4,7 +4,7 @@
 */
 #include <nova/timers/pit.h>
 #include <nova/cpu/sysbus.h>
-#include <nova/spinlock.h>
+#include <nova/locks.h>
 #include <nova/kernel.h>
 
 
@@ -81,7 +81,7 @@ static void set_reload_value(u8 port, u16 value)
 /// @param frequency The frequency at which to generate interrupts (the nearest possible frequency will be used)
 void pic_setup_interrupt_generator(const u32 frequency)
 {
-    pit_lock.aqquire();
+    SpinGuard guard(pit_lock);
 
     if (frequency == 0)
     {
@@ -102,6 +102,4 @@ void pic_setup_interrupt_generator(const u32 frequency)
 
     set_reload_value(PIT_CHANNEL0_DATA_PORT, reload_value);
     logk("PIC setup: frequency = %d Hz", actual_frequency);
-
-    pit_lock.release();
 }

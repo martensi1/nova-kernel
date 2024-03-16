@@ -25,7 +25,7 @@
 #define NOVA_SERIAL_H
 
 #include "serial_port.h"
-#include <nova/types.h>
+#include <nova/common.h>
 
 class Serial
 {

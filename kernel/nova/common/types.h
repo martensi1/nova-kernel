@@ -21,42 +21,21 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_SERIAL_PORT_H
-#define NOVA_SERIAL_PORT_H
+#ifndef NOVA_DATA_TYPES_H
+#define NOVA_DATA_TYPES_H
 
-#include <nova/common.h>
+#include <stdint.h>
+#include <stddef.h>
 
-class SerialPort
-{
-public:
-    SerialPort(u16 ioPort, u8 divisor = 1);
-    ~SerialPort();
 
-    bool initialize();
-    bool doSelfTest();
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
 
-    void writeData(u8 byte);
-    void flush();
 
-    bool hasData();
-    u8 readData();
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
 
-    u32 getPort() const;
-    u32 getBaudRate() const;
 
-private:
-    void enterLoopbackMode();
-    void exitLoopbackMode();
-
-    bool isTransitEmpty();
-
-    u16 ioPort_;
-    u8 divisor_;
-
-    u8 buffer_[256];
-    u32 index_;
-
-    SpinLock lock_;
-};
-
-#endif // NOVA_SERIAL_PORT_H
+#endif // NOVA_DATA_TYPES_H

@@ -6,7 +6,7 @@
 #ifndef __NOVA_CPU_ID_H__
 #define __NOVA_CPU_ID_H__
 
-#include <nova/types.h>
+#include <nova/common.h>
 
 
 // Processor vendor ID strings

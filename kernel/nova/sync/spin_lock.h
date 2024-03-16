@@ -24,7 +24,8 @@
 #ifndef NOVA_SPINLOCK_H
 #define NOVA_SPINLOCK_H
 
-#include <nova/types.h>
+#include <nova/common/types.h>
+#include <nova/common/macros.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -46,12 +47,6 @@ public:
     SpinLock(bool irqSave=true);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Destructor
-    ///
-    ////////////////////////////////////////////////////////////
-    ~SpinLock();
-
-    ////////////////////////////////////////////////////////////
     /// \brief Aqquires the lock
     ///
     ////////////////////////////////////////////////////////////
@@ -64,8 +59,18 @@ public:
     void release();
 
 private:
-    void lock();
-    void unlock();
+    void FORCE_INLINE lock()
+    {
+        while (__atomic_test_and_set(&lock_, __ATOMIC_ACQUIRE))
+        {
+            __builtin_ia32_pause();
+        }
+    }
+
+    void FORCE_INLINE unlock()
+    {
+        __atomic_clear(&lock_, __ATOMIC_RELEASE);
+    }
 
     volatile u32 lock_;
     unsigned long cpuFlags_;

@@ -21,42 +21,38 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_SERIAL_PORT_H
-#define NOVA_SERIAL_PORT_H
+#include "spin_lock.h"
+#include <nova/cpu/flgreg.h>
+#include <nova/cpu/irq.h>
 
-#include <nova/common.h>
 
-class SerialPort
+
+SpinLock::SpinLock(bool irqSave) :
+    lock_(0),
+    cpuFlags_(0),
+    irqSave_(irqSave)
 {
-public:
-    SerialPort(u16 ioPort, u8 divisor = 1);
-    ~SerialPort();
+}
 
-    bool initialize();
-    bool doSelfTest();
 
-    void writeData(u8 byte);
-    void flush();
+void SpinLock::aqquire()
+{
+    if (irqSave_)
+    {
+        cpuFlags_ = flagreg_dump();
+        irq_disable();
+    }
 
-    bool hasData();
-    u8 readData();
+    lock();
+}
 
-    u32 getPort() const;
-    u32 getBaudRate() const;
 
-private:
-    void enterLoopbackMode();
-    void exitLoopbackMode();
+void SpinLock::release()
+{
+    unlock();
 
-    bool isTransitEmpty();
-
-    u16 ioPort_;
-    u8 divisor_;
-
-    u8 buffer_[256];
-    u32 index_;
-
-    SpinLock lock_;
-};
-
-#endif // NOVA_SERIAL_PORT_H
+    if (irqSave_ && flagreg_dump_check_bit(cpuFlags_, CPUFLAG_IF))
+    {
+        irq_enable();
+    }
+}

@@ -6,7 +6,7 @@
 #include <nova/cpu/idt.h>
 #include <nova/pic/pic.h>
 #include <nova/kernel.h>
-#include <nova/spinlock.h>
+#include <nova/locks.h>
 #include <libc/string.h>
 
 
@@ -68,7 +68,7 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
     }
 
     check_bounds(irq);
-    irq_handlers_lock.aqquire();
+    SpinGuard guard(irq_handlers_lock);
 
     irq_handler_t* dest = &irq_handlers[irq];
 
@@ -77,8 +77,6 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
     }
 
     *dest = handler;
-
-    irq_handlers_lock.release();
 }
 
 /// @brief Removes the interrupt handler for the given IRQ
@@ -87,12 +85,11 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
 irq_handler_t irq_remove_handler(irq_number_t irq)
 {
     check_bounds(irq);
-    irq_handlers_lock.aqquire();
+    SpinGuard guard(irq_handlers_lock);
 
     irq_handler_t handler = irq_handlers[irq];
     irq_handlers[irq] = NULL;
 
-    irq_handlers_lock.release();
     return handler;
 }
 

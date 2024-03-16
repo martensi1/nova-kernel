@@ -5,7 +5,7 @@
 */
 #include <nova/sbit.h>
 #include <nova/kernel.h>
-#include <nova/spinlock.h>
+#include <nova/locks.h>
 #include <nova/cpu/irq.h>
 
 
@@ -18,9 +18,8 @@ static volatile uint8_t irq0_counter = 0;
 
 static void on_irq0()
 {
-    irq0_counter_lock.aqquire();
+    SpinGuard guard(irq0_counter_lock);
     irq0_counter++;
-    irq0_counter_lock.release();
 }
 
 
@@ -33,16 +32,13 @@ static void check_timer()
 
     for (int i = 0; i < 100; i++) {
         asm volatile("hlt");
-
-        irq0_counter_lock.aqquire();
+        SpinGuard guard(irq0_counter_lock);
         
         if (irq0_counter > 10) {
             is_ticking = true;
             irq0_counter_lock.release();
             break;
         }
-
-        irq0_counter_lock.release();
     }
 
     static_cast<void>(irq_remove_handler(IRQ0));
