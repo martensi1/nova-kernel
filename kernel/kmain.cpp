@@ -13,7 +13,7 @@ using namespace Nova;
 extern "C" {
     void kmain(u32 boot_handover_eax) 
     {
-        term_initialize();
+        InitializeTerminal();
 
         Log("==============================");
         Log("= NOVA OS");

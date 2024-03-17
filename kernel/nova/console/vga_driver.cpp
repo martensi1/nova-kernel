@@ -32,6 +32,9 @@ static size_t vga_row;
 static u8 vga_write_color;
 
 
+using namespace Nova;
+
+
 enum vga_color {
     VGA_COLOR_BLACK = 0,
     VGA_COLOR_BLUE = 1,
@@ -55,14 +58,14 @@ enum vga_color {
 
 static inline u8 read_register(u8 index)
 {
-    sysbus_io_out(VGA_INDEX_PORT, index);
-    return sysbus_io_in(VGA_DATA_PORT);
+    WriteIO(VGA_INDEX_PORT, index);
+    return ReadIO(VGA_DATA_PORT);
 }
 
 static inline void write_register(u8 index, u8 value)
 {
-    sysbus_io_out(VGA_INDEX_PORT, index);
-    sysbus_io_out(VGA_DATA_PORT, value);
+    WriteIO(VGA_INDEX_PORT, index);
+    WriteIO(VGA_DATA_PORT, value);
 }
 
 
@@ -198,7 +201,7 @@ static void vga_clear(void)
 
 
 // Define driver
-struct console_driver vga_driver = {
+struct ConsoleDriver vgaDriver = {
     "vgacon",             // name
     vga_is_available,     // is_available
     vga_initialize,       // initialize

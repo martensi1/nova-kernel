@@ -87,15 +87,15 @@ namespace Nova
             command |= operatingMode;
             command |= PIT_RELOAD_VALUE_MODE;
 
-            sysbus_io_out(PIT_COMMAND_PORT, command);
+            WriteIO(PIT_COMMAND_PORT, command);
         }
 
         static void setReloadValue(u8 port, u16 value)
         {
             asm volatile("cli");
 
-            sysbus_io_out(port, value & 0xFF);
-            sysbus_io_out(port, (value >> 8) & 0xFF);
+            WriteIO(port, value & 0xFF);
+            WriteIO(port, (value >> 8) & 0xFF);
         }
     }
 

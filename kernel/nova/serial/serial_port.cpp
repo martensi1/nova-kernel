@@ -50,13 +50,13 @@ bool SerialPort::initialize()
         return false;
     }
 
-    sysbus_io_out(ioPort_ + 1, 0x00);     // Disable all interrupts
-    sysbus_io_out(ioPort_ + 3, 0x80);     // Enable DLAB (for setting the baud rate divisor)
-    sysbus_io_out(ioPort_ + 0, divisor_); // Set divisor to 3, i.e 38400 baudrate (lo byte)
-    sysbus_io_out(ioPort_ + 1, 0x00);     //                                      (hi byte)
-    sysbus_io_out(ioPort_ + 3, 0x03);     // 8 bits, no parity, one stop bit
-    sysbus_io_out(ioPort_ + 2, 0xC7);     // Enable FIFO, clear them, with 14-byte threshold
-    sysbus_io_out(ioPort_ + 4, 0x0B);     // IRQs enabled, RTS/DSR set
+    WriteIO(ioPort_ + 1, 0x00);     // Disable all interrupts
+    WriteIO(ioPort_ + 3, 0x80);     // Enable DLAB (for setting the baud rate divisor)
+    WriteIO(ioPort_ + 0, divisor_); // Set divisor to 3, i.e 38400 baudrate (lo byte)
+    WriteIO(ioPort_ + 1, 0x00);     //                                      (hi byte)
+    WriteIO(ioPort_ + 3, 0x03);     // 8 bits, no parity, one stop bit
+    WriteIO(ioPort_ + 2, 0xC7);     // Enable FIFO, clear them, with 14-byte threshold
+    WriteIO(ioPort_ + 4, 0x0B);     // IRQs enabled, RTS/DSR set
 
     lock_.release();
 
@@ -101,7 +101,7 @@ void SerialPort::flush()
     for (u8 i = 0; i < index_; ++i)
     {
         while(!isTransitEmpty());
-        sysbus_io_out(ioPort_, buffer_[i]);
+        WriteIO(ioPort_, buffer_[i]);
     }
 
     index_ = 0;
@@ -109,13 +109,13 @@ void SerialPort::flush()
 
 bool SerialPort::hasData()
 {
-    return (sysbus_io_in(ioPort_ + 5) & 1) != 0;
+    return (ReadIO(ioPort_ + 5) & 1) != 0;
 }
 
 u8 SerialPort::readData()
 {
     while (!hasData());
-    return sysbus_io_in(ioPort_);
+    return ReadIO(ioPort_);
 }
 
 u32 SerialPort::getPort() const
@@ -131,15 +131,15 @@ u32 SerialPort::getBaudRate() const
 
 void SerialPort::enterLoopbackMode()
 {
-    sysbus_io_out(ioPort_ + 4, 0x1E);
+    WriteIO(ioPort_ + 4, 0x1E);
 }
 
 void SerialPort::exitLoopbackMode()
 {
-    sysbus_io_out(ioPort_ + 4, 0x0F);
+    WriteIO(ioPort_ + 4, 0x0F);
 }
 
 bool SerialPort::isTransitEmpty()
 {
-    return (sysbus_io_in(ioPort_ + 5) & 0x20) != 0;
+    return (ReadIO(ioPort_ + 5) & 0x20) != 0;
 }
