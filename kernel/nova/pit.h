@@ -41,7 +41,4 @@ namespace Nova
 }
 
 
-void pic_setup_interrupt_generator(const u32 frequency);
-
-
 #endif // NOVA_PIT_H
