@@ -25,8 +25,8 @@
 #include <nova/kernel.h>
 
 
-#define TEST_OK(description) logk(" [OK]: %s", description)
-#define TEST_FAIL(description, data) kpanic(description, data)
+#define TEST_OK(description) Log(" [OK]: %s", description)
+#define TEST_FAIL(description, data) EnterPanic(description, data)
 
 
 // The __attribute__ ((constructor)) attribute causes the function to 
@@ -110,13 +110,13 @@ namespace Nova
     ////////////////////////////////////////////////////////////
     void RunHBIT(u32 bootHandoverEax)
     {
-        logk("Running HBIT (Handover Buildt-in Test)");
+        Log("Running HBIT (Handover Buildt-in Test)");
 
         priv::checkIfMultibootLoaded(bootHandoverEax);
         priv::checkCPUMode();
         priv::checkStartAddress();
         priv::checkGlobalConstructorsCalled();
 
-        logk("HBIT passed!");
+        Log("HBIT passed!");
     }
 }

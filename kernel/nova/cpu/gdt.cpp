@@ -7,6 +7,7 @@
 #include <nova/kernel.h>
 #include <libc/string.h>
 
+using namespace Nova;
 
 
 void GDT::setup(const u32 writeAddress, u16& gdtSize)
@@ -34,12 +35,12 @@ void GDT::writeTable(u32 writeAddress, GDTR& gdtr)
     gdtr.size = (u16)((u32)dest - writeAddress);
     gdtr.offset = writeAddress;
 
-    logk("Global Descriptor Table (GDT) successfully written to memory");
+    Log("Global Descriptor Table (GDT) successfully written to memory");
 }
 
 void GDT::loadTable(const GDTR& gdtr)
 {
-    logk("Loading GDT into processor...");
+    Log("Loading GDT into processor...");
 
     // Disable interrupts and update the GDTR register to
     // point to our new GDT
@@ -60,7 +61,7 @@ void GDT::loadTable(const GDTR& gdtr)
         " : : "i" (KERNEL_DATA_SEGMENT), "i" (KERNEL_CODE_SEGMENT));
     
 
-    logk("GDT loaded and activated"); 
+    Log("GDT loaded and activated"); 
 }
 
 void* GDT::writeDescriptor(void* dest, u32 base, u32 limit, u16 flags)

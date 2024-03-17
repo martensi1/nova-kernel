@@ -7,6 +7,8 @@
 #include <nova/cpu/flgreg.h>
 #include <nova/kernel.h>
 
+using namespace Nova;
+
 
 enum cpu_id_requests {
     CPUID_LEVEL_AND_VENDOR       = 0x00,
@@ -106,15 +108,15 @@ static void fill_version_and_features(cpuinfo_x86_t* cpuinfo)
 void cpuid_identify_cpu(cpuinfo_x86_t& cpuinfo)
 {
     if (!has_cpuid()) {
-        kpanic("CPUID is not supported by the processor");
+        EnterPanic("CPUID is not supported by the processor");
     }
 
-    logk("Gathering CPUID information...");
+    Log("Gathering CPUID information...");
 
     fill_vendor_and_max_input(&cpuinfo);
     fill_version_and_features(&cpuinfo);
 
-    logk("CPUID information successfully obtained");
+    Log("CPUID information successfully obtained");
 }
 
 /// @brief Check if the CPU has a specific feature

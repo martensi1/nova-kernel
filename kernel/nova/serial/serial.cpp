@@ -26,6 +26,9 @@
 #include <nova/kernel.h>
 
 
+using namespace Nova;
+
+
 SerialPort Serial::ports_[8] = {
     SerialPort(0x3F8), // COM1
     SerialPort(0x2F8), // COM2
@@ -42,10 +45,10 @@ void Serial::setup(Serial::Port port)
     auto comPort = getPort(port);
 
     if (!comPort->initialize()) {
-        kpanic("Failed to initialize serial port", port);
+        EnterPanic("Failed to initialize serial port", port);
     }
 
-    logk("Serial port COM%d initialized, baudrate=%d", port, comPort->getBaudRate(), comPort);
+    Log("Serial port COM%d initialized, baudrate=%d", port, comPort->getBaudRate(), comPort);
 }
 
 void Serial::writeData(Serial::Port port, char byte)

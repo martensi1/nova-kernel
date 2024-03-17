@@ -6,8 +6,10 @@
 #include <nova/cpu/idt.h>
 #include <nova/pic/pic.h>
 #include <nova/kernel.h>
-#include <nova/locks.h>
+#include <nova/common.h>
 #include <libc/string.h>
+
+using namespace Nova;
 
 
 #define LOCATE_ISR(x) extern "C" void irq_##x(void);
@@ -33,7 +35,7 @@ static inline void check_bounds(irq_number_t irq)
 {
     if (irq < 0 || irq >= IRQ_MAX)
     {
-        kpanic("IRQ out of range", irq);
+        EnterPanic("IRQ out of range", irq);
     }
 }
 
@@ -73,7 +75,7 @@ void irq_add_handler(irq_number_t irq, irq_handler_t handler)
     irq_handler_t* dest = &irq_handlers[irq];
 
     if (*dest != NULL) {
-        kpanic("IRQ handler already set", irq);
+        EnterPanic("IRQ handler already set", irq);
     }
 
     *dest = handler;

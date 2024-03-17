@@ -1,5 +1,5 @@
 #include <nova/tty.h>
-#include <nova/locks.h>
+#include <nova/common.h>
 #include <nova/console/driver.h>
 #include <libc/string.h>
 

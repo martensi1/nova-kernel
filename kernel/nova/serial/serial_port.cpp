@@ -25,6 +25,7 @@
 #include <nova/cpu/sysbus.h>
 #include <nova/kernel.h>
 
+using namespace Nova;
 
 SerialPort::SerialPort(u16 ioPort, u8 divisor) :
     ioPort_(ioPort),
@@ -45,7 +46,7 @@ bool SerialPort::initialize()
 
     if (divisor_ > 3 || divisor_ < 1)
     {
-        kpanic("Invalid divisor for serial port", divisor_);
+        EnterPanic("Invalid divisor for serial port", divisor_);
         return false;
     }
 

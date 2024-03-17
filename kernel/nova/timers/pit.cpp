@@ -4,8 +4,11 @@
 */
 #include <nova/timers/pit.h>
 #include <nova/cpu/sysbus.h>
-#include <nova/locks.h>
+#include <nova/common.h>
 #include <nova/kernel.h>
+
+
+using namespace Nova;
 
 
 static SpinLock pit_lock = SpinLock();
@@ -85,7 +88,7 @@ void pic_setup_interrupt_generator(const u32 frequency)
 
     if (frequency == 0)
     {
-        kpanic("PIC setup failed: frequency cannot be 0");
+        EnterPanic("PIC setup failed: frequency cannot be 0");
     }
 
     u32 reload_value = PIT_TIMER_FREQUENCY / frequency;
@@ -93,7 +96,7 @@ void pic_setup_interrupt_generator(const u32 frequency)
 
     if (reload_value > PIT_RELOAD_VALUE_MAX)
     {
-        kpanic("PIC setup failed: frequency too low");
+        EnterPanic("PIC setup failed: frequency too low");
     }
 
     configure_channel(
@@ -101,5 +104,5 @@ void pic_setup_interrupt_generator(const u32 frequency)
     );
 
     set_reload_value(PIT_CHANNEL0_DATA_PORT, reload_value);
-    logk("PIC setup: frequency = %d Hz", actual_frequency);
+    Log("PIC setup: frequency = %d Hz", actual_frequency);
 }

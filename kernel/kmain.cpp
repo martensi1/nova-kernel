@@ -15,10 +15,10 @@ extern "C" {
     {
         term_initialize();
 
-        logk("==============================");
-        logk("= NOVA OS");
-        logk("==============================");
-        logk("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
+        Log("==============================");
+        Log("= NOVA OS");
+        Log("==============================");
+        Log("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
         
         RunHBIT(boot_handover_eax);
         pic_setup_interrupt_generator(200);
@@ -33,7 +33,7 @@ extern "C" {
         Serial::flush(Serial::COM1);
         //Serial::flush(Serial::COM2);
 
-        sbit_run();
+        RunSBIT();
 
         while (true) {
             asm volatile("hlt");

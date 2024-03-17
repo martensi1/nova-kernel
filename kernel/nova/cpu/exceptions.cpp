@@ -6,6 +6,8 @@
 #include <nova/cpu/idt.h>
 #include <nova/kernel.h>
 
+using namespace Nova;
+
 
 #define LOCATE_ISR(x) extern "C" void cpuex_##x(void);
 
@@ -86,5 +88,5 @@ void exceptions_setup_gates(void)
 extern "C" void on_exception_interrupt(u32 error_code, u32 interrupt_index)
 {
     static_cast<void>(error_code);
-    kpanic("CPU exception", interrupt_index);
+    EnterPanic("CPU exception", interrupt_index);
 }
