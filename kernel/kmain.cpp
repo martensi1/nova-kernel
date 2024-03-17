@@ -3,7 +3,7 @@
 #include <nova/kernel.h>
 #include <nova/hbit.h>
 #include <nova/sbit.h>
-#include <nova/timers/pit.h>
+#include <nova/pit.h>
 #include <nova/build.h>
 #include <nova/serial/serial.h>
 
@@ -21,7 +21,7 @@ extern "C" {
         Log("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
         
         RunHBIT(boot_handover_eax);
-        pic_setup_interrupt_generator(200);
+        SetupPIC(200);
         cpu_setup();
 
         Serial::setup(Serial::COM1);
