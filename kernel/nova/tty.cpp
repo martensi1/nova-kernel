@@ -1,123 +1,90 @@
-////////////////////////////////////////////////////////////
-//
-// Nova OS
-// Copyright (C) 2024 Simon Mårtensson
-//
-// This software is provided 'as-is', without any express or implied warranty.
-// In no event will the authors be held liable for any damages arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it freely,
-// subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented;
-//    you must not claim that you wrote the original software.
-//    If you use this software in a product, an acknowledgment
-//    in the product documentation would be appreciated but is not required.
-//
-// 2. Altered source versions must be plainly marked as such,
-//    and must not be misrepresented as being the original software.
-//
-// 3. This notice may not be removed or altered from any source distribution.
-//
-////////////////////////////////////////////////////////////
-#include "tty.h"
+#include <nova/tty.h>
 #include <nova/common.h>
 #include <nova/console/driver.h>
 #include <libc/string.h>
 
 
-static ConsoleDriver* choosenDrivers[3] = {NULL, NULL, NULL};
-static SpinLock lock = SpinLock();
-
+extern struct ConsoleDriver dummyDriver;
 extern struct ConsoleDriver vgaDriver;
-//extern struct ConsoleDriver serialDriver;
+
+struct ConsoleDriver* activeDriver = NULL;
+static SpinLock lock = SpinLock();
 
 
 namespace Nova
 {
     namespace priv
     {
-        static void findAndChooseDrivers()
+        ////////////////////////////////////////////////////////////
+        static void chooseDriver()
         {
-            u32 i = 0;
-
             if (vgaDriver.isAvailable()) {
-                choosenDrivers[i++] = &vgaDriver;
+                activeDriver = &vgaDriver;
             }
-
-            /*
-            if (serialDriver.isAvailable()) {
-                choosenDrivers[i++] = &serialDriver;
+            else {
+                activeDriver = &dummyDriver;
             }
-            */
         }
 
-        static void initializeDriver(ConsoleDriver* driver)
-        {
-            driver->initialize();
-            driver->clear();
-
-            driver->enableCursor();
-            driver->updateCursor();
-
-            TerminalWrite("\n\n\n\n\n");
-            TerminalWrite("Terminal initialized (");
-            TerminalWrite(driver->name);
-            TerminalWrite(")\n");
-        }
-
-        static void writeStr(ConsoleDriver* driver, const char* data, size_t size)
+        static FORCE_INLINE void writeData(const char* data, size_t size)
         {
             for (size_t i = 0; i < size; i++) {
                 char c  = data[i];
 
                 if (c == '\n') {
-                    driver->writeLineFeed();
+                    activeDriver->writeLineFeed();
                     continue;
                 }
 
-                driver->writeChar(c);
+                activeDriver->writeChar(c);
             }
 
-            driver->updateCursor();
+            activeDriver->updateCursor();
+        }
+
+        static FORCE_INLINE void writeData(const char* data)
+        {
+            size_t length = strlen(data);
+            writeData(data, length);
         }
     }
 
+    ////////////////////////////////////////////////////////////
     void InitializeTerminal()
     {
-        priv::findAndChooseDrivers();
-    
-        for (size_t i = 0; i < 3; i++) {
-            if (choosenDrivers[i] != NULL) {
-                priv::initializeDriver(choosenDrivers[i]);
-            }
-        }
+        SpinGuard guard(lock);
+        priv::chooseDriver();
+
+        activeDriver->initialize();
+        activeDriver->clear();
+
+        activeDriver->enableCursor();
+        activeDriver->updateCursor();
+
+        priv::writeData("\n\n\n\n\n");
+        priv::writeData("Terminal initialized (");
+        priv::writeData(activeDriver->name);
+        priv::writeData(")\n");
     }
 
+    ////////////////////////////////////////////////////////////
     void ClearTerminal()
     {
-        for (size_t i = 0; i < 3; i++) {
-            if (choosenDrivers[i] != NULL) {
-                choosenDrivers[i]->clear();
-            }
-        }
+        SpinGuard guard(lock);
+        activeDriver->clear();
     }
 
+    ////////////////////////////////////////////////////////////
     void TerminalWrite(const char* data, size_t size)
     {
         SpinGuard guard(lock);
-
-        for (size_t i = 0; i < 3; i++) {
-            if (choosenDrivers[i] != NULL) {
-                priv::writeStr(choosenDrivers[i], data, size);
-            }
-        }
+        priv::writeData(data, size);
     }
 
+    ////////////////////////////////////////////////////////////
     void TerminalWrite(const char* str)
     {
         size_t length = strlen(str);
-        TerminalWrite(str, length);
+        priv::writeData(str, length);
     }
 }
