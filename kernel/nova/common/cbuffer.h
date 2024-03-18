@@ -29,10 +29,18 @@
 #include <libc/string.h>
 
 
+////////////////////////////////////////////////////////////
+/// \brief A circular buffer with a fixed size N
+///
+////////////////////////////////////////////////////////////
 template<int N>
 class CircularBuffer
 {
 public:
+    ////////////////////////////////////////////////////////////
+    /// \brief Constructs a circular buffer
+    ///
+    ////////////////////////////////////////////////////////////
     CircularBuffer() :
         head_(0),
         full_(false)
@@ -40,7 +48,13 @@ public:
         clear();
     }
 
-
+    ////////////////////////////////////////////////////////////
+    /// \brief Pushes data to the buffer
+    ///
+    /// \param data The data to push
+    /// \param size The size of the data
+    ///
+    ////////////////////////////////////////////////////////////
     void push(const char* data, u32 size)
     {
         for (u32 i = 0; i < size; i++)

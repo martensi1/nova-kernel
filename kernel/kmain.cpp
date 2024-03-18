@@ -3,7 +3,7 @@
 #include <nova/kernel.h>
 #include <nova/hbit.h>
 #include <nova/sbit.h>
-#include <nova/pit.h>
+#include <nova/time/pit.h>
 #include <nova/build.h>
 #include <nova/serial/serial.h>
 
