@@ -31,7 +31,7 @@
 extern struct ConsoleDriver vgaDriver;
 extern struct ConsoleDriver serialDriver;
 
-static CircularBuffer<512> history;
+static CircularBuffer<1024> history;
 
 
 static Nova::priv::TerminalInterface interfaces[2] = {
@@ -153,7 +153,7 @@ namespace Nova
                 bool enabled = interface->Enable();
 
                 if (enabled) {
-                    char buffer[512];
+                    char buffer[1024];
                     history.read(buffer);
                     interface->Write(buffer, history.size());
                 }

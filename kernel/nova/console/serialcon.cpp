@@ -68,7 +68,7 @@ static void Flush(void)
 
 static void Clear(void)
 {
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 80; i++) {
         Serial::writeData(port, '=');
     }
 

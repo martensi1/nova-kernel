@@ -10,16 +10,44 @@
 using namespace Nova;
 
 
+
 extern "C" {
+    ////////////////////////////////////////////////////////////
+    /// @brief Prints the welcome message
+    ///
+    ////////////////////////////////////////////////////////////
+    FORCE_INLINE static void PrintLogo(void)
+    {
+        Print("------------------------------------------------\n");
+        Print(" __  _  ____ __  __ ____     ____   ____        \n");
+        Print("|  \\| |/ () \\\\ \\/ // () \\   / () \\ (_ (_` \n");
+        Print("|_|\\__|\\____/ \\__//__/\\__\\  \\____/.__)__) \n");
+        Print("------------------------------------------------\n");
+    }
+
+    ////////////////////////////////////////////////////////////
+    /// @brief Prints the compiler information
+    ///
+    ////////////////////////////////////////////////////////////
+    FORCE_INLINE static void PrintCompilerInfo(void)
+    {
+        Log("Compiled %s by %s", NOVA_BUILD_DATETIME, NOVA_COMPILER, NOVA_ARCHITECTURE);
+    }
+
+    ////////////////////////////////////////////////////////////
+    /// @brief Kernel entry point
+    ///
+    /// @param boot_handover_eax The value of the EAX register 
+    ///                          at the time of the boot handover
+    ///
+    ////////////////////////////////////////////////////////////
     void kmain(u32 boot_handover_eax) 
     {
         InitializeTerminal();
 
-        Log("==============================");
-        Log("= NOVA OS");
-        Log("==============================");
-        Log("Compiled %s by %s", NOVA_BUILD_DATETIME, NOVA_COMPILER, NOVA_ARCHITECTURE);
-        
+        PrintLogo();
+        PrintCompilerInfo();
+
         RunHBIT(boot_handover_eax);
 
         Serial::scanForPorts();
