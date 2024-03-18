@@ -1,10 +1,11 @@
+#!/bin/sh
 QEMU_MEMORY=1024
 QEMU_DRIVE="format=raw,file=./bin/kernel.img"
 ELF_FILE="./bin/nova_kernel.elf"
 
 sh ./kill-qemu.sh
 
-if [ $1 = "-debug-deamon" ]; then
+if [ "$1" = "-debug-deamon" ]; then
     qemu-system-i386 \
     -m $QEMU_MEMORY \
     -drive "$QEMU_DRIVE" \
