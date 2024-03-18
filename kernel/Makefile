@@ -3,9 +3,22 @@ TARGET := nova_kernel.elf
 
 CC := g++
 AS := nasm
-ASM_FLAGS := -f elf32
-CPP_FLAGS := -m32 -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11 -DNOVA_ARCH_I386=1
-LD_FLAGS = -m elf_i386 -T linker.ld -z noexecstack
+
+ASM_FLAGS := 
+CPP_FLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
+LD_FLAGS = -T linker.ld -z noexecstack
+
+ifeq ($(ARCH), i386)
+	ASM_FLAGS += -f elf32
+	CPP_FLAGS += -m32 -DNOVA_ARCH_I386=1
+	LD_FLAGS += -m elf_i386
+else ifeq ($(ARCH), x86_64)
+	ASM_FLAGS += -f elf64
+	CPP_FLAGS += -m64 -DNOVA_ARCH_X86_64=1
+	LD_FLAGS += -m elf_x86_64
+else
+#$(error Target architecture not defined! Please set ARCH to i386 or x86_64)
+endif
 
 ifeq ($(DEBUG), 1)
 	CPP_FLAGS += -g
@@ -44,10 +57,8 @@ $(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
 	@mkdir -p $(BIN_DIR)
 	$(LD) $(LD_FLAGS) -o $@ $^ $(LIBC_STATIC)
 
-	@echo "-> Binary information:"
-	nm -n $(OUTPUT)
-	readelf -S $(OUTPUT)
-
+#	@nm -n $(OUTPUT) >> $(BIN_DIR)/symbols.txt
+#	@readelf -S $(OUTPUT) >> $(BIN_DIR)/sections.txt
 	@echo "-> Done!"
 
 $(OBJ_DIR)/%.o: %.asm
