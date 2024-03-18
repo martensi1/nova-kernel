@@ -28,6 +28,7 @@
 using namespace Nova;
 
 SerialPort::SerialPort(u16 ioPort, u8 divisor) :
+    available_(false),
     ioPort_(ioPort),
     divisor_(divisor),
     index_(0),
@@ -42,7 +43,7 @@ SerialPort::~SerialPort()
 
 bool SerialPort::initialize()
 {
-    lock_.aqquire();
+    SpinGuard guard(lock_);
 
     if (divisor_ > 3 || divisor_ < 1)
     {
@@ -58,33 +59,17 @@ bool SerialPort::initialize()
     WriteIO(ioPort_ + 2, 0xC7);     // Enable FIFO, clear them, with 14-byte threshold
     WriteIO(ioPort_ + 4, 0x0B);     // IRQs enabled, RTS/DSR set
 
-    lock_.release();
+    if (!doSelfTest())
+    {
+        return false;
+    }
 
+    available_ = true;
     return true;
-}
-
-bool SerialPort::doSelfTest()
-{
-    lock_.aqquire();
-
-    enterLoopbackMode();
-    u8 testByte = 0xAE;
-
-    writeData(testByte);
-    flush();
-
-    bool result = (readData() == testByte);
-    exitLoopbackMode();
-
-    lock_.release();
-
-    return result;
 }
 
 void SerialPort::writeData(u8 byte)
 {
-    lock_.aqquire();
-
     buffer_[index_] = byte;
     index_++;
 
@@ -92,8 +77,6 @@ void SerialPort::writeData(u8 byte)
     {
         flush();
     }
-
-    lock_.release();
 }
 
 void SerialPort::flush()
@@ -128,6 +111,26 @@ u32 SerialPort::getBaudRate() const
     constexpr u32 baseBaudRate = 115200;
     return baseBaudRate / divisor_;
 }
+
+bool SerialPort::isAvailable() const
+{
+    return available_;
+}
+
+bool SerialPort::doSelfTest()
+{
+    enterLoopbackMode();
+    u8 testByte = 0xAE;
+
+    writeData(testByte);
+    flush();
+
+    bool result = (readData() == testByte);
+    exitLoopbackMode();
+
+    return result;
+}
+
 
 void SerialPort::enterLoopbackMode()
 {

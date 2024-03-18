@@ -21,17 +21,12 @@ extern "C" {
         Log("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
         
         RunHBIT(boot_handover_eax);
+
+        Serial::scanForPorts();
+        TerminalScanDrivers();
+        
         SetupPIC(200);
         cpu_setup();
-
-        Serial::setup(Serial::COM1);
-        //Serial::setup(Serial::COM2);
-        Serial::writeData(Serial::COM1, 'H');
-        Serial::writeData(Serial::COM1, 'H');
-        //Serial::writeData(Serial::COM2, 'H');
-        //Serial::writeData(Serial::COM2, 'H');
-        Serial::flush(Serial::COM1);
-        //Serial::flush(Serial::COM2);
 
         RunSBIT();
 

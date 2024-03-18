@@ -24,6 +24,9 @@
 #ifndef NOVA_MACROS_H
 #define NOVA_MACROS_H
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+#define ARRAY_FOR_EACH(i, a) for (size_t i = 0; i < ARRAY_SIZE(a); i++)
+
 #define FORCE_INLINE inline __attribute__((always_inline))
 
 

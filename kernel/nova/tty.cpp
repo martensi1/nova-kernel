@@ -25,13 +25,17 @@
 #include <nova/common.h>
 #include <nova/console/driver.h>
 #include <libc/string.h>
+#include <nova/common/cbuffer.h>
 
 
-extern struct ConsoleDriver dummyDriver;
 extern struct ConsoleDriver vgaDriver;
+extern struct ConsoleDriver serialDriver;
 
-struct ConsoleDriver* activeDriver = NULL;
-static SpinLock lock = SpinLock();
+
+static Nova::priv::TerminalInterface interfaces[2] = {
+    { "Screen", &vgaDriver },
+    { "Serial", &serialDriver }
+};
 
 
 namespace Nova
@@ -39,77 +43,158 @@ namespace Nova
     namespace priv
     {
         ////////////////////////////////////////////////////////////
-        static void chooseDriver()
+        TerminalInterface::TerminalInterface(const char* name, ConsoleDriver* driver)
+            : name_(name)
+            , console_(driver)
         {
-            if (vgaDriver.isAvailable()) {
-                activeDriver = &vgaDriver;
-            }
-            else {
-                activeDriver = &dummyDriver;
-            }
         }
 
         ////////////////////////////////////////////////////////////
-        static FORCE_INLINE void writeData(const char* data, size_t size)
+        void TerminalInterface::Enable()
+        {
+            SpinGuard guard(lock_);
+
+            if (enabled_) {
+                return;
+            }
+
+            console_->initialize();
+            console_->clear();
+
+            console_->enableCursor();
+            console_->updateCursor();
+
+            writeData("Terminal initialized (");
+            writeData(console_->name);
+            writeData(")\n");
+
+            enabled_ = true;
+        }
+
+        ////////////////////////////////////////////////////////////
+        void TerminalInterface::Disable()
+        {
+            SpinGuard guard(lock_);
+
+            if (!enabled_) {
+                return;
+            }
+
+            console_->clear();
+            console_->disableCursor();
+            enabled_ = false;
+        }
+
+        ////////////////////////////////////////////////////////////
+        void TerminalInterface::Write(const char* data, size_t size)
+        {
+            SpinGuard guard(lock_);
+            writeData(data, size);
+        }
+
+
+        ////////////////////////////////////////////////////////////
+        void TerminalInterface::Write(const char* str)
+        {
+            size_t length = strlen(str);
+            writeData(str, length);
+        }
+
+        ////////////////////////////////////////////////////////////
+        void TerminalInterface::Flush()
+        {
+            SpinGuard guard(lock_);
+            console_->flush();
+        }
+
+        ////////////////////////////////////////////////////////////
+        void TerminalInterface::Clear()
+        {
+            SpinGuard guard(lock_);
+            console_->clear();
+        }
+
+        ////////////////////////////////////////////////////////////
+        void TerminalInterface::writeData(const char* data, size_t size)
         {
             for (size_t i = 0; i < size; i++) {
                 char c  = data[i];
 
                 if (c == '\n') {
-                    activeDriver->writeLineFeed();
+                    console_->writeLineFeed();
                     continue;
                 }
 
-                activeDriver->writeChar(c);
+                console_->writeChar(c);
             }
 
-            activeDriver->updateCursor();
+            console_->updateCursor();
+            console_->flush();
         }
 
         ////////////////////////////////////////////////////////////
-        static FORCE_INLINE void writeData(const char* data)
+        void TerminalInterface::writeData(const char* str)
         {
-            size_t length = strlen(data);
-            writeData(data, length);
+            size_t length = strlen(str);
+            writeData(str, length);
         }
     }
 
     ////////////////////////////////////////////////////////////
-    void InitializeTerminal()
+    void TerminalScanDrivers()
     {
-        SpinGuard guard(lock);
-        priv::chooseDriver();
+        ARRAY_FOR_EACH(i, interfaces) {
+            auto interface = &interfaces[i];
 
-        activeDriver->initialize();
-        activeDriver->clear();
-
-        activeDriver->enableCursor();
-        activeDriver->updateCursor();
-
-        priv::writeData("\n\n\n\n\n");
-        priv::writeData("Terminal initialized (");
-        priv::writeData(activeDriver->name);
-        priv::writeData(")\n");
+            if (interface->IsAvailable()) {
+                interface->Enable();
+            }
+            else if (!interface->IsAvailable()) {
+                interface->Disable();
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////
-    void ClearTerminal()
+    void TerminalClear()
     {
-        SpinGuard guard(lock);
-        activeDriver->clear();
+        ARRAY_FOR_EACH(i, interfaces) {
+            auto interface = &interfaces[i];
+
+            if (interface->IsEnabled()) {
+                interface->Clear();
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////
     void TerminalWrite(const char* data, size_t size)
     {
-        SpinGuard guard(lock);
-        priv::writeData(data, size);
+        ARRAY_FOR_EACH(i, interfaces) {
+            auto interface = &interfaces[i];
+
+            if (interface->IsEnabled()) {
+                interface->Write(data, size);
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////
     void TerminalWrite(const char* str)
     {
         size_t length = strlen(str);
-        priv::writeData(str, length);
+        TerminalWrite(str, length);
+    }
+
+    ////////////////////////////////////////////////////////////
+    void TerminalFlush()
+    {
+        ARRAY_FOR_EACH(i, interfaces) {
+            auto interface = &interfaces[i];
+
+            if (interface->IsEnabled()) {
+                interface->Flush();
+            }
+        }
     }
 }

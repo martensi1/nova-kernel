@@ -40,6 +40,24 @@ SerialPort Serial::ports_[8] = {
     SerialPort(0x4E8)  // COM8
 };
 
+
+void Serial::scanForPorts()
+{
+    for (u16 i = 0; i < ARRAY_SIZE(ports_); i++) {
+        auto comPort = &ports_[i];
+
+        if (comPort->initialize()) {
+            Log("Serial port COM%d found, baudrate=%d", (i+1), comPort->getBaudRate());
+        }
+    }
+}
+
+bool Serial::isPortAvailable(Port port)
+{
+    auto comPort = getPort(port);
+    return comPort->isAvailable();
+}
+
 void Serial::setup(Serial::Port port)
 {
     auto comPort = getPort(port);

@@ -39,6 +39,7 @@ struct ConsoleDriver {
     void (*enableCursor)();
     void (*updateCursor)();
     void (*disableCursor)();
+    void (*flush)();
     void (*clear)();
 };
 

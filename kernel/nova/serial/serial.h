@@ -41,6 +41,9 @@ public:
         COM8 = 0x08,
     };
 
+    static void scanForPorts();
+    static bool isPortAvailable(Port port);
+
     static void setup(Port port);
 
     static void writeData(Port port, char byte);

@@ -127,6 +127,7 @@ namespace Nova
 
             *out = '\0';
             TerminalWrite(buffer);
+            TerminalFlush();
 
             return out - buffer;
         }
@@ -136,7 +137,7 @@ namespace Nova
     void EnterPanic(const char* message, const u32 data)
     {
         asm volatile("cli");
-        ClearTerminal();
+        TerminalClear();
 
         Print("\n\nKernel panic!\n");
         Print("Message: %s\n", message);

@@ -33,7 +33,6 @@ public:
     ~SerialPort();
 
     bool initialize();
-    bool doSelfTest();
 
     void writeData(u8 byte);
     void flush();
@@ -43,12 +42,18 @@ public:
 
     u32 getPort() const;
     u32 getBaudRate() const;
+    
+    bool isAvailable() const;
 
 private:
+    bool doSelfTest();
+
     void enterLoopbackMode();
     void exitLoopbackMode();
 
     bool isTransitEmpty();
+
+    bool available_;
 
     u16 ioPort_;
     u8 divisor_;

@@ -187,6 +187,11 @@ static void vga_disable_cursor(void)
     disable_cursor();
 }
 
+static void vga_flush(void)
+{
+    // Do nothing
+}
+
 static void vga_clear(void)
 {
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
@@ -210,5 +215,6 @@ struct ConsoleDriver vgaDriver = {
     vga_enable_cursor,    // enable_cursor
     vga_update_cursor,    // update_cursor
     vga_disable_cursor,   // disable_cursor
+    vga_flush,            // flush
     vga_clear             // clear
 };

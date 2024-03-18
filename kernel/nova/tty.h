@@ -25,21 +25,135 @@
 #define NOVA_TERMINAL_H
 
 #include <nova/common.h>
+#include <nova/console/driver.h>
+#include <nova/common/cbuffer.h>
 
 
 namespace Nova
 {
+    namespace priv
+    {
+        class TerminalInterface
+        {
+        public:
+            ////////////////////////////////////////////////////////////
+            /// \brief Constructs a terminal interface
+            ///
+            /// \param name The name of the interface
+            /// \param driver The driver to use
+            ///
+            ////////////////////////////////////////////////////////////
+            TerminalInterface(const char* name, ConsoleDriver* driver);
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Checks if the terminal interface is available
+            ///
+            /// \return True if the interface is available
+            ///
+            ////////////////////////////////////////////////////////////
+            bool FORCE_INLINE IsAvailable()
+            {
+                return console_->isAvailable();
+            }
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Enables the terminal interface
+            ///
+            ////////////////////////////////////////////////////////////
+            void Enable();
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Disables the terminal interface
+            ///
+            ////////////////////////////////////////////////////////////
+            void Disable();
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Writes data to the terminal
+            ///
+            /// \param data The data to write
+            /// \param size The size of the data
+            ///
+            ////////////////////////////////////////////////////////////
+            void Write(const char* data, size_t size);
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Writes a string to the terminal
+            ///
+            /// \param str The string to write
+            ///
+            ////////////////////////////////////////////////////////////
+            void Write(const char* str);
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Flushes the terminal
+            ///
+            ////////////////////////////////////////////////////////////
+            void Flush();
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Clears the terminal
+            ///
+            ////////////////////////////////////////////////////////////
+            void Clear();
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Checks if the terminal interface is enabled
+            ///
+            /// \return True if the interface is enabled
+            ///
+            ////////////////////////////////////////////////////////////
+            bool FORCE_INLINE IsEnabled() const
+            {
+                return enabled_;
+            }
+
+            ////////////////////////////////////////////////////////////
+            /// \brief Gets the name of the terminal interface
+            ///
+            /// \return The name of the interface
+            ///
+            ////////////////////////////////////////////////////////////
+            FORCE_INLINE const char* GetName() const
+            {
+                return name_;
+            }
+
+        private:
+            FORCE_INLINE void writeData(const char* data, size_t size);
+            FORCE_INLINE void writeData(const char* str);
+
+            const char* name_;
+            bool enabled_;
+
+            CircularBuffer<256> buffer_;
+            SpinLock lock_;
+
+            ConsoleDriver* console_;
+
+        };
+    }
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Scans for terminal drivers
+    ///
+    ////////////////////////////////////////////////////////////
+    void TerminalScanDrivers();
+
     ////////////////////////////////////////////////////////////
     /// \brief Initializes the terminal
     ///
     ////////////////////////////////////////////////////////////
-    void InitializeTerminal();
+    void FORCE_INLINE InitializeTerminal()
+    {
+        TerminalScanDrivers();
+    }
 
     ////////////////////////////////////////////////////////////
     /// \brief Clears the terminal
     ///
     ////////////////////////////////////////////////////////////
-    void ClearTerminal();
+    void TerminalClear();
 
     ////////////////////////////////////////////////////////////
     /// \brief Writes data to the terminal
@@ -57,6 +171,12 @@ namespace Nova
     ///
     ////////////////////////////////////////////////////////////
     void TerminalWrite(const char* str);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Flushes the terminal
+    ///
+    ////////////////////////////////////////////////////////////
+    void TerminalFlush();
 
 }
 
