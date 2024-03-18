@@ -31,7 +31,7 @@ extern "C" {
     ////////////////////////////////////////////////////////////
     FORCE_INLINE static void PrintCompilerInfo(void)
     {
-        Log("Compiled %s by %s", NOVA_BUILD_DATETIME, NOVA_COMPILER, NOVA_ARCHITECTURE);
+        Log("Compiled %s by %s (arch %s)", NOVA_BUILD_DATETIME, NOVA_COMPILER, NOVA_ARCHITECTURE);
     }
 
     ////////////////////////////////////////////////////////////

@@ -105,7 +105,7 @@ namespace Nova
 
         if (frequency == 0)
         {
-            EnterPanic("PIC setup failed: frequency cannot be 0");
+            EnterPanic("PIT setup failed: frequency cannot be 0");
         }
 
         u32 reloadValue = PIT_TIMER_FREQUENCY / frequency;
@@ -113,7 +113,7 @@ namespace Nova
 
         if (reloadValue > PIT_RELOAD_VALUE_MAX)
         {
-            EnterPanic("PIC setup failed: frequency too low");
+            EnterPanic("PIT setup failed: frequency too low");
         }
 
         priv::configureChannel(
@@ -121,6 +121,6 @@ namespace Nova
         );
 
         priv::setReloadValue(PIT_CHANNEL0_DATA_PORT, reloadValue);
-        Log("PIC setup: frequency = %d Hz", actualFrequency);
+        Log("PIT setup: frequency = %d Hz", actualFrequency);
     }
 }
