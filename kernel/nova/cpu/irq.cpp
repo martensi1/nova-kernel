@@ -109,5 +109,5 @@ extern "C" void on_irq_interrupt(u32 irq_number, u32 interrupt_index)
         handler();
     }
 
-    pic_send_eoi(irq_number);
+    PIC::SendEOI(irq_number);
 }

@@ -12,6 +12,9 @@
 #include <nova/pic/pic.h>
 
 
+using namespace Nova;
+
+
 static inline void setup_descriptor_tables()
 {
     #define GDT_LOCATION 0x800
@@ -32,8 +35,8 @@ static inline void setup_descriptor_tables()
 
 static inline void setup_pic(void)
 {
-    pic_initialize(IDT_INTERRUPTS_START);
-    pic_enable_irqs();
+    PIC::Initialize(IDT_INTERRUPTS_START);
+    PIC::EnableIRQs();
 }
 
 static inline void identify_cpu(void)
