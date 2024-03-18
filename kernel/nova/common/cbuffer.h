@@ -26,6 +26,7 @@
 
 #include <nova/common/types.h>
 #include <nova/common/macros.h>
+#include <libc/string.h>
 
 
 template<int N>

@@ -31,6 +31,8 @@
 extern struct ConsoleDriver vgaDriver;
 extern struct ConsoleDriver serialDriver;
 
+static CircularBuffer<512> history;
+
 
 static Nova::priv::TerminalInterface interfaces[2] = {
     { "Screen", &vgaDriver },
@@ -50,12 +52,12 @@ namespace Nova
         }
 
         ////////////////////////////////////////////////////////////
-        void TerminalInterface::Enable()
+        bool TerminalInterface::Enable()
         {
             SpinGuard guard(lock_);
 
             if (enabled_) {
-                return;
+                return false;
             }
 
             console_->initialize();
@@ -69,6 +71,7 @@ namespace Nova
             writeData(")\n");
 
             enabled_ = true;
+            return true;
         }
 
         ////////////////////////////////////////////////////////////
@@ -147,7 +150,13 @@ namespace Nova
             auto interface = &interfaces[i];
 
             if (interface->IsAvailable()) {
-                interface->Enable();
+                bool enabled = interface->Enable();
+
+                if (enabled) {
+                    char buffer[512];
+                    history.read(buffer);
+                    interface->Write(buffer, history.size());
+                }
             }
             else if (!interface->IsAvailable()) {
                 interface->Disable();
@@ -165,11 +174,15 @@ namespace Nova
                 interface->Clear();
             }
         }
+
+        history.clear();
     }
 
     ////////////////////////////////////////////////////////////
     void TerminalWrite(const char* data, size_t size)
     {
+        history.push(data, size);
+
         ARRAY_FOR_EACH(i, interfaces) {
             auto interface = &interfaces[i];
 

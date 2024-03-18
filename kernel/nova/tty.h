@@ -59,8 +59,10 @@ namespace Nova
             ////////////////////////////////////////////////////////////
             /// \brief Enables the terminal interface
             ///
+            /// \return True if the interface was enabled
+            ///
             ////////////////////////////////////////////////////////////
-            void Enable();
+            bool Enable();
 
             ////////////////////////////////////////////////////////////
             /// \brief Disables the terminal interface
@@ -126,9 +128,7 @@ namespace Nova
             const char* name_;
             bool enabled_;
 
-            CircularBuffer<256> buffer_;
             SpinLock lock_;
-
             ConsoleDriver* console_;
 
         };

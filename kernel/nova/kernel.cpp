@@ -40,8 +40,8 @@ namespace Nova
                 return 0;
             }
 
-            char buffer[200];
-            char temp[20];
+            char buffer[250];
+            char temp[30];
 
             char* out = buffer;
             char c = 0;

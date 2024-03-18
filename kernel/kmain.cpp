@@ -18,7 +18,7 @@ extern "C" {
         Log("==============================");
         Log("= NOVA OS");
         Log("==============================");
-        Log("%s built %s by %s", NOVA_ARCHITECTURE, NOVA_BUILD_DATETIME, NOVA_COMPILER);
+        Log("Compiled %s by %s", NOVA_BUILD_DATETIME, NOVA_COMPILER, NOVA_ARCHITECTURE);
         
         RunHBIT(boot_handover_eax);
 
