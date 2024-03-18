@@ -59,7 +59,7 @@ public:
     {
         if (full_)
         {
-            memcpy(data, buffer_ + head_, N);
+            memcpy(data, buffer_ + head_, N - head_);
             memcpy(data + N - head_, buffer_, head_);
         }
         else
