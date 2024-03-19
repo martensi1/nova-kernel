@@ -37,11 +37,9 @@ emulate-debug-64:
 # General
 ##############################################
 package:
-	@echo "Packaging kernel..."
-	@sudo sh build-image.sh
+	@sudo ./build-image.sh
 
 clean:
-	@echo "Cleaning kernel..."
 	make -C ./libc clean
 	make -C ./kernel clean
 
