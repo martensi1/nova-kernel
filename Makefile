@@ -44,9 +44,9 @@ clean:
 	make -C ./kernel clean
 
 
-test-32: clean build-32 package emulate-32
-test-64: clean build-64 package emulate-64
+test-32: build-32 package emulate-32
+test-64: build-64 package emulate-64
 
-debug-32: clean build-32-debug package emulate-32-debug
-debug-64: clean build-64-debug package emulate-64-debug
+debug-32: build-32-debug package emulate-32-debug
+debug-64: build-64-debug package emulate-64-debug
 
