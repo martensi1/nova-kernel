@@ -25,7 +25,7 @@
 #include <nova/cpu/sysbus.h>
 #include <nova/serial/serial.h>
 
-using namespace Nova;
+using namepspace Nova;
 static Serial::Port port = Serial::COM1;
 
 
@@ -76,17 +76,16 @@ static void Clear(void)
     Serial::flush(port);
 }
 
-
 // Define driver
 struct ConsoleDriver serialDriver = {
-    "serialcon",          // name
-    IsAvailable,          // isAvailable
-    Initialize,           // initialize
-    WriteChar,            // writeChar
-    WriteLineFeed,        // writeLineFeed
-    EnableCursor,         // enableCursor
-    UpdateCursor,         // updateCursor
-    DisableCursor,        // disableCursor
-    Flush,                // flush
-    Clear                 // clear
+    "serialcon",    // name
+    IsAvailable,    // isAvailable
+    Initialize,     // initialize
+    WriteChar,      // writeChar
+    WriteLineFeed,  // writeLineFeed
+    EnableCursor,   // enableCursor
+    UpdateCursor,   // updateCursor
+    DisableCursor,  // disableCursor
+    Flush,          // flush
+    Clear           // clear
 };

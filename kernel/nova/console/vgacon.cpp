@@ -1,9 +1,31 @@
-/**
- * vgamode.cpp
- * VGA mode console driver
-*/
+////////////////////////////////////////////////////////////
+//
+// Nova OS
+// Copyright (C) 2024 Simon Mårtensson
+//
+// This software is provided 'as-is', without any express or implied warranty.
+// In no event will the authors be held liable for any damages arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it freely,
+// subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented;
+//    you must not claim that you wrote the original software.
+//    If you use this software in a product, an acknowledgment
+//    in the product documentation would be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such,
+//    and must not be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source distribution.
+//
+////////////////////////////////////////////////////////////
 #include <nova/console/driver.h>
 #include <nova/cpu/sysbus.h>
+
+
+using namespace Nova;
 
 
 #define VGA_TEXT_MODE_WIDTH 80
@@ -26,16 +48,14 @@
 static const size_t VGA_WIDTH = VGA_TEXT_MODE_WIDTH;
 static const size_t VGA_HEIGHT = VGA_TEXT_MODE_HEIGHT;
 
-static u16* vga_buffer;
-static size_t vga_column;
-static size_t vga_row;
-static u8 vga_write_color;
+static u16* videoBuffer;
+static u8 writeColor;
+
+static size_t column;
+static size_t row;
 
 
-using namespace Nova;
-
-
-enum vga_color {
+enum VGAColor {
     VGA_COLOR_BLACK = 0,
     VGA_COLOR_BLUE = 1,
     VGA_COLOR_GREEN = 2,
@@ -55,166 +75,166 @@ enum vga_color {
 };
 
 
-
-static inline u8 read_register(u8 index)
+namespace priv
 {
-    WriteIO(VGA_INDEX_PORT, index);
-    return ReadIO(VGA_DATA_PORT);
-}
+    static inline u8 ReadRegister(u8 index)
+    {
+        WriteIO(VGA_INDEX_PORT, index);
+        return ReadIO(VGA_DATA_PORT);
+    }
 
-static inline void write_register(u8 index, u8 value)
-{
-    WriteIO(VGA_INDEX_PORT, index);
-    WriteIO(VGA_DATA_PORT, value);
-}
+    static inline void WriteRegister(u8 index, u8 value)
+    {
+        WriteIO(VGA_INDEX_PORT, index);
+        WriteIO(VGA_DATA_PORT, value);
+    }
 
 
-static inline void set_operation_mode(u8 mode)
-{
-    write_register(VGA_REGISTER_MODE, mode);
-}
+    static inline void SetOperationMode(u8 mode)
+    {
+        WriteRegister(VGA_REGISTER_MODE, mode);
+    }
 
-static inline void write_video_memory(char c, u8 color, size_t x, size_t y)
-{
-    const size_t offset = y * VGA_WIDTH + x;
-    u16 byte = (u16)c | (u16)color << 8;
+    static inline void WriteVideoMemory(char c, u8 color, size_t x, size_t y)
+    {
+        const size_t offset = y * VGA_WIDTH + x;
+        u16 byte = (u16)c | (u16)color << 8;
 
-    vga_buffer[offset] = byte;
-}
+        videoBuffer[offset] = byte;
+    }
 
-static inline void set_cursor_pos(size_t x, size_t y)
-{
-    size_t offset = y * VGA_WIDTH + x;
+    static inline void SetCursorPos(size_t x, size_t y)
+    {
+        size_t offset = y * VGA_WIDTH + x;
 
-    write_register(VGA_REGISTER_CURSOR_HIGH, (u8)(offset >> 8));
-    write_register(VGA_REGISTER_CURSOR_LOW, (u8)(offset & 0xFF));
-}
+        WriteRegister(VGA_REGISTER_CURSOR_HIGH, (u8)(offset >> 8));
+        WriteRegister(VGA_REGISTER_CURSOR_LOW, (u8)(offset & 0xFF));
+    }
 
-static inline void enable_cursor(u8 cursor_start, u8 cursor_end)
-{
-    u8 start_value = read_register(VGA_REGISTER_CURSOR_START);
-    u8 end_value = read_register(VGA_REGISTER_CURSOR_END);
+    static inline void EnableCursor(u8 cursorStart, u8 cursorEnd)
+    {
+        u8 startValue = ReadRegister(VGA_REGISTER_CURSOR_START);
+        u8 endValue = ReadRegister(VGA_REGISTER_CURSOR_END);
 
-    start_value = (start_value & 0xC0) | (cursor_start & 0x0F);
-    end_value = (end_value & 0xE0) | (cursor_end & 0x0F);
+        startValue = (startValue & 0xC0) | (cursorStart & 0x0F);
+        endValue = (endValue & 0xE0) | (cursorEnd & 0x0F);
 
-    write_register(VGA_REGISTER_CURSOR_START, start_value);
-    write_register(VGA_REGISTER_CURSOR_END, end_value);
-}
+        WriteRegister(VGA_REGISTER_CURSOR_START, startValue);
+        WriteRegister(VGA_REGISTER_CURSOR_END, endValue);
+    }
 
-static inline void disable_cursor(void)
-{
-    u8 value = 0x01 << 5;
-    write_register(VGA_REGISTER_CURSOR_START, value);
-}
+    static inline void DisableCursor(void)
+    {
+        u8 value = 0x01 << 5;
+        WriteRegister(VGA_REGISTER_CURSOR_START, value);
+    }
 
-static void scroll_up(void) {
-    for (size_t y = 0; y < (VGA_HEIGHT - 1); y++) {
+    static void ScrollUp(void) {
+        for (size_t y = 0; y < (VGA_HEIGHT - 1); y++) {
+            for (size_t x = 0; x < VGA_WIDTH; x++) {
+                const size_t index = y * VGA_WIDTH + x;
+                const size_t nextIndex = (y + 1) * VGA_WIDTH + x;
+
+                videoBuffer[index] = videoBuffer[nextIndex];
+                videoBuffer[nextIndex] = 0;
+            }
+        }
+
         for (size_t x = 0; x < VGA_WIDTH; x++) {
-            const size_t index = y * VGA_WIDTH + x;
-            const size_t next_index = (y + 1) * VGA_WIDTH + x;
-            vga_buffer[index] = vga_buffer[next_index];
-            vga_buffer[next_index] = 0;
+            const size_t index = (VGA_HEIGHT - 1) * VGA_WIDTH + x;
+            videoBuffer[index] = 0;
         }
     }
 
-    for (size_t x = 0; x < VGA_WIDTH; x++) {
-        const size_t index = (VGA_HEIGHT - 1) * VGA_WIDTH + x;
-        vga_buffer[index] = 0;
+    static void SetWriteColor(VGAColor foreground, VGAColor background)
+    {
+        u8 colorByte = foreground | background << 4;
+        writeColor = colorByte;
     }
 }
 
-static void set_write_color(vga_color foreground, vga_color background)
-{
-    u8 color_byte = foreground | background << 4;
-    vga_write_color = color_byte;
-}
-
-
-
-bool vga_is_available(void)
+bool IsAvailable(void)
 {
     return true;
 }
 
-static void vga_initialize(void)
+static void Initialize(void)
 {
-    vga_column = 0;
-    vga_row = 0;
+    column = 0;
+    row = 0;
 
-    vga_buffer = (u16*)VGA_TEXT_BUFFER_ADDRESS;
+    videoBuffer = (u16*)VGA_TEXT_BUFFER_ADDRESS;
     
-    set_operation_mode(0x03);
-    set_write_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    priv::SetOperationMode(0x03);
+    priv::SetWriteColor(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 }
 
-static void vga_write_line_feed(void)
+static void WriteLineFeed(void)
 {
-    vga_column = 0;
+    column = 0;
 
-    if (vga_row == (VGA_HEIGHT - 1)) {
-        scroll_up();
+    if (row == (VGA_HEIGHT - 1)) {
+        priv::ScrollUp();
     }
     else {
-        vga_row++;
+        row++;
     }
 }
 
-static void vga_write_char(const char c)
+static void WriteChar(const char c)
 {
-    write_video_memory(c, vga_write_color, vga_column, vga_row);
+    priv::WriteVideoMemory(c, writeColor, column, row);
 
-    if (++vga_column == VGA_WIDTH) {
-        vga_write_line_feed();
+    if (++column == VGA_WIDTH) {
+        WriteLineFeed();
     }
 }
 
-static void vga_enable_cursor(void)
+static void EnableCursor(void)
 {
-    enable_cursor(
+    priv::EnableCursor(
         VGA_CURSOR_START_SCANLINE,
         VGA_CURSOR_END_SCANLINE
     );
 }
 
-static void vga_update_cursor(void)
+static void UpdateCursor(void)
 {
-    set_cursor_pos(vga_column, vga_row);
+    priv::SetCursorPos(column, row);
 }
 
-static void vga_disable_cursor(void)
+static void DisableCursor(void)
 {
-    disable_cursor();
+    priv::DisableCursor();
 }
 
-static void vga_flush(void)
+static void Flush(void)
 {
     // Do nothing
 }
 
-static void vga_clear(void)
+static void Clear(void)
 {
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
-            write_video_memory(' ', vga_write_color, x, y);
+            priv::WriteVideoMemory(' ', writeColor, x, y);
         }
     }
 
-    vga_column = 0;
-    vga_row = 0;
+    column = 0;
+    row = 0;
 }
-
 
 // Define driver
 struct ConsoleDriver vgaDriver = {
-    "vgacon",             // name
-    vga_is_available,     // is_available
-    vga_initialize,       // initialize
-    vga_write_char,       // write_char
-    vga_write_line_feed,  // write_line_feed
-    vga_enable_cursor,    // enable_cursor
-    vga_update_cursor,    // update_cursor
-    vga_disable_cursor,   // disable_cursor
-    vga_flush,            // flush
-    vga_clear             // clear
+    "vgacon",        // name
+    IsAvailable,     // is_available
+    Initialize,      // initialize
+    WriteChar,       // write_char
+    WriteLineFeed,   // write_line_feed
+    EnableCursor,    // enable_cursor
+    UpdateCursor,    // update_cursor
+    DisableCursor,   // disable_cursor
+    Flush,           // flush
+    Clear            // clear
 };
