@@ -25,7 +25,7 @@
 #include <nova/cpu/sysbus.h>
 #include <nova/serial/serial.h>
 
-using namepspace Nova;
+using namespace Nova;
 static Serial::Port port = Serial::COM1;
 
 
