@@ -34,7 +34,7 @@ echo "############################################"
 # Check if root
 ############################
 if [ "$(id -u)" -ne 0 ]; then
-    echo "Please run as root"
+    error "Please run as root"
     exit 1
 fi
 
@@ -57,7 +57,7 @@ checkpoint "Build tools found"
 ############################
 # Create empty image
 ############################
-IMAGE_PATH="$OUTPUT_DIR/kernel.img"
+IMAGE_PATH="bin/kernel.img"
 IMAGE_SIZE="30M"
 
 if [ -f "$IMAGE_PATH" ]; then
@@ -130,6 +130,10 @@ sleep 0.1
 
 # Format partition with a filesystem and mount it
 mke2fs -t "$PARTITION_FILE_SYSTEM" "$LOOP_DEVICE_PARTITION" > /dev/null
+
+# your fstab has been modified, but systemd still uses the old version; use 'systemctl daemon-reload' to reload.
+systemctl daemon-reload
+
 mount "$LOOP_DEVICE_PARTITION" "$MOUNT_DIR"
 rm -rf "$MOUNT_DIR"/*
 
