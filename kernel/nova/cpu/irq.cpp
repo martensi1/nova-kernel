@@ -9,7 +9,7 @@
 #include <nova/common.h>
 #include <libc/string.h>
 
-using namespace Nova;
+using namespace nova;
 
 
 #define LOCATE_ISR(x) extern "C" void irq_##x(void);

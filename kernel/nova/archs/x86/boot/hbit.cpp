@@ -33,11 +33,11 @@
 // be treated as a global constructor to be called automatically before 
 // execution enters kmain(). We use this to test if the kernel startup
 // code is working correctly.
-static bool globalConstructorCalled = false;
+static bool global_constructors_called = false;
 
 __attribute__ ((constructor)) void globalConstructorTest() 
 {
-    globalConstructorCalled = true;
+    global_constructors_called = true;
 }
 
 // This is the start address of the kernel.
@@ -45,27 +45,25 @@ __attribute__ ((constructor)) void globalConstructorTest()
 extern u32 kernel_start;
 
 
-namespace Nova
+namespace nova
 {
     namespace priv
     {
-        ////////////////////////////////////////////////////////////
-        static void checkIfMultibootLoaded(u32 bootHandoverEax)
+        static void check_if_multiboot_loaded(u32 boot_handover_eax)
         {
             #define MULTIBOOT_SPEC_MAGIC_BYTE 0x2BADB002
 
-            if (bootHandoverEax == MULTIBOOT_SPEC_MAGIC_BYTE)
+            if (boot_handover_eax == MULTIBOOT_SPEC_MAGIC_BYTE)
             {
                 TEST_OK("Boot handover from multiboot compliant bootloader");
             }
             else 
             {
-                TEST_FAIL("Boot handover not from a multiboot compliant bootloader", bootHandoverEax);
+                TEST_FAIL("Boot handover not from a multiboot compliant bootloader", boot_handover_eax);
             }
         }
 
-        ////////////////////////////////////////////////////////////
-        static void checkCPUMode(void) 
+        static void check_cpu_mode(void) 
         {
             u32 cr0;
             asm volatile("mov %%cr0, %0" : "=r" (cr0));
@@ -78,8 +76,7 @@ namespace Nova
             }
         }
 
-        ////////////////////////////////////////////////////////////
-        static void checkStartAddress(void)
+        static void check_start_address(void)
         {
             #define EXPECTED_KERNEL_START_ADDRESS 0x100000
 
@@ -93,10 +90,9 @@ namespace Nova
             }
         }
 
-        ////////////////////////////////////////////////////////////
-        static void checkGlobalConstructorsCalled(void)
+        static void check_global_constructors_called(void)
         {
-            if (globalConstructorCalled)
+            if (global_constructors_called)
             {
                 TEST_OK("Global constructor initialization");
             }
@@ -107,15 +103,14 @@ namespace Nova
         }
     }
 
-    ////////////////////////////////////////////////////////////
-    void RunHBIT(u32 bootHandoverEax)
+    void run_hbit(u32 boot_handover_eax)
     {
         Log("Running HBIT (Handover Buildt-in Test)");
 
-        priv::checkIfMultibootLoaded(bootHandoverEax);
-        priv::checkCPUMode();
-        priv::checkStartAddress();
-        priv::checkGlobalConstructorsCalled();
+        priv::check_if_multiboot_loaded(boot_handover_eax);
+        priv::check_cpu_mode();
+        priv::check_start_address();
+        priv::check_global_constructors_called();
 
         Log("HBIT passed!");
     }

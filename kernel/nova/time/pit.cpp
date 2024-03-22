@@ -75,7 +75,7 @@ static SpinLock lock = SpinLock();
 #define PIT_RELOAD_VALUE_MAX 65535 // Max value (we always use binary counter mode)
 
 
-namespace Nova
+namespace nova
 {
     namespace priv
     {

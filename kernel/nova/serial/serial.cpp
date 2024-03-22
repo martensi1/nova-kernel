@@ -26,7 +26,7 @@
 #include <nova/kernel.h>
 
 
-using namespace Nova;
+using namespace nova;
 
 
 SerialPort Serial::ports_[8] = {

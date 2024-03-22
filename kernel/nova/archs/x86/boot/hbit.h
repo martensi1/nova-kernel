@@ -21,24 +21,28 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_PIT_H
-#define NOVA_PIT_H
+#ifndef NOVA_HANDOVER_BIT_H
+#define NOVA_HANDOVER_BIT_H
 
-#include <nova/common.h>
-
+#include <nova/types.h>
 
 namespace nova
 {
     ////////////////////////////////////////////////////////////
-    /// \brief Sets up the Channel 0 of the PIT to generate 
-    ///        interrupts (IRQ0) at the specified frequency
+    /// \brief Run HBIT
     ///
-    /// \param frequency The frequency at which to generate 
-    ///                  interrupts (the nearest possible frequency will be used)
+    /// HBIT (Handover Built-in Test) is a test that checks
+    /// if the kernel was handovered correctly by the bootloader.
+    /// For example if the bootloader is multiboot compliant, if 
+    /// the CPU is in 32-bit protected mode, etc.
+    ///
+    /// boot_handover_eax The value of the EAX register when the 
+    ///                   bootloader handed over control to the 
+    ///                   kernel
     ///
     ////////////////////////////////////////////////////////////
-    void SetupPIC(const u32 frequency);
+    void run_hbit(u32 boot_handover_eax);
 }
 
 
-#endif // NOVA_PIT_H
+#endif // NOVA_HANDOVER_BIT_H

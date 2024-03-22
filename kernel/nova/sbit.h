@@ -24,7 +24,7 @@
 #ifndef NOVA_STARTUP_BIT_H
 #define NOVA_STARTUP_BIT_H
 
-namespace Nova
+namespace nova
 {
     ////////////////////////////////////////////////////////////
     /// \brief Run SBIT

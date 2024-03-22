@@ -7,7 +7,7 @@
 #include <nova/cpu/flgreg.h>
 #include <nova/kernel.h>
 
-using namespace Nova;
+using namespace nova;
 
 
 enum cpu_id_requests {

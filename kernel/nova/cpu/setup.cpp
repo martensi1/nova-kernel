@@ -12,7 +12,7 @@
 #include <nova/pic/pic.h>
 
 
-using namespace Nova;
+using namespace nova;
 
 
 static inline void setup_descriptor_tables()

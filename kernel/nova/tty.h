@@ -29,7 +29,7 @@
 #include <nova/common/cbuffer.h>
 
 
-namespace Nova
+namespace nova
 {
     namespace priv
     {

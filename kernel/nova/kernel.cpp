@@ -29,7 +29,7 @@
 #include <stdarg.h>
 
 
-namespace Nova
+namespace nova
 {
     namespace priv
     {

@@ -37,7 +37,7 @@
 #define PIC_COMMAND_EOI 0x20 // End of Interrupt
 
 
-namespace Nova
+namespace nova
 {
     namespace PIC
     {

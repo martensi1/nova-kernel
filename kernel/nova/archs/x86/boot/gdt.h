@@ -21,24 +21,15 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_PIT_H
-#define NOVA_PIT_H
+#ifndef NOVA_GDT_H
+#define NOVA_GDT_H
 
-#include <nova/common.h>
-
+#include <nova/types.h>
 
 namespace nova
 {
-    ////////////////////////////////////////////////////////////
-    /// \brief Sets up the Channel 0 of the PIT to generate 
-    ///        interrupts (IRQ0) at the specified frequency
-    ///
-    /// \param frequency The frequency at which to generate 
-    ///                  interrupts (the nearest possible frequency will be used)
-    ///
-    ////////////////////////////////////////////////////////////
-    void SetupPIC(const u32 frequency);
+    void setup_gdt(const u32 write_address, u16& gdt_size);
 }
 
 
-#endif // NOVA_PIT_H
+#endif // NOVA_GDT_H

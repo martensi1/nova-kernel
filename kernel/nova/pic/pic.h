@@ -26,7 +26,7 @@
 
 #include <nova/common.h>
 
-namespace Nova
+namespace nova
 {
     ////////////////////////////////////////////////////////////
     /// \brief PIC (Programmable Interrupt Controller) is a chip 

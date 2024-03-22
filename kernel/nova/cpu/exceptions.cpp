@@ -6,7 +6,7 @@
 #include <nova/cpu/idt.h>
 #include <nova/kernel.h>
 
-using namespace Nova;
+using namespace nova;
 
 
 #define LOCATE_ISR(x) extern "C" void cpuex_##x(void);

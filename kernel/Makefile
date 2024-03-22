@@ -1,8 +1,9 @@
+export CPP := g++
+export AS := nasm
+
+
 # Architectire, compiler and flags
 TARGET := nova_kernel.elf
-
-CC := g++
-AS := nasm
 
 ASM_FLAGS := 
 CPP_FLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
@@ -28,17 +29,24 @@ else
 endif
 
 # Define source and object directories
-INC_DIR := -I . -I ../libc/include/
+INC_DIR := -I . -I ../libc/include/ -I ./nova/archs/x86/
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin
 
+#rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+
 ASM_FILES := $(wildcard $(SRC_DIR)/*.asm)
 ASM_FILES += $(wildcard $(SRC_DIR)/*/*.asm)
 ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*.asm)
+ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*/*.asm)
+ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*/*/*.asm)
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 CPP_FILES += $(wildcard $(SRC_DIR)/*/*.cpp)
 CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*.cpp)
+CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*/*.cpp)
+CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*/*/*.cpp)
 
 ASM_OBJS := $(patsubst ./%.asm, $(OBJ_DIR)/%.o, $(ASM_FILES))
 CPP_OBJS := $(patsubst ./%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))

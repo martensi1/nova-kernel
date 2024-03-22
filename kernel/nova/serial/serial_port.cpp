@@ -25,7 +25,7 @@
 #include <nova/cpu/sysbus.h>
 #include <nova/kernel.h>
 
-using namespace Nova;
+using namespace nova;
 
 SerialPort::SerialPort(u16 ioPort, u8 divisor) :
     available_(false),

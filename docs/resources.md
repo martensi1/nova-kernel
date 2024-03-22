@@ -13,6 +13,13 @@ The Multiboot specification is an open standard that provides kernels with a uni
 
 * [x86 Calling Conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)
 
+## Hardware Interfacing
+
+* [CPUID - CPU Identification](https://www.felixcloutier.com/x86/cpuid)
+* [SVGA/VGA Video Programming Information Page](http://www.osdever.net/FreeVGA/vga/crtcreg.htm)
+
+
+
 ## QEMU
 
 QEMU (Quick Emulator) is an open-source emulator

@@ -1,6 +1,6 @@
 global entrypoint
 
-extern kmain
+extern kernel_entry_point
 extern kernel_start, ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
 
 
@@ -26,12 +26,14 @@ section .bss
         resb STACK_SIZE
 
 section .data
-    boot_handover_eax dw 0
+    boot_handover_ebx dd 0
+    boot_handover_eax dd 0
 
 
 section .text
     entrypoint:
-        ; The boot loader will put a magic byte in eax if it supports multiboot
+        ; The boot handover information is passed by GRUB in the registers
+        mov [boot_handover_ebx], ebx
         mov [boot_handover_eax], eax
 
         ; Setup the stack
@@ -41,11 +43,13 @@ section .text
         call run_ctors
 
         ; Call the kernel's main function
+        mov ebx, [boot_handover_ebx]
         mov eax, [boot_handover_eax]
+        push ebx
         push eax
 
-        call kmain
-        add esp, 4
+        call kernel_entry_point
+        add esp, 8
 
         ; Run C++ global destructors
         call run_dtors

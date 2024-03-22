@@ -21,24 +21,21 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_PIT_H
-#define NOVA_PIT_H
+#ifndef NOVA_DATA_TYPES_H
+#define NOVA_DATA_TYPES_H
 
-#include <nova/common.h>
-
-
-namespace nova
-{
-    ////////////////////////////////////////////////////////////
-    /// \brief Sets up the Channel 0 of the PIT to generate 
-    ///        interrupts (IRQ0) at the specified frequency
-    ///
-    /// \param frequency The frequency at which to generate 
-    ///                  interrupts (the nearest possible frequency will be used)
-    ///
-    ////////////////////////////////////////////////////////////
-    void SetupPIC(const u32 frequency);
-}
+#include <stdint.h>
+#include <stddef.h>
 
 
-#endif // NOVA_PIT_H
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+
+
+#endif // NOVA_DATA_TYPES_H

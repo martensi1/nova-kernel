@@ -7,7 +7,7 @@
 #include <nova/kernel.h>
 #include <libc/string.h>
 
-using namespace Nova;
+using namespace nova;
 
 
 void GDT::setup(const u32 writeAddress, u16& gdtSize)

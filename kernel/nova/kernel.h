@@ -27,7 +27,7 @@
 #include <nova/common.h>
 
 
-namespace Nova
+namespace nova
 {
     ////////////////////////////////////////////////////////////
     /// \brief Enter a panic state and halt the kernel

@@ -27,7 +27,7 @@
 #include <nova/common.h>
 
 
-namespace Nova
+namespace nova
 {
     /// @brief Writes value to the specified I/O port
     /// @param port I/O port

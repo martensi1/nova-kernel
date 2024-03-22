@@ -8,7 +8,7 @@
 #include <nova/kernel.h>
 #include <libc/string.h>
 
-using namespace Nova;
+using namespace nova;
 
 
 typedef struct __attribute__((packed)) {

@@ -21,24 +21,27 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_PIT_H
-#define NOVA_PIT_H
-
-#include <nova/common.h>
+#ifndef NOVA_CONSOLE_DRIVER_H
+#define NOVA_CONSOLE_DRIVER_H
 
 
-namespace nova
-{
-    ////////////////////////////////////////////////////////////
-    /// \brief Sets up the Channel 0 of the PIT to generate 
-    ///        interrupts (IRQ0) at the specified frequency
-    ///
-    /// \param frequency The frequency at which to generate 
-    ///                  interrupts (the nearest possible frequency will be used)
-    ///
-    ////////////////////////////////////////////////////////////
-    void SetupPIC(const u32 frequency);
-}
+////////////////////////////////////////////////////////
+/// \brief The console driver interface
+///
+////////////////////////////////////////////////////////
+struct ConsoleDriver {
+    char name[10];
+    
+    bool (*isAvailable)();
+    void (*initialize)();
+    void (*writeChar)(const char c);
+    void (*writeLineFeed)();
+    void (*enableCursor)();
+    void (*updateCursor)();
+    void (*disableCursor)();
+    void (*flush)();
+    void (*clear)();
+};
 
 
-#endif // NOVA_PIT_H
+#endif // NOVA_CONSOLE_DRIVER_H

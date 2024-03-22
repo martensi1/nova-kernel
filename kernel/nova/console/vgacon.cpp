@@ -25,7 +25,7 @@
 #include <nova/cpu/sysbus.h>
 
 
-using namespace Nova;
+using namespace nova;
 
 
 #define VGA_TEXT_MODE_WIDTH 80

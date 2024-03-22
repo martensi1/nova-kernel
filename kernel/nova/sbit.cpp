@@ -42,7 +42,7 @@ static void onIRQ0()
     timerCounter++;
 }
 
-namespace Nova
+namespace nova
 {
     namespace priv
     {

@@ -21,28 +21,15 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_HANDOVER_BIT_H
-#define NOVA_HANDOVER_BIT_H
+#ifndef NOVA_LOADER_H
+#define NOVA_LOADER_H
 
-#include <nova/common.h>
+#include <nova/types.h>
 
-namespace Nova
+namespace nova
 {
-    ////////////////////////////////////////////////////////////
-    /// \brief Run HBIT
-    ///
-    /// HBIT (Handover Built-in Test) is a test that checks
-    /// if the kernel was handovered correctly by the bootloader.
-    /// For example if the bootloader is multiboot compliant, if 
-    /// the CPU is in 32-bit protected mode, etc.
-    ///
-    /// bootHandoverEax The value of the EAX register when the 
-    ///                 bootloader handed over control to the 
-    ///                 kernel
-    ///
-    ////////////////////////////////////////////////////////////
-    void RunHBIT(u32 bootHandoverEax);
+    void load_kernel(u32 boot_handover_ebx);
 }
 
 
-#endif // NOVA_HANDOVER_BIT_H
+#endif // NOVA_LOADER_H

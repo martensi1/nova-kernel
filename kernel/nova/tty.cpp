@@ -33,14 +33,14 @@ extern struct ConsoleDriver serialDriver;
 
 static CircularBuffer<1024> history;
 
-using namespace Nova::priv;
+using namespace nova::priv;
 static TerminalInterface interfaces[2] = {
     { "Screen", &vgaDriver },
     { "Serial", &serialDriver }
 };
 
 
-namespace Nova
+namespace nova
 {
     namespace priv
     {
