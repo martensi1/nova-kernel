@@ -26,6 +26,7 @@
 
 #include <nova/types.h>
 
+#define ELF_IDENT_SIZE          16
 
 #define ELF_FORMAT_32           0x01
 #define ELF_FORMAT_64           0x02
@@ -64,38 +65,62 @@
 #define ELF_ISA_RISC_V          0xF3
 
 
-namespace nova
+// Data types defined by the
+// ELF specification
+typedef u16 elf32_half_t;
+typedef u32 elf32_addr_t;
+typedef u32 elf32_off_t;
+typedef u32 elf32_word_t;
+typedef s32 elf32_sword_t;
+
+
+typedef enum elf_ident {
+    EI_MAG0         = 0, // 0x7F
+    EI_MAG1         = 1, // 'E'
+    EI_MAG2         = 2, // 'L'
+    EI_MAG3         = 3, // 'F'
+    EI_CLASS        = 4, // Architecture (32/64-bit)
+    EI_DATA         = 5, // Byte order
+    EI_VERSION      = 6, // ELF version
+    EI_OSABI        = 7, // OS ABI
+    EI_ABIVERSION   = 8, // ABI version
+    EI_PAD          = 9  // Padding
+} elf_ident_t;
+
+
+typedef struct elf32_header {
+    u8 ident[ELF_IDENT_SIZE];
+    elf32_half_t type;
+    elf32_half_t machine;
+    elf32_word_t version;
+    elf32_addr_t entry;
+    elf32_off_t ph_offset;
+    elf32_off_t sh_offset;
+    elf32_word_t flags;
+    elf32_half_t header_size;
+    elf32_half_t ph_entry_size;
+    elf32_half_t ph_entry_count;
+    elf32_half_t sh_entry_size;
+    elf32_half_t sh_entry_count;
+    elf32_half_t sh_str_index;
+} elf32_header_t;
+
+
+class elf32_file
 {
-    typedef enum elf_type
-    {
-        RELOCATABLE     = 0x01,
-        EXECUTABLE      = 0x02,
-        SHARED          = 0x03,
-        CORE            = 0x04
-    } elf_type_t;
+public:
+    elf32_file(const void* data);
 
-    typedef struct elf_ident {
-        u8 format;
-        u8 endianness;
-        u8 header_version;
-        u8 abi;
-        u8 type;
-        u8 isa;
-        u8 version;
-    } elf_ident_t;
+    bool is_valid() const;
+    bool is_supported(u8 expected_class, u8 expected_data) const;
 
-    typedef struct elf32_header {
-        elf_ident_t ident;
-        u32 entry;
-    } elf32_header_t;
+    elf32_header_t* get_header() const;
 
-    typedef struct elf32_file {
-        elf32_header_t header;
-    } elf32_file_t;
+private:
+    const void* data_;
+};
 
-    bool identify_elf(void* elf_data, elf_ident_t& ident);
-    bool load_elf(void* elf_data, elf32_header_t& header);
-}
+typedef elf32_file elf32_file_t;
 
 
 #endif // NOVA_ELF32_H

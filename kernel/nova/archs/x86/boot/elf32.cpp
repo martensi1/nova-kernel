@@ -23,61 +23,41 @@
 ////////////////////////////////////////////////////////////
 #include "elf32.h"
 
-namespace nova
+
+#define ELF_MAG0 0x7F
+#define ELF_MAG1 'E'
+#define ELF_MAG2 'L'
+#define ELF_MAG3 'F'
+#define ELF_CURRENT_VERSION 1
+
+
+
+elf32_file::elf32_file(const void* data) :
+    data_(data)
 {
-    namespace priv
-    {
-        static bool read_magic_number(const u8* elf_data, u32& i)
-        {
-            return elf_data[i++] == 0x7F && 
-                   elf_data[i++] == 'E' &&
-                   elf_data[i++] == 'L' &&
-                   elf_data[i++] == 'F';
-        }
 
-        static bool read_generic_header(const u8* elf_data, u32& i, elf_ident_t& ident)
-        {
-            if (!read_magic_number(elf_data, i))
-                return false;
+}
 
-            ident.format = elf_data[i++];
-            ident.endianness = elf_data[i++];
-            ident.header_version = elf_data[i++];
-            ident.abi = elf_data[i++];
+bool elf32_file::is_valid() const
+{
+    elf32_header_t* header = get_header();
 
-            i += 9; // Skip padding
-
-            i++;
-            ident.type = elf_data[i++];
-            i++;
-            ident.isa = elf_data[i++];
-            ident.version = elf_data[i++];
-
-            if (ident.header_version != 1)
-                return false;
-
-            return true;
-        }
+    if (!header) {
+        return false;
     }
 
-    bool identify_elf(void* elf_data, elf_ident_t& ident)
-    {
-        const u8* data = static_cast<const u8*>(elf_data);
-        u32 i = 0;
+    bool has_magic = 
+        header->ident[0] == ELF_MAG0 &&
+        header->ident[1] == ELF_MAG1 &&
+        header->ident[2] == ELF_MAG2 &&
+        header->ident[3] == ELF_MAG3;
 
-        return priv::read_generic_header(data, i, ident);
-    }
+    return has_magic;
+}
 
-    bool load_elf(void* elf_data, elf32_header_t& header)
-    {
-        const u8* data = static_cast<const u8*>(elf_data);
-        u32 i = 0;
 
-        static_cast<void>(header);
 
-        if (!priv::read_magic_number(data, i))
-            return false;
-
-        return true;
-    }
+elf32_header_t* elf32_file::get_header() const
+{
+    return (elf32_header_t*)(data_);
 }

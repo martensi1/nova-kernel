@@ -205,6 +205,8 @@ sleep 0.1
 losetup -d "$LOOP_DEVICE"
 sleep 0.1
 
+sudo chown $SUDO_USER $IMAGE_PATH
+sudo chgrp $SUDO_USER $IMAGE_PATH
 
 ############################
 # Finalize

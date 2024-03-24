@@ -30,84 +30,71 @@
 
 namespace nova
 {
-    namespace priv
+    static void _are_modules_available(const multiboot_info_t* boot_info)
     {
-        static void are_modules_available(const multiboot_info_t* boot_info)
-        {
-            multiboot_uint32_t flags = boot_info->flags;
+        multiboot_uint32_t flags = boot_info->flags;
 
-            if (flags & MULTIBOOT_INFO_MODS)
-            {
-                Log("GRUB modules are available");
-            }
-            else
-            {
-                EnterPanic("Failed to locate kernel (GRUB modules not available)");
-            }
+        if (flags & MULTIBOOT_INFO_MODS)
+        {
+            Log("GRUB modules are available");
         }
-
-        static bool is_module_kernel(const multiboot_module_t* module)
+        else
         {
-            void* module_start = (void*)module->mod_start;
-            void* module_end = (void*)module->mod_end;
-
-            elf_ident_t ident;
-            bool valid_elf = identify_elf(module_start, ident);
-
-            if (!valid_elf) {
-                Log("Failed to identify ELF module at 0x%x - 0x%x", module_start, module_end);
-            }
-
-            if (ident.format != ELF_FORMAT_32)
-            {
-                Log("ELF module is not 32-bit");
-                return false;
-            }
-
-            if (ident.abi != ELF_ABI_SYSTEM_V)
-            {
-                Log("ELF module is not System V ABI");
-                return false;
-            }
-
-            if (ident.isa != ELF_ISA_X86)
-            {
-                Log("ELF module is not x86");
-                return false;
-            }
-
-            return true;
-        }
-
-        static const multiboot_module_t* locate_kernel_module(const multiboot_info_t* boot_info)
-        {
-            multiboot_module_t* modules = (multiboot_module_t*)boot_info->mods_addr;
-            u32 num_modules = boot_info->mods_count;
-
-            for (u32 i = 0; i < num_modules; i++)
-            {
-                multiboot_module_t* module = &modules[i];
-
-                if (is_module_kernel(module))
-                {
-                    Log("Kernel module found at 0x%x - 0x%x", module->mod_start, module->mod_end);
-                    return module;
-                }
-            }
-
-            return NULL;
+            EnterPanic("Failed to locate kernel (GRUB modules not available)");
         }
     }
 
-    ////////////////////////////////////////////////////////////
+    static bool _is_module_kernel(const multiboot_module_t* module)
+    {
+        void* module_start = (void*)module->mod_start;
+        void* module_end = (void*)module->mod_end;
+
+        elf32_file_t file(module_start);
+
+        if (!file.is_valid())
+        {
+            Log("Failed to identify ELF module at 0x%x - 0x%x", module_start, module_end);
+            return false;
+        }
+
+        elf32_header_t* header = file.get_header();
+        
+        if (header->ident[EI_CLASS] != ELF_FORMAT_32)
+        {
+            Log("ELF module is not 32-bit");
+            return false;
+        }
+
+        return true;
+    }
+
+    static const multiboot_module_t* _locate_kernel_module(const multiboot_info_t* boot_info)
+    {
+        multiboot_module_t* modules = (multiboot_module_t*)boot_info->mods_addr;
+        u32 num_modules = boot_info->mods_count;
+
+        for (u32 i = 0; i < num_modules; i++)
+        {
+            multiboot_module_t* module = &modules[i];
+
+            if (_is_module_kernel(module))
+            {
+                Log("Kernel module found at 0x%x - 0x%x", module->mod_start, module->mod_end);
+                return module;
+            }
+        }
+
+        return NULL;
+    }
+
     void load_kernel(u32 boot_handover_ebx)
     {
         Log("Reading boot parameters...");
 
         const multiboot_info_t* boot_info = (multiboot_info_t*)boot_handover_ebx;
 
-        priv::are_modules_available(boot_info);
-        const multiboot_module_t* kernel_module = priv::locate_kernel_module(boot_info);
+        _are_modules_available(boot_info);
+        const multiboot_module_t* kernel_module = _locate_kernel_module(boot_info);
         static_cast<void>(kernel_module);
     }
 }
