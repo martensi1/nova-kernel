@@ -11,8 +11,9 @@ Currently supports:
 ## Structure
 
 - `kernel` - Kernel source code
-- `libc` - libc implementation used by kernel
-- `sysroot` - the initial file system of the OS
+- `libc` - Libc implementation used by kernel
+- `sysroot` - The initial file system of the OS
+- `qemu` - Emulation scripts
 
 ## Setup
 
