@@ -59,6 +59,11 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+if [ -z "$SUDO_USER" ]; then
+    error "Please run with sudo"
+    exit 1
+fi
+
 
 ############################
 # Check dependencies
@@ -214,4 +219,4 @@ sudo chgrp $SUDO_USER $IMAGE_PATH
 echo "Image produced (size: $IMAGE_SIZE, MD5: $(md5sum "$IMAGE_PATH" | cut -d ' ' -f 1))"
 
 # Copy ELF to output directory for debugging
-cp "$ELF_FILE" "$OUTPUT_DIR/"
+cp "$ELF_FILE" "$(dirname "$IMAGE_PATH")"
