@@ -44,7 +44,7 @@ error () {
 ############################
 # Print welcome message
 ############################
-VERSION='0.1.1'
+VERSION='0.1.2'
 
 echo "############################################"
 echo "#    Nova OS - Image Builder (v${VERSION})  "
@@ -90,8 +90,7 @@ if [ -f "$IMAGE_PATH" ]; then
     rm -f "$IMAGE_PATH"
 
     if [ -f "$IMAGE_PATH" ]; then
-        echo "Failed to delete old image file: $IMAGE_PATH"
-        exit 1
+        error "Failed to delete old image file: $IMAGE_PATH"
     fi
 fi
 
@@ -213,10 +212,10 @@ sleep 0.1
 sudo chown $SUDO_USER $IMAGE_PATH
 sudo chgrp $SUDO_USER $IMAGE_PATH
 
+# Copy ELF to output directory for debugging
+cp "$ELF_FILE" "$(dirname "$IMAGE_PATH")"
+
 ############################
 # Finalize
 ############################
 echo "Image produced (size: $IMAGE_SIZE, MD5: $(md5sum "$IMAGE_PATH" | cut -d ' ' -f 1))"
-
-# Copy ELF to output directory for debugging
-cp "$ELF_FILE" "$(dirname "$IMAGE_PATH")"
