@@ -25,7 +25,7 @@
 #include <nova/common.h>
 #include <nova/console/driver.h>
 #include <libc/string.h>
-#include <nova/common/cbuffer.h>
+#include <nova/types/cbuffer.h>
 
 
 extern struct ConsoleDriver vgaDriver;

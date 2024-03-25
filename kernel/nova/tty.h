@@ -26,7 +26,6 @@
 
 #include <nova/common.h>
 #include <nova/console/driver.h>
-#include <nova/common/cbuffer.h>
 
 
 namespace nova

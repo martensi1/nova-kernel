@@ -24,40 +24,53 @@
 #include "elf32.h"
 
 
-#define ELF_MAG0 0x7F
-#define ELF_MAG1 'E'
-#define ELF_MAG2 'L'
-#define ELF_MAG3 'F'
-#define ELF_CURRENT_VERSION 1
-
-
-
-elf32_file::elf32_file(const void* data) :
-    data_(data)
+bool _is_valid_file(elf32_header_t* header)
 {
-
-}
-
-bool elf32_file::is_valid() const
-{
-    elf32_header_t* header = get_header();
-
     if (!header) {
         return false;
     }
 
     bool has_magic = 
-        header->ident[0] == ELF_MAG0 &&
-        header->ident[1] == ELF_MAG1 &&
-        header->ident[2] == ELF_MAG2 &&
-        header->ident[3] == ELF_MAG3;
+        header->ident[EI_MAG0] == ELF_MAG0 &&
+        header->ident[EI_MAG1] == ELF_MAG1 &&
+        header->ident[EI_MAG2] == ELF_MAG2 &&
+        header->ident[EI_MAG3] == ELF_MAG3;
 
-    return has_magic;
+    return has_magic;   
 }
 
 
-
-elf32_header_t* elf32_file::get_header() const
+bool parse_elf32(const void* data, elf32_file_t* result)
 {
-    return (elf32_header_t*)(data_);
+    elf32_header_t* header = (elf32_header_t*)data;
+
+    if (!_is_valid_file(header)) {
+        return false;
+    }
+
+    if (header->ident[EI_CLASS] != ELFCLASS32) {
+        return false;
+    }
+
+    if (header->ident[EI_DATA] != ELFDATA2LSB) {
+        return false;
+    }
+
+    if (header->version != EV_CURRENT) {
+        return false;
+    }
+
+    if (header->ph_entry_size != sizeof(elf32_program_header_t)) {
+        return false;
+    }
+
+    if (header->sh_entry_size != sizeof(elf32_section_header_t)) {
+        return false;
+    }
+
+    result->header = header;
+    result->segments = (elf32_program_header_t*)((u8*)data + header->ph_offset);
+    result->sections = (elf32_section_header_t*)((u8*)data + header->sh_offset);
+
+    return true;
 }

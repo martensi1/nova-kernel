@@ -1,4 +1,6 @@
-TARGET := nova_loader.elf
+TARGET := loader.bin
+
+
 
 ASM_FLAGS += -f elf32
 CPP_FLAGS += -m32 -DNOVA_ARCH_I386=1

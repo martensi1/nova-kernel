@@ -27,6 +27,8 @@
 #include <nova/kernel.h>
 #include <boot/elf32.h>
 
+#include <libc/string.h>
+
 
 namespace nova
 {
@@ -49,20 +51,31 @@ namespace nova
         void* module_start = (void*)module->mod_start;
         void* module_end = (void*)module->mod_end;
 
-        elf32_file_t file(module_start);
+        elf32_file_t elf;
+        bool valid = parse_elf32(module_start, &elf);
 
-        if (!file.is_valid())
+        if (!valid)
         {
             Log("Failed to identify ELF module at 0x%x - 0x%x", module_start, module_end);
             return false;
         }
 
-        elf32_header_t* header = file.get_header();
-        
-        if (header->ident[EI_CLASS] != ELF_FORMAT_32)
+        for (u32 i = 0; i < elf.header->sh_entry_count; i++)
         {
-            Log("ELF module is not 32-bit");
-            return false;
+            elf32_program_header_t segment = elf.segments[i];
+
+            if (segment.type == PT_LOAD) {
+                const void* src = (const void*) ((u8*)module_start + segment.offset);                         
+			    //memcpy((void*)segment.paddr, src, segment.file_size);
+
+                if (segment.file_size < segment.mem_size) {
+                    //memset((void*)(segment.paddr + segment.file_size), 0, segment.mem_size - segment.file_size);
+                }
+
+                static_cast<void>(src);
+
+                Log("Loaded segment %d: 0x%x - 0x%x", i, segment.vaddr, segment.vaddr + segment.mem_size);
+            }
         }
 
         return true;

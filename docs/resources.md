@@ -1,5 +1,11 @@
 # Resources
 
+## ELF
+
+The Executable and Linkable Format (ELF) is a common standard file format for executables, object code, shared libraries, and core dumps.
+
+* [ELF Specification](http://www.skyfree.org/linux/references/ELF_Format.pdf)
+
 ## GRUB
 
 The Multiboot specification is an open standard that provides kernels with a uniform way to be booted by Multiboot-compliant bootloaders. The reference implementation of the Multiboot specification is provided by the GNU GRUB bootloader.

@@ -1,6 +1,8 @@
 export CPP := g++
 export AS := nasm
 
+export NOVA_INCLUDE := $(shell pwd)
+
 
 # Architectire, compiler and flags
 TARGET := nova_kernel.elf
@@ -29,7 +31,7 @@ else
 endif
 
 # Define source and object directories
-INC_DIR := -I . -I ../libc/include/ -I ./nova/archs/x86/
+INC_DIR := -I . -I ../libc/include/ -I ./archs/x86/
 SRC_DIR := .
 OBJ_DIR := obj
 BIN_DIR := bin
