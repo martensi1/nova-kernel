@@ -1,13 +1,19 @@
+LIBC_STATIC := $(CURDIR)/libc/bin/libc.a
+
+
+export LIBC_STATIC
+
+
 ##############################################
 # I386
 ##############################################
 build-32:
 	make -C ./libc all ARCH=i386
-	make -C ./kernel all ARCH=i386
+	make -C ./nova all ARCH=i386
 
 build-32-debug:
 	make -C ./libc all ARCH=i386 DEBUG=1
-	make -C ./kernel all ARCH=i386 DEBUG=1
+	make -C ./nova all ARCH=i386 DEBUG=1
 
 emulate-32:
 	make -C ./qemu run ARCH=i386
@@ -21,11 +27,11 @@ emulate-32-debug:
 ##############################################
 build-64:
 	make -C ./libc all ARCH=x86_64
-	make -C ./kernel all ARCH=x86_64
+	make -C ./nova all ARCH=x86_64
 
 build-64-debug:
 	make -C ./libc all ARCH=x86_64 DEBUG=1
-	make -C ./kernel all ARCH=x86_64 DEBUG=1
+	make -C ./nova all ARCH=x86_64 DEBUG=1
 
 emulate-64:
 	make -C ./qemu run ARCH=x86_64
@@ -41,7 +47,7 @@ package:
 
 clean:
 	make -C ./libc clean
-	make -C ./kernel clean
+	make -C ./nova clean
 
 
 test-32: clean build-32 package emulate-32

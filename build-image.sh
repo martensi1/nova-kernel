@@ -179,7 +179,7 @@ checkpoint "GRUB v${GRUB_VERSION} installed"
 ############################
 # Kernel multiboot test
 ############################
-ELF_FILE="./kernel/bin/nova_kernel.elf"
+ELF_FILE="./nova/bin/nova_kernel.elf"
 grub-file --is-x86-multiboot "$ELF_FILE"
 
 checkpoint "Kernel multiboot check"
