@@ -21,32 +21,10 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#ifndef NOVA_SYSTEM_BUS_H
-#define NOVA_SYSTEM_BUS_H
 
+// Place common kernel headers here
 #include <nova/types.h>
-
-
-namespace nova
-{
-    /// @brief Writes value to the specified I/O port
-    /// @param port I/O port
-    /// @param value Value to write
-    static inline void WriteIO(const u16 port, const u8 value)
-    {
-        asm volatile("out %%al, %%dx" : : "a"(value), "d"(port));
-    }
-
-    /// @brief Reads value from the specified I/O port
-    /// @param port I/O port
-    /// @return Read value
-    static inline u8 ReadIO(const u16 port)
-    {
-        u8 value;
-        asm volatile("in %%dx, %%al" : "=a"(value) : "d"(port));
-
-        return value;
-    }
-}
-
-#endif // NOVA_SYSTEM_BUS_H
+#include <nova/macros.h>
+#include <nova/print.h>
+#include <nova/panic.h>
+#include <nova/sync/spin_guard.h>

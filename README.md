@@ -33,4 +33,4 @@ To test out the OS, run `make test` in the root of the repository. This will:
 
 ## Author
 
-Simon Mårtensson
+Simon Alm Mårtensson
