@@ -67,7 +67,7 @@ define make-executable
 	sources += $1
 
 $2: $(call source-to-object,$1)
-	$(LD)  $(LD_FLAGS) -o $$@ $$^ ../../../libc/bin/libc.a $3
+	$(LD)  $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
 endef
 
 define make-library
@@ -75,7 +75,7 @@ define make-library
 	sources += $1
 
 $2: $(call source-to-object,$1)
-	$(LD)  $(LD_FLAGS) -o $$@ $$^ -r $3
+	$(LD)  $(LDFLAGS) -o $$@ $$^ -r $3
 endef
 
 include $(ARCH_DIR)/arch.mk
@@ -87,14 +87,20 @@ objects = $(call source-to-object,$(sources))
 #########################################
 # Targets
 #########################################
-all: $(executables) $(libraries)
+all: $(libraries) $(executables)
 
 %.o: %.cpp
-	$(CPP) $(CPP_FLAGS) -DNOVA_ARCH_I386=1 -c $< -o $@
+	@echo Compiling $<
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.c
+	@echo Compiling $<
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.asm
-	$(AS) $(ASM_FLAGS) $< -o $@
+	@echo Compiling $<
+	$(AS) $(ASFLAGS) $< -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(objects) $(programs)
+	$(RM) $(objects) $(executables) $(libraries)
