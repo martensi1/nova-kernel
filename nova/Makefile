@@ -34,17 +34,30 @@ ASFLAGS :=
 
 
 #########################################
+# Debug flags
+#########################################
+ifeq ($(DEBUG), 1)
+	CXXFLAGS += -g
+	LDFLAGS += -g
+else
+	CXXFLAGS += -O2
+endif
+
+
+#########################################
 # Include directories
 #########################################
-NOVA_INCLUDE := $(CURDIR)/include
-LIBC_INCLUDE := $(CURDIR)/libc/include
-ARCH_INCLUDE := $(CURDIR)/$(ARCH_DIR)/include
+THIS_DIR := .
+
+NOVA_INCLUDE := $(THIS_DIR)/include
+LIBC_INCLUDE := $(THIS_DIR)/libc/include
+ARCH_INCLUDE := $(THIS_DIR)/$(ARCH_DIR)/include
 
 INCLUDE_DIRS := $(NOVA_INCLUDE) $(LIBC_INCLUDE) $(ARCH_INCLUDE)
 CXXFLAGS += $(addprefix -I ,$(INCLUDE_DIRS))
 
-NOVA_SRC := $(CURDIR)/kernel
-ARCH_SRC := $(CURDIR)/$(ARCH_DIR)/kernel
+NOVA_SRC := $(THIS_DIR)/kernel
+ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
 
 
 #########################################
@@ -67,7 +80,12 @@ define make-executable
 	sources += $1
 
 $2: $(call source-to-object,$1)
-	$(LD)  $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
+	@echo "-> Linking $2"
+	$(LD) $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
+	@echo "-> Executable $2 created"
+
+#	@nm -n $$@
+#	@readelf -S $$@
 endef
 
 define make-library
@@ -75,7 +93,9 @@ define make-library
 	sources += $1
 
 $2: $(call source-to-object,$1)
+	@echo "-> Linking $2"
 	$(LD)  $(LDFLAGS) -o $$@ $$^ -r $3
+	@echo "-> Library $2 created"
 endef
 
 include $(ARCH_DIR)/arch.mk
@@ -87,20 +107,22 @@ objects = $(call source-to-object,$(sources))
 #########################################
 # Targets
 #########################################
+.PHONY: all
 all: $(libraries) $(executables)
-
-%.o: %.cpp
-	@echo Compiling $<
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-%.o: %.c
-	@echo Compiling $<
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-%.o: %.asm
-	@echo Compiling $<
-	$(AS) $(ASFLAGS) $< -o $@
 
 .PHONY: clean
 clean:
 	$(RM) $(objects) $(executables) $(libraries)
+
+
+%.o: %.cpp
+	@echo "-> Compiling $<"
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.c
+	@echo "-> Compiling $<"
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.asm
+	@echo "-> Compiling $<"
+	$(AS) $(ASFLAGS) $< -o $@
