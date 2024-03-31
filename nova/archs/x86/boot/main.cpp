@@ -3,9 +3,10 @@
 #include <nova/build.h>
 #include <nova/macros.h>
 
-#include <boot/hbit.h>
 #include <arch/gdt.h>
-#include <boot/loader.h>
+
+#include "hbit.h"
+#include "loader.h"
 
 using namespace nova;
 

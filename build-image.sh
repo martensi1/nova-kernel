@@ -179,7 +179,7 @@ checkpoint "GRUB v${GRUB_VERSION} installed"
 ############################
 # Kernel multiboot test
 ############################
-ELF_FILE="./nova/bin/nova_kernel.elf"
+ELF_FILE="./bin/loader.elf"
 grub-file --is-x86-multiboot "$ELF_FILE"
 
 checkpoint "Kernel multiboot check"
@@ -213,7 +213,7 @@ sudo chown $SUDO_USER $IMAGE_PATH
 sudo chgrp $SUDO_USER $IMAGE_PATH
 
 # Copy ELF to output directory for debugging
-cp "$ELF_FILE" "$(dirname "$IMAGE_PATH")"
+#cp "$ELF_FILE" "$(dirname "$IMAGE_PATH")"
 
 ############################
 # Finalize

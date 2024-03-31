@@ -1,86 +1,100 @@
-export CPP := g++
-export AS := nasm
+#########################################
+# Base variables
+#########################################
+CXX := g++
+AS := nasm
+MV := mv -f
+RM := rm -f
+SED := sed
 
-export NOVA_INCLUDE := $(shell pwd)
 
-
-# Architectire, compiler and flags
-TARGET := nova_kernel.elf
-
-ASM_FLAGS := 
-CPP_FLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs -fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
-LD_FLAGS = -T linker.ld -z noexecstack
-
+#########################################
+# Architecture
+#########################################
 ifeq ($(ARCH), i386)
-	ASM_FLAGS += -f elf32
-	CPP_FLAGS += -m32 -DNOVA_ARCH_I386=1
-	LD_FLAGS += -m elf_i386
+	ARCH_DIR := x86
 else ifeq ($(ARCH), x86_64)
-	ASM_FLAGS += -f elf64
-	CPP_FLAGS += -m64 -DNOVA_ARCH_X86_64=1
-	LD_FLAGS += -m elf_x86_64
+	ARCH_DIR += x86
 else
-#$(error Target architecture not defined! Please set ARCH to i386 or x86_64)
+$(error Target architecture not defined or not supported!)
 endif
 
-ifeq ($(DEBUG), 1)
-	CPP_FLAGS += -g
-	LD_FLAGS += -g
-else
-	CPP_FLAGS += -O2
-endif
-
-# Define source and object directories
-INC_DIR := -I ./include/ -I ../libc/include/ -I ./archs/x86/include/ -I ./archs/x86/
-SRC_DIR := .
-OBJ_DIR := obj
-BIN_DIR := bin
-
-#rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+ARCH_DIR := archs/$(ARCH_DIR)
 
 
-ASM_FILES := $(wildcard $(SRC_DIR)/*.asm)
-ASM_FILES += $(wildcard $(SRC_DIR)/*/*.asm)
-ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*.asm)
-ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*/*.asm)
-ASM_FILES += $(wildcard $(SRC_DIR)/*/*/*/*/*.asm)
-CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-CPP_FILES += $(wildcard $(SRC_DIR)/*/*.cpp)
-CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*.cpp)
-CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*/*.cpp)
-CPP_FILES += $(wildcard $(SRC_DIR)/*/*/*/*/*.cpp)
+#########################################
+# Base flags
+#########################################
+CXXFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs \
+-fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
 
-ASM_OBJS := $(patsubst ./%.asm, $(OBJ_DIR)/%.o, $(ASM_FILES))
-CPP_OBJS := $(patsubst ./%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))
-#LIBC_STATIC := ../libc/bin/libc.a
+LDFLAGS := -z noexecstack
 
-OUTPUT := $(BIN_DIR)/$(TARGET)
+ASFLAGS :=
 
 
+#########################################
+# Include directories
+#########################################
+NOVA_INCLUDE := $(CURDIR)/include
+LIBC_INCLUDE := $(CURDIR)/libc/include
+ARCH_INCLUDE := $(CURDIR)/$(ARCH_DIR)/include
+
+INCLUDE_DIRS := $(NOVA_INCLUDE) $(LIBC_INCLUDE) $(ARCH_INCLUDE)
+CXXFLAGS += $(addprefix -I ,$(INCLUDE_DIRS))
+
+NOVA_SRC := $(CURDIR)/kernel
+ARCH_SRC := $(CURDIR)/$(ARCH_DIR)/kernel
+
+
+#########################################
+# Modules
+#########################################
+executables :=
+libraries :=
+sources :=
+
+source-to-object = $(subst .cpp,.o,$(filter %.cpp,$1)) \
+                   $(subst .asm,.o,$(filter %.asm,$1)) \
+				   $(subst .c,.o,$(filter %.c,$1))
+
+subdirectory = $(patsubst %/module.mk,%,                        \
+                 $(word                                         \
+                   $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
+define make-executable
+	executables += $2
+	sources += $1
+
+$2: $(call source-to-object,$1)
+	$(LD)  $(LD_FLAGS) -o $$@ $$^ ../../../libc/bin/libc.a $3
+endef
+
+define make-library
+	libraries += $2
+	sources += $1
+
+$2: $(call source-to-object,$1)
+	$(LD)  $(LD_FLAGS) -o $$@ $$^ -r $3
+endef
+
+include $(ARCH_DIR)/arch.mk
+include libc/module.mk
+
+objects = $(call source-to-object,$(sources))
+
+
+#########################################
 # Targets
-.PHONY: all clean
+#########################################
+all: $(executables) $(libraries)
 
-all: $(OUTPUT)
+%.o: %.cpp
+	$(CPP) $(CPP_FLAGS) -DNOVA_ARCH_I386=1 -c $< -o $@
 
-$(OUTPUT): $(ASM_OBJS) $(CPP_OBJS)
-	@echo "-> Linking object files"
-	@mkdir -p $(BIN_DIR)
-	$(LD) $(LD_FLAGS) -o $@ $^ $(LIBC_STATIC)
+%.o: %.asm
+	$(AS) $(ASM_FLAGS) $< -o $@
 
-#	@nm -n $(OUTPUT) >> $(BIN_DIR)/symbols.txt
-#	@readelf -S $(OUTPUT) >> $(BIN_DIR)/sections.txt
-	@echo "-> Done!"
-
-$(OBJ_DIR)/%.o: %.asm
-	@mkdir -p $(OBJ_DIR)/$(dir $*)
-	$(AS) $(ASM_FLAGS) $< -o $(OBJ_DIR)/$*.o
-
-$(OBJ_DIR)/%.o: %.cpp
-	@mkdir -p $(OBJ_DIR)/$(dir $*)
-
-	@echo "-> Compiling $<"
-	$(CC) $(CPP_FLAGS) $(INC_DIR) -c $< -o $(OBJ_DIR)/$*.o
-
-
+.PHONY: clean
 clean:
-	rm -rf $(OBJ_DIR)/* $(BIN_DIR)/*
+	$(RM) $(objects) $(programs)

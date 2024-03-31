@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 #include "loader.h"
-#include <boot/multiboot.h>
+#include "multiboot.h"
 
 #include <nova/print.h>
 #include <nova/panic.h>

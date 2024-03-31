@@ -45,3 +45,7 @@ debug:
 	@echo "Starting QEMU (architecture: $(ARCH), debug: false)..."
 	@$(QEMU_COMMAND) $(QEMU_FLAGS) $(DEBUG_FLAGS)
 	@$(GDB) $(GDB_FLAGS)
+
+kill:
+	@echo "Killing QEMU..."
+	@killall $(QEMU_COMMAND)
