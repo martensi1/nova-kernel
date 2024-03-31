@@ -80,9 +80,9 @@ define make-executable
 	sources += $1
 
 $2: $(call source-to-object,$1)
-	@echo "-> Linking $2"
+	@echo "-> Linking $$@"
 	$(LD) $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
-	@echo "-> Executable $2 created"
+	@echo "-> Executable $$@ created"
 
 #	@nm -n $$@
 #	@readelf -S $$@
@@ -93,9 +93,9 @@ define make-library
 	sources += $1
 
 $2: $(call source-to-object,$1)
-	@echo "-> Linking $2"
-	$(LD)  $(LDFLAGS) -o $$@ $$^ -r $3
-	@echo "-> Library $2 created"
+	@echo "-> Linking $$@"
+	$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
+	@echo "-> Library $$@ created"
 endef
 
 include $(ARCH_DIR)/arch.mk
