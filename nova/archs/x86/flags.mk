@@ -1,7 +1,3 @@
-include archs/x86/boot/module.mk
-include archs/x86/kernel/module.mk
-
-
 ifeq ($(ARCH), i386)
 	CXXFLAGS += -m32 -DNOVA_ARCH_I386=1
 	ASFLAGS += -f elf32

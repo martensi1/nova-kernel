@@ -98,7 +98,8 @@ $2: $(call source-to-object,$1)
 	@echo "-> Library $$@ created"
 endef
 
-include $(ARCH_DIR)/arch.mk
+include $(ARCH_DIR)/flags.mk
+include $(ARCH_DIR)/modules.mk
 include libc/module.mk
 
 objects = $(call source-to-object,$(sources))
