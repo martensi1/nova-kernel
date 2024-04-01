@@ -1,7 +1,23 @@
-ROOTDIR := $(CURDIR)/../
-include $(ROOTDIR)/make/functions.mk
-include $(ROOTDIR)/make/colors.mk
-
+# Nova OS
+# Copyright (C) 2024 Simon Alm Mårtensson
+#
+# This software is provided 'as-is', without any express or implied warranty.
+# In no event will the authors be held liable for any damages arising from the use of this software.
+#
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it freely,
+# subject to the following restrictions:
+#
+# 1. The origin of this software must not be misrepresented;
+#    you must not claim that you wrote the original software.
+#    If you use this software in a product, an acknowledgment
+#    in the product documentation would be appreciated but is not required.
+#
+# 2. Altered source versions must be plainly marked as such,
+#    and must not be misrepresented as being the original software.
+#
+# 3. This notice may not be removed or altered from any source distribution.
+#
 
 #########################################
 # Base variables
@@ -10,19 +26,22 @@ CXX := g++
 AS := nasm
 MV := mv -f
 RM := rm -f
+RMDIR := rm -rf
 SED := sed
-TEST := test
 MKDIR := mkdir -p
 
+ANSI_GREEN := \033[1;32m
+ANSI_RED := \033[1;31m
+ANSI_NC := \033[0m
+
+DATETIME := $(shell date +%Y%m%d%H%M%S)
 
 #########################################
 # Base flags
 #########################################
 CXXFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs \
 -fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
-
 LDFLAGS := -z noexecstack
-
 ASFLAGS :=
 
 
@@ -38,22 +57,27 @@ endif
 
 
 #########################################
-# Architecture
+# Architecture selection
 #########################################
 ifeq ($(ARCH), i386)
 	ARCH_DIR := x86
 else ifeq ($(ARCH), x86_64)
-	ARCH_DIR += x86
+	ARCH_DIR := x86
 else
 $(error Target architecture not defined or not supported!)
 endif
 
 ARCH_DIR := archs/$(ARCH_DIR)
+
+
+#########################################
+# Architecture flags
+#########################################
 include $(ARCH_DIR)/flags.mk
 
 
 #########################################
-# Include directories
+# Include and source directories
 #########################################
 THIS_DIR := .
 
@@ -69,80 +93,122 @@ ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
 
 
 #########################################
-# Modules
+# Build path
 #########################################
-executables :=
-libraries :=
-sources :=
+BUILD_DIR := ../bin/builds
+DATETIME := $(shell date +%Y%m%d%H%M%S)
 
-define make-executable
-	executables += $2
-	sources += $1
+OUT_DIR := $(BUILD_DIR)/$(ARCH)
+#OUT_DIR := $(BUILD_DIR)/$(ARCH)-$(DATETIME)
 
-$2: $(call source-to-object,$1)
-	@echo "LD EXEC $$@"
-	@$(LD) $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
-	@echo "$(GREEN)[EXEC]$(NC) -> $$@"
+BIN_DIR := $(OUT_DIR)/bin
+OBJ_DIR := $(OUT_DIR)/obj
 
-#	@nm -n $$@
-#	@readelf -S $$@
-endef
+# $(call source-to-object, $(source_files))
+source-to-object = $(addprefix $(OBJ_DIR)/, \
+				   $(subst .cpp,.o,$(filter %.cpp,$1)) \
+		           $(subst .asm,.o,$(filter %.asm,$1)) \
+				   $(subst .c,.o,$(filter %.c,$1)))
 
-define make-library
-	libraries += $2
-	sources += $1
+#########################################
+# Build functions
+#########################################
 
-$2: $(call source-to-object,$1)
-	@echo "LD LIB $$@"
-	@$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
-	@echo "$(GREEN)[LIB]$(NC) -> $$@"
-endef
-
-define compile-rules
-$(foreach f, $(local_src),$(call one-compile-rule,$(call source-to-object,$f),$f))
-endef
-
-define one-compile-rule
+# $(call compile-src, $(obj_path), $(src_path))
+define compile-src
 $(if $(filter %.c,$2),$(call compile-c,$1,$2),)
 $(if $(filter %.cpp,$2),$(call compile-cpp,$1,$2),)
 $(if $(filter %.asm,$2),$(call compile-asm,$1,$2),)
 endef
 
+# $(call compile-c, $(obj_path), $(src_path))
 define compile-c
 $1: $2
-	@mkdir -p $(dir $1)
+	@$(MKDIR) $(dir $1)
 	@echo "CXX $$<"
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
 endef
 
+# $(call compile-cpp, $(obj_path), $(src_path))
 define compile-cpp
 $1: $2
-	@mkdir -p $(dir $1)
+	@$(MKDIR) $(dir $1)
 	@echo "CXX $$<"
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
 endef
 
+# $(call compile-asm, $(obj_path), $(src_path))
 define compile-asm
 $1: $2
-	@mkdir -p $(dir $1)
+	@$(MKDIR) $(dir $1)
 	@echo "AS $$<"
 	@$(AS) $(ASFLAGS) $2 -o $1
 endef
 
-#modules = $(ARCH_DIR) libc
+# $(call link-executable, $(obj_files), $(exe_name), $(link_flags))
+define link-executable
+$2: $1
+	@$(MKDIR) $(dir $2)
+	@echo "LD EXEC $$@"
+	@$(LD) $(LDFLAGS) -o $$@ $$^ $(BIN_DIR)/libc/libc.a $3
+	@echo "$(ANSI_GREEN)[EXEC]$(ANSI_NC) -> $$@"
 
-include $(ARCH_DIR)/modules.mk
-include libc/module.mk
+#	@nm -n $$@
+#	@readelf -S $$@
+endef
 
-objects = $(call source-to-object,$(sources))
+# $(call link-library, $(obj_files), $(lib_name), $(link_flags))
+define link-library
+$2: $1
+	@$(MKDIR) $(dir $2)
+	@echo "LD LIB $$@"
+	@$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
+	@echo "$(ANSI_GREEN)[LIB]$(ANSI_NC) -> $$@"
+endef
 
 
 #########################################
-# Targets
+# Module functions
+#########################################
+executables :=
+libraries :=
+
+# $(call make-executable, $(source_files), $(out_path), $(link_flags))
+define make-executable
+executables += $(addprefix $(BIN_DIR)/,$2)
+$(call link-executable,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
+endef
+
+# $(call make-library, $(source_files), $(out_path), $(link_flags))
+define make-library
+libraries += $(addprefix $(BIN_DIR)/,$2)
+$(call link-library,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
+endef
+
+# $(call generate-compile-rules)
+define generate-compile-rules
+$(foreach f, $(local_src),$(call compile-src,$(call source-to-object,$f),$f))
+endef
+
+# Usage: $(subdirectory) Description: Returns the relative path to the current module
+subdirectory = $(patsubst %/module.mk,%,                        \
+                 $(word                                         \
+                   $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
+
+#########################################
+# Load modules
+#########################################
+include $(ARCH_DIR)/modules.mk
+include libc/module.mk
+
+
+#########################################
+# General rules
 #########################################
 .PHONY: all
 all: $(libraries) $(executables)
 
 .PHONY: clean
 clean:
-	$(RM) $(objects) $(executables) $(libraries)
+	$(RMDIR) $(BUILD_DIR)

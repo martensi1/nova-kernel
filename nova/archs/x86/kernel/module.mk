@@ -7,4 +7,4 @@ local_src += $(wildcard $(CORE_SRC)/*.cpp)
 local_src += $(wildcard $(CORE_SRC)/**/*.cpp)
 
 $(eval $(call make-executable, $(local_src), $(subdirectory)/kernel.elf, -T $(subdirectory)/linker.ld))
-$(eval $(compile-rules))
+$(eval $(generate-compile-rules))
