@@ -96,8 +96,6 @@ ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
 # Build path
 #########################################
 BUILD_DIR := ../bin/builds
-DATETIME := $(shell date +%Y%m%d%H%M%S)
-
 OUT_DIR := $(BUILD_DIR)/$(ARCH)
 #OUT_DIR := $(BUILD_DIR)/$(ARCH)-$(DATETIME)
 
