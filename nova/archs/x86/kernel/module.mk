@@ -7,3 +7,4 @@ local_src += $(wildcard $(NOVA_SRC)/*.cpp)
 local_src += $(wildcard $(NOVA_SRC)/**/*.cpp)
 
 $(eval $(call make-executable, $(local_src), $(subdirectory)/kernel.elf, -T $(subdirectory)/linker.ld))
+$(eval $(compile-rules))

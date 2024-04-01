@@ -15,3 +15,4 @@ local_src += $(NOVA_SRC)/drivers/serialcon.cpp
 local_src += $(NOVA_SRC)/drivers/vgacon.cpp
 
 $(eval $(call make-executable, $(local_src), $(subdirectory)/loader.elf, -T $(subdirectory)/linker.ld))
+$(eval $(compile-rules))

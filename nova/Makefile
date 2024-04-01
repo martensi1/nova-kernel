@@ -80,7 +80,7 @@ define make-executable
 $2: $(call source-to-object,$1)
 	@echo "LD EXEC $$@"
 	@$(LD) $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
-	@echo "[$(GREEN)BUILT$(NC)] -> $$@"
+	@echo "$(GREEN)[EXEC]$(NC) -> $$@"
 
 #	@nm -n $$@
 #	@readelf -S $$@
@@ -93,10 +93,35 @@ define make-library
 $2: $(call source-to-object,$1)
 	@echo "LD LIB $$@"
 	@$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
-	@echo "[$(GREEN)BUILT$(NC)] -> $$@"
-	@echo "-> Linking $$@"
-	$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
-	@echo "-> Library $$@ created"
+	@echo "$(GREEN)[LIB]$(NC) -> $$@"
+endef
+
+define compile-rules
+$(foreach f, $(local_src),$(call one-compile-rule,$(call source-to-object,$f),$f))
+endef
+
+define one-compile-rule
+$(if $(filter %.c,$2),$(call compile-c,$1,$2),)
+$(if $(filter %.cpp,$2),$(call compile-cpp,$1,$2),)
+$(if $(filter %.asm,$2),$(call compile-asm,$1,$2),)
+endef
+
+define compile-c
+$1: $2
+	@echo "CXX $$<"
+	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
+endef
+
+define compile-cpp
+$1: $2
+	@echo "CXX $$<"
+	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
+endef
+
+define compile-asm
+$1: $2
+	@echo "AS $$<"
+	@$(AS) $(ASFLAGS) $2 -o $1
 endef
 
 include $(ARCH_DIR)/modules.mk
@@ -114,16 +139,3 @@ all: $(libraries) $(executables)
 .PHONY: clean
 clean:
 	$(RM) $(objects) $(executables) $(libraries)
-
-
-%.o: %.cpp
-	@echo "CXX $<"
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-
-%.o: %.c
-	@echo "CXX $<"
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-
-%.o: %.asm
-	@echo "NASM $<"
-	@$(AS) $(ASFLAGS) $< -o $@
