@@ -1,5 +1,6 @@
 ROOTDIR := $(CURDIR)/../
 include $(ROOTDIR)/make/functions.mk
+include $(ROOTDIR)/make/colors.mk
 
 
 #########################################
@@ -77,9 +78,9 @@ define make-executable
 	sources += $1
 
 $2: $(call source-to-object,$1)
-	@echo "-> Linking $$@"
-	$(LD) $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
-	@echo "-> Executable $$@ created"
+	@echo "LD EXEC $$@"
+	@$(LD) $(LDFLAGS) -o $$@ $$^ libc/libc.a $3
+	@echo "[$(GREEN)BUILT$(NC)] -> $$@"
 
 #	@nm -n $$@
 #	@readelf -S $$@
@@ -90,6 +91,9 @@ define make-library
 	sources += $1
 
 $2: $(call source-to-object,$1)
+	@echo "LD LIB $$@"
+	@$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
+	@echo "[$(GREEN)BUILT$(NC)] -> $$@"
 	@echo "-> Linking $$@"
 	$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
 	@echo "-> Library $$@ created"
@@ -113,13 +117,13 @@ clean:
 
 
 %.o: %.cpp
-	@echo "-> Compiling $<"
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo "CXX $<"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.c
-	@echo "-> Compiling $<"
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo "CXX $<"
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.asm
-	@echo "-> Compiling $<"
-	$(AS) $(ASFLAGS) $< -o $@
+	@echo "NASM $<"
+	@$(AS) $(ASFLAGS) $< -o $@
