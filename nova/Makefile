@@ -48,7 +48,7 @@ ASFLAGS :=
 #########################################
 # Debug flags
 #########################################
-ifeq ($(DEBUG), 1)
+ifdef DEBUG
 CXXFLAGS += -g
 LDFLAGS += -g
 else
