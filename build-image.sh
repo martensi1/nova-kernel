@@ -179,7 +179,7 @@ checkpoint "GRUB v${GRUB_VERSION} installed"
 ############################
 # Kernel multiboot test
 ############################
-ELF_FILE="./bin/loader.elf"
+ELF_FILE="./nova/archs/x86/boot/loader.elf"
 grub-file --is-x86-multiboot "$ELF_FILE"
 
 checkpoint "Kernel multiboot check"
@@ -189,6 +189,7 @@ checkpoint "Kernel multiboot check"
 # Install kernel
 ############################
 cp "$ELF_FILE" "$MOUNT_DIR/boot/"
+cp "./nova/archs/x86/kernel/kernel.elf" "$MOUNT_DIR/boot/"
 checkpoint "Kernel copied"
 
 
