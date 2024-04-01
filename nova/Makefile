@@ -55,14 +55,14 @@ include $(ARCH_DIR)/flags.mk
 #########################################
 THIS_DIR := .
 
-NOVA_INCLUDE := $(THIS_DIR)/include
+CORE_INCLUDE := $(THIS_DIR)/include
 LIBC_INCLUDE := $(THIS_DIR)/libc/include
 ARCH_INCLUDE := $(THIS_DIR)/$(ARCH_DIR)/include
 
-INCLUDE_DIRS := $(NOVA_INCLUDE) $(LIBC_INCLUDE) $(ARCH_INCLUDE)
+INCLUDE_DIRS := $(CORE_INCLUDE) $(LIBC_INCLUDE) $(ARCH_INCLUDE)
 CXXFLAGS += $(addprefix -I ,$(INCLUDE_DIRS))
 
-NOVA_SRC := $(THIS_DIR)/kernel
+CORE_SRC := $(THIS_DIR)/core
 ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
 
 
