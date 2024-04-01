@@ -1,3 +1,7 @@
+ROOTDIR := $(CURDIR)/../
+include $(ROOTDIR)/make/functions.mk
+
+
 #########################################
 # Base variables
 #########################################
@@ -6,20 +10,6 @@ AS := nasm
 MV := mv -f
 RM := rm -f
 SED := sed
-
-
-#########################################
-# Architecture
-#########################################
-ifeq ($(ARCH), i386)
-	ARCH_DIR := x86
-else ifeq ($(ARCH), x86_64)
-	ARCH_DIR += x86
-else
-$(error Target architecture not defined or not supported!)
-endif
-
-ARCH_DIR := archs/$(ARCH_DIR)
 
 
 #########################################
@@ -45,6 +35,21 @@ endif
 
 
 #########################################
+# Architecture
+#########################################
+ifeq ($(ARCH), i386)
+	ARCH_DIR := x86
+else ifeq ($(ARCH), x86_64)
+	ARCH_DIR += x86
+else
+$(error Target architecture not defined or not supported!)
+endif
+
+ARCH_DIR := archs/$(ARCH_DIR)
+include $(ARCH_DIR)/flags.mk
+
+
+#########################################
 # Include directories
 #########################################
 THIS_DIR := .
@@ -66,14 +71,6 @@ ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
 executables :=
 libraries :=
 sources :=
-
-source-to-object = $(subst .cpp,.o,$(filter %.cpp,$1)) \
-                   $(subst .asm,.o,$(filter %.asm,$1)) \
-				   $(subst .c,.o,$(filter %.c,$1))
-
-subdirectory = $(patsubst %/module.mk,%,                        \
-                 $(word                                         \
-                   $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 define make-executable
 	executables += $2
@@ -98,7 +95,6 @@ $2: $(call source-to-object,$1)
 	@echo "-> Library $$@ created"
 endef
 
-include $(ARCH_DIR)/flags.mk
 include $(ARCH_DIR)/modules.mk
 include libc/module.mk
 
