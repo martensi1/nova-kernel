@@ -49,10 +49,10 @@ ASFLAGS :=
 # Debug flags
 #########################################
 ifeq ($(DEBUG), 1)
-	CXXFLAGS += -g
-	LDFLAGS += -g
+CXXFLAGS += -g
+LDFLAGS += -g
 else
-	CXXFLAGS += -O2
+CXXFLAGS += -O2
 endif
 
 
@@ -60,14 +60,16 @@ endif
 # Architecture selection
 #########################################
 ifeq ($(ARCH), i386)
-	ARCH_DIR := x86
+ARCH_DIR := x86
 else ifeq ($(ARCH), x86_64)
-	ARCH_DIR := x86
+ARCH_DIR := x86
+endif
+
+ifdef ARCH_DIR
+ARCH_DIR := archs/$(ARCH_DIR)
 else
 $(error Target architecture not defined or not supported!)
 endif
-
-ARCH_DIR := archs/$(ARCH_DIR)
 
 
 #########################################
