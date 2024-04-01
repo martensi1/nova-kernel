@@ -4,9 +4,13 @@
 # - returns: list of object files 
 #            (same path but with .o extension)
 ##################################################
-source-to-object = $(subst .cpp,.o,$(filter %.cpp,$1)) \
+BINARY_DIR = ../bin/$(ARCH)/build/
+source-dir-to-binary-dir = $(addprefix $(BINARY_DIR)/, $1)
+
+source-to-object = $(call source-dir-to-binary-dir, \
+				   $(subst .cpp,.o,$(filter %.cpp,$1)) \
                    $(subst .asm,.o,$(filter %.asm,$1)) \
-				   $(subst .c,.o,$(filter %.c,$1))
+				   $(subst .c,.o,$(filter %.c,$1)))
 
 
 ##################################################

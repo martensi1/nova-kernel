@@ -11,6 +11,8 @@ AS := nasm
 MV := mv -f
 RM := rm -f
 SED := sed
+TEST := test
+MKDIR := mkdir -p
 
 
 #########################################
@@ -108,21 +110,26 @@ endef
 
 define compile-c
 $1: $2
+	@mkdir -p $(dir $1)
 	@echo "CXX $$<"
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
 endef
 
 define compile-cpp
 $1: $2
+	@mkdir -p $(dir $1)
 	@echo "CXX $$<"
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
 endef
 
 define compile-asm
 $1: $2
+	@mkdir -p $(dir $1)
 	@echo "AS $$<"
 	@$(AS) $(ASFLAGS) $2 -o $1
 endef
+
+#modules = $(ARCH_DIR) libc
 
 include $(ARCH_DIR)/modules.mk
 include libc/module.mk
