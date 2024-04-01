@@ -81,9 +81,9 @@ include $(ARCH_DIR)/flags.mk
 #########################################
 THIS_DIR := .
 
-CORE_INCLUDE := $(THIS_DIR)/include
+CORE_INCLUDE := $(THIS_DIR)/core/include
 LIBC_INCLUDE := $(THIS_DIR)/libc/include
-ARCH_INCLUDE := $(THIS_DIR)/$(ARCH_DIR)/include
+ARCH_INCLUDE := $(THIS_DIR)/$(ARCH_DIR)/kernel/include
 
 INCLUDE_DIRS := $(CORE_INCLUDE) $(LIBC_INCLUDE) $(ARCH_INCLUDE)
 CXXFLAGS += $(addprefix -I ,$(INCLUDE_DIRS))
