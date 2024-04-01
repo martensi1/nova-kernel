@@ -106,9 +106,9 @@ OBJ_DIR := $(OUT_DIR)/obj
 
 # $(call source-to-object, $(source_files))
 source-to-object = $(addprefix $(OBJ_DIR)/, \
-				   $(subst .cpp,.o,$(filter %.cpp,$1)) \
-		           $(subst .asm,.o,$(filter %.asm,$1)) \
-				   $(subst .c,.o,$(filter %.c,$1)))
+				$(subst .cpp,.o,$(filter %.cpp,$1)) \
+				$(subst .asm,.o,$(filter %.asm,$1)) \
+				$(subst .c,.o,$(filter %.c,$1)))
 
 #########################################
 # Build functions
