@@ -29,6 +29,7 @@ RM := rm -f
 RMDIR := rm -rf
 SED := sed
 MKDIR := mkdir -p
+CP := cp
 
 ANSI_GREEN := \033[1;32m
 ANSI_RED := \033[1;31m
@@ -97,12 +98,14 @@ ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
 #########################################
 # Build path
 #########################################
-BUILD_DIR := ../bin/builds
-OUT_DIR := $(BUILD_DIR)/$(ARCH)
+BIN_DIR := ../bin
+BUILD_DIR := $(BIN_DIR)/build
+OUT_DIR := $(BUILD_DIR)
 #OUT_DIR := $(BUILD_DIR)/$(ARCH)-$(DATETIME)
 
 BIN_DIR := $(OUT_DIR)/bin
 OBJ_DIR := $(OUT_DIR)/obj
+BOOT_DIR := $(OUT_DIR)/boot
 
 # $(call source-to-object, $(source_files))
 source-to-object = $(addprefix $(OBJ_DIR)/, \
@@ -172,16 +175,45 @@ endef
 
 
 #########################################
+# GRUB config functions
+#########################################
+grubdata :=
+grubcopy :=
+
+define register-grub-file
+ifeq ($(strip $1), grub-start)
+grubdata := $(grubdata)multiboot \/boot\/$(notdir $2)\n\t
+else ifeq ($(strip $1), grub-module)
+grubdata := $(grubdata)module \/boot\/$(notdir $2)\n\t
+endif
+
+grubcopy += $(BOOT_DIR)/$(notdir $2)
+
+$(BOOT_DIR)/$(notdir $2): $2
+	@$(MKDIR) $(dir $$@)
+	@$(CP) $$^ $(BOOT_DIR)/
+
+endef
+
+
+$(BOOT_DIR)/grub/grub.cfg: $(executables)
+	@$(MKDIR) $(dir $@)
+	@$(SED) -e 's/%GRUB-DATA%/$(grubdata)/g' grub-cfg.tmpl > $@
+
+
+
+#########################################
 # Module functions
 #########################################
 executables :=
 libraries :=
 sources :=
 
-# $(call make-executable, $(source_files), $(out_path), $(link_flags))
+# $(call make-executable, $(source_files), $(out_path), $(link_flags), $(grub-type))
 define make-executable
 executables += $(addprefix $(BIN_DIR)/,$2)
 sources += $1
+$(call register-grub-file,$4,$(addprefix $(BIN_DIR)/,$2))
 $(call link-executable,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
 endef
 
@@ -223,12 +255,11 @@ endef
 
 $(eval $(generate-compile-rules))
 
-
 #########################################
 # General rules
 #########################################
 .PHONY: all
-all: $(libraries) $(executables)
+all: $(libraries) $(executables) $(BOOT_DIR)/grub/grub.cfg $(grubcopy)
 
 .PHONY: clean
 clean:

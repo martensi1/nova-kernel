@@ -5,8 +5,7 @@ set root (hd0,1)
 
 
 menuentry "Nova OS (Development)" {
-	multiboot /boot/loader.elf
-	module /boot/kernel.elf "kernel32"
+	%GRUB-DATA%
 }
 
 menuentry "System restart" {

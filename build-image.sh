@@ -177,20 +177,30 @@ checkpoint "GRUB v${GRUB_VERSION} installed"
 
 
 ############################
-# Kernel multiboot test
-############################
-ELF_FILE="./nova/archs/x86/boot/loader.elf"
-grub-file --is-x86-multiboot "$ELF_FILE"
-
-checkpoint "Kernel multiboot check"
-
-
-############################
 # Install kernel
 ############################
-cp "$ELF_FILE" "$MOUNT_DIR/boot/"
-cp "./nova/archs/x86/kernel/kernel.elf" "$MOUNT_DIR/boot/"
+KERNEL_FILES="bin/build/boot"
+cp -R "$KERNEL_FILES" "$MOUNT_DIR/"
 checkpoint "Kernel copied"
+
+
+############################
+# Kernel multiboot test
+############################
+GRUB_CFG="$MOUNT_DIR/boot/grub/grub.cfg"
+
+# extract word after multiboot
+echo "GRUB_CFG: $GRUB_CFG"
+ls -l "$MOUNT_DIR/boot/"
+KERNEL_ENTRY_FUKE=$(grep -oP "multiboot \K\S+" "$GRUB_CFG")
+echo "Kernel entry: $KERNEL_ENTRY_FUKE"
+
+# find multiboot path in grub cfg
+
+ELF_FILE="./nova/archs/x86/boot/loader.elf"
+grub-file --is-x86-multiboot "$MOUNT_DIR/$KERNEL_ENTRY_FUKE"
+
+checkpoint "Kernel multiboot check"
 
 
 ############################
