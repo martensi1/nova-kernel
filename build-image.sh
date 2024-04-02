@@ -188,18 +188,9 @@ checkpoint "Kernel copied"
 # Kernel multiboot test
 ############################
 GRUB_CFG="$MOUNT_DIR/boot/grub/grub.cfg"
+KERNEL_ENTRY_FILE="$MOUNT_DIR/$(grep -oP "multiboot \K\S+" "$GRUB_CFG")"
 
-# extract word after multiboot
-echo "GRUB_CFG: $GRUB_CFG"
-ls -l "$MOUNT_DIR/boot/"
-KERNEL_ENTRY_FUKE=$(grep -oP "multiboot \K\S+" "$GRUB_CFG")
-echo "Kernel entry: $KERNEL_ENTRY_FUKE"
-
-# find multiboot path in grub cfg
-
-ELF_FILE="./nova/archs/x86/boot/loader.elf"
-grub-file --is-x86-multiboot "$MOUNT_DIR/$KERNEL_ENTRY_FUKE"
-
+grub-file --is-x86-multiboot "$KERNEL_ENTRY_FILE"
 checkpoint "Kernel multiboot check"
 
 
