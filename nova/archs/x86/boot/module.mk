@@ -15,4 +15,4 @@ local_src += $(CORE_SRC)/drivers/serialcon.cpp
 local_src += $(CORE_SRC)/drivers/vgacon.cpp
 
 $(eval $(call make-executable, $(local_src), $(subdirectory)/loader.elf, -T $(subdirectory)/linker.ld))
-$(eval $(generate-compile-rules))
+#$(eval $(generate-compile-rules))

@@ -127,6 +127,7 @@ $1: $2
 	@$(MKDIR) $(dir $1)
 	@echo "CXX $$<"
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
+
 endef
 
 # $(call compile-cpp, $(obj_path), $(src_path))
@@ -135,6 +136,7 @@ $1: $2
 	@$(MKDIR) $(dir $1)
 	@echo "CXX $$<"
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
+
 endef
 
 # $(call compile-asm, $(obj_path), $(src_path))
@@ -143,6 +145,7 @@ $1: $2
 	@$(MKDIR) $(dir $1)
 	@echo "AS $$<"
 	@$(AS) $(ASFLAGS) $2 -o $1
+
 endef
 
 # $(call link-executable, $(obj_files), $(exe_name), $(link_flags))
@@ -164,6 +167,7 @@ $2: $1
 	@echo "LD LIB $$@"
 	@$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
 	@echo "$(ANSI_GREEN)[LIB]$(ANSI_NC) -> $$@"
+
 endef
 
 
@@ -172,22 +176,20 @@ endef
 #########################################
 executables :=
 libraries :=
+sources :=
 
 # $(call make-executable, $(source_files), $(out_path), $(link_flags))
 define make-executable
 executables += $(addprefix $(BIN_DIR)/,$2)
+sources += $1
 $(call link-executable,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
 endef
 
 # $(call make-library, $(source_files), $(out_path), $(link_flags))
 define make-library
 libraries += $(addprefix $(BIN_DIR)/,$2)
+sources += $1
 $(call link-library,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
-endef
-
-# $(call generate-compile-rules)
-define generate-compile-rules
-$(foreach f, $(local_src),$(call compile-src,$(call source-to-object,$f),$f))
 endef
 
 # Usage: $(subdirectory) Description: Returns the relative path to the current module
@@ -201,6 +203,25 @@ subdirectory = $(patsubst %/module.mk,%,                        \
 #########################################
 include $(ARCH_DIR)/modules.mk
 include libc/module.mk
+
+
+#########################################
+# Generate compile rules
+#########################################
+
+# $(call uniq, $(list))
+define remove-duplicates =
+  $(eval seen :=)
+  $(foreach _,$1,$(if $(filter $_,${seen}),,$(eval seen += $_)))
+  ${seen}
+endef
+
+# $(call generate-compile-rules)
+define generate-compile-rules
+$(foreach f, $(strip $(call remove-duplicates,$(sources))),$(call compile-src,$(call source-to-object,$f),$f))
+endef
+
+$(eval $(generate-compile-rules))
 
 
 #########################################
