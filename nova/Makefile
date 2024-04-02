@@ -20,16 +20,16 @@
 #
 
 #########################################
-# Base variables
+# Programs, commands and constants
 #########################################
 CXX := g++
 AS := nasm
 MV := mv -f
+CP := cp
 RM := rm -f
 RMDIR := rm -rf
-SED := sed
 MKDIR := mkdir -p
-CP := cp
+SED := sed
 
 ANSI_GREEN := \033[1;32m
 ANSI_RED := \033[1;31m
@@ -37,67 +37,7 @@ ANSI_NC := \033[0m
 
 DATETIME := $(shell date +%Y%m%d%H%M%S)
 
-#########################################
-# Base flags
-#########################################
-CXXFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs \
--fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
-LDFLAGS := -z noexecstack
-ASFLAGS :=
-
-
-#########################################
-# Debug flags
-#########################################
-ifdef DEBUG
-CXXFLAGS += -g
-LDFLAGS += -g
-else
-CXXFLAGS += -O2
-endif
-
-
-#########################################
-# Architecture selection
-#########################################
-ifeq ($(ARCH), i386)
-ARCH_DIR := x86
-else ifeq ($(ARCH), x86_64)
-ARCH_DIR := x86
-endif
-
-ifdef ARCH_DIR
-ARCH_DIR := archs/$(ARCH_DIR)
-else
-$(error Target architecture not defined or not supported!)
-endif
-
-
-#########################################
-# Architecture flags
-#########################################
-include $(ARCH_DIR)/flags.mk
-
-
-#########################################
-# Include and source directories
-#########################################
-THIS_DIR := .
-
-CORE_INCLUDE := $(THIS_DIR)/core/include
-LIBC_INCLUDE := $(THIS_DIR)/libc/include
-ARCH_INCLUDE := $(THIS_DIR)/$(ARCH_DIR)/kernel/include
-
-INCLUDE_DIRS := $(CORE_INCLUDE) $(LIBC_INCLUDE) $(ARCH_INCLUDE)
-CXXFLAGS += $(addprefix -I ,$(INCLUDE_DIRS))
-
-CORE_SRC := $(THIS_DIR)/core
-ARCH_SRC := $(THIS_DIR)/$(ARCH_DIR)/kernel
-
-
-#########################################
-# Build path
-#########################################
+# Output directories
 BIN_DIR := ../bin
 BUILD_DIR := $(BIN_DIR)/build
 OUT_DIR := $(BUILD_DIR)
@@ -107,11 +47,55 @@ BIN_DIR := $(OUT_DIR)/bin
 OBJ_DIR := $(OUT_DIR)/obj
 BOOT_DIR := $(OUT_DIR)/boot
 
-# $(call source-to-object, $(source_files))
-source-to-object = $(addprefix $(OBJ_DIR)/, \
-		$(subst .cpp,.o,$(filter %.cpp,$1)) \
-		$(subst .asm,.o,$(filter %.asm,$1)) \
-		$(subst .c,.o,$(filter %.c,$1)))
+
+#########################################
+# Architecture selection
+#########################################
+ifndef ARCH
+$(error Target architecture not defined!)
+endif
+
+include arch-map.mk
+archdir := $(ARCH_DIR_$(ARCH))
+
+ifeq ($(strip $(archdir)),)
+$(error Target architecture '$(ARCH)' not supported!)
+endif
+
+ARCH_PATH := archs/$(archdir)
+
+
+#########################################
+# Compiler flags
+#########################################
+CXXFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-exceptions -fno-stack-protector -nodefaultlibs \
+-fno-use-cxa-atexit -fno-rtti -Wall -Wextra -Werror -std=c++11
+LDFLAGS := -z noexecstack
+ASFLAGS :=
+
+ifdef DEBUG
+CXXFLAGS += -g
+LDFLAGS += -g
+else
+CXXFLAGS += -O2
+endif
+
+include $(ARCH_PATH)/flags.mk
+
+
+#########################################
+# Include and source directories
+#########################################
+core_include := core/include
+libc_include := libc/include
+arch_include := $(ARCH_PATH)/kernel/include
+
+include_dirs := $(core_include) $(libc_include) $(arch_include)
+CXXFLAGS += $(addprefix -I ,$(include_dirs))
+
+CORE_SRC := core
+ARCH_SRC := $(ARCH_PATH)/kernel
+
 
 #########################################
 # Build functions
@@ -127,8 +111,8 @@ endef
 # $(call compile-c, $(obj_path), $(src_path))
 define compile-c
 $1: $2
-	@$(MKDIR) $(dir $1)
 	@echo "CXX $$<"
+	@$(MKDIR) $(dir $1)
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
 
 endef
@@ -136,8 +120,8 @@ endef
 # $(call compile-cpp, $(obj_path), $(src_path))
 define compile-cpp
 $1: $2
-	@$(MKDIR) $(dir $1)
 	@echo "CXX $$<"
+	@$(MKDIR) $(dir $1)
 	@$(CXX) $(CXXFLAGS) -c $$< -o $$@
 
 endef
@@ -145,33 +129,75 @@ endef
 # $(call compile-asm, $(obj_path), $(src_path))
 define compile-asm
 $1: $2
-	@$(MKDIR) $(dir $1)
 	@echo "AS $$<"
+	@$(MKDIR) $(dir $1)
 	@$(AS) $(ASFLAGS) $2 -o $1
 
 endef
 
-# $(call link-executable, $(obj_files), $(exe_name), $(link_flags))
+# $(call link-executable, $(obj_files), $(out_path), $(link_flags))
 define link-executable
-$2: $1
-	@$(MKDIR) $(dir $2)
+$1: $2
 	@echo "LD EXEC $$@"
+	@$(MKDIR) $(dir $1)
 	@$(LD) $(LDFLAGS) -o $$@ $$^ $(BIN_DIR)/libc/libc.a $3
 	@echo "$(ANSI_GREEN)[EXEC]$(ANSI_NC) -> $$@"
 
-#	@nm -n $$@
-#	@readelf -S $$@
 endef
 
-# $(call link-library, $(obj_files), $(lib_name), $(link_flags))
+# $(call link-library, $(obj_files), $(out_path), $(link_flags))
 define link-library
-$2: $1
-	@$(MKDIR) $(dir $2)
+$1: $2
 	@echo "LD LIB $$@"
+	@$(MKDIR) $(dir $1)
 	@$(LD) $(LDFLAGS) -o $$@ $$^ -r $3
 	@echo "$(ANSI_GREEN)[LIB]$(ANSI_NC) -> $$@"
 
 endef
+
+
+#########################################
+# GRUB functions
+#########################################
+grubdata :=
+grubcopy :=
+
+# $(call boot-path, $(path))
+fs-boot-path = /boot/$(notdir $1)
+
+# $(call escape-sed-str, $(string))
+escape-sed-str = $(subst /,\/,$1)
+
+define copy-to-boot
+$(BOOT_DIR)/$(notdir $1): $1
+	@$(MKDIR) $(dir $$@)
+	@$(CP) $$^ $(BOOT_DIR)/
+endef
+
+# $(call add-grub-file, $(type), $(path))
+define add-grub-file
+	type = $(strip $1)
+	fspath = $(call fs-boot-path,$2)
+
+	ifeq ($(type), grub-start)
+		grubdata := $(grubdata)multiboot $(fspath)\n\t
+	else ifeq ($(type), grub-module)
+		grubdata := $(grubdata)module $(fspath)\n\t
+	endif
+
+
+	grubcopy += $(BOOT_DIR)/$(notdir $2)
+
+$(path): $2
+	@$(MKDIR) $(dir $$@)
+	@$(CP) $$^ $(BOOT_DIR)/
+
+endef
+
+
+
+
+
 
 
 #########################################
@@ -182,9 +208,9 @@ grubcopy :=
 
 define register-grub-file
 ifeq ($(strip $1), grub-start)
-grubdata := $(grubdata)multiboot \/boot\/$(notdir $2)\n\t
+grubdata := $(grubdata)multiboot $(call boot-path,$2)\n\t
 else ifeq ($(strip $1), grub-module)
-grubdata := $(grubdata)module \/boot\/$(notdir $2)\n\t
+grubdata := $(grubdata)module $(call boot-path,$2)\n\t
 endif
 
 grubcopy += $(BOOT_DIR)/$(notdir $2)
@@ -198,7 +224,7 @@ endef
 
 $(BOOT_DIR)/grub/grub.cfg: $(executables)
 	@$(MKDIR) $(dir $@)
-	@$(SED) -e 's/%GRUB-DATA%/$(grubdata)/g' grub-cfg.tmpl > $@
+	@$(SED) -e 's/%MODULE-LIST%/$(call escape-sed-str,$(grubdata))/g' grub-cfg.tmpl > $@
 
 
 
@@ -209,31 +235,37 @@ executables :=
 libraries :=
 sources :=
 
+# $(call source-to-object, $(source_files))
+source-to-object = $(addprefix $(OBJ_DIR)/, \
+		$(subst .cpp,.o,$(filter %.cpp,$1)) \
+		$(subst .asm,.o,$(filter %.asm,$1)) \
+		$(subst .c,.o,$(filter %.c,$1)))
+
 # $(call make-executable, $(source_files), $(out_path), $(link_flags), $(grub-type))
 define make-executable
 executables += $(addprefix $(BIN_DIR)/,$2)
 sources += $1
-$(call register-grub-file,$4,$(addprefix $(BIN_DIR)/,$2))
-$(call link-executable,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
+$(call add-grub-file,$4,$(addprefix $(BIN_DIR)/,$2))
+$(call link-executable,$(addprefix $(BIN_DIR)/,$2),$(call source-to-object,$1),$3)
 endef
 
 # $(call make-library, $(source_files), $(out_path), $(link_flags))
 define make-library
 libraries += $(addprefix $(BIN_DIR)/,$2)
 sources += $1
-$(call link-library,$(call source-to-object,$1),$(addprefix $(BIN_DIR)/,$2),$3)
+$(call link-library,$(addprefix $(BIN_DIR)/,$2),$(call source-to-object,$1),$3)
 endef
 
 # Usage: $(subdirectory) Description: Returns the relative path to the current module
-subdirectory = $(patsubst %/module.mk,%,                        \
-                 $(word                                         \
-                   $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+subdirectory = $(patsubst %/module.mk,%,                      \
+               $(word                                         \
+               $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 
 #########################################
 # Load modules
 #########################################
-include $(ARCH_DIR)/modules.mk
+include $(ARCH_PATH)/modules.mk
 include libc/module.mk
 
 
