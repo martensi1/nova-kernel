@@ -83,7 +83,7 @@ checkpoint "Build tools found"
 ############################
 # Create empty image
 ############################
-IMAGE_PATH="bin/kernel.img"
+IMAGE_PATH="build/kernel.img"
 IMAGE_SIZE="30M"
 
 if [ -f "$IMAGE_PATH" ]; then
@@ -179,7 +179,7 @@ checkpoint "GRUB v${GRUB_VERSION} installed"
 ############################
 # Install kernel
 ############################
-KERNEL_FILES="bin/build/boot"
+KERNEL_FILES="build/boot"
 cp -R "$KERNEL_FILES" "$MOUNT_DIR/"
 checkpoint "Kernel copied"
 
