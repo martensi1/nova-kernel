@@ -128,11 +128,11 @@ to-fs-boot-path = /boot/$(notdir $1)
 
 # $(call add-file-to-grub-cfg, $(file-type), $(file-fs-path)
 define add-file-to-grub-cfg
-	ifeq ($1, grub-start)
-		GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)multiboot $2\n\t
-	else ifeq ($1, grub-module)
-		GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)module $2\n\t
-	endif
+ifeq ($1, grub-start)
+	GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)multiboot $2\n\t
+else ifeq ($1, grub-module)
+	GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)module $2\n\t
+endif
 endef
 
 # $(call register-grub-file, $(file-type), $(path))
@@ -156,24 +156,18 @@ executables :=
 libraries :=
 sources :=
 
-# $(call source-to-object, $(source_files))
-source-to-object = $(addprefix $(OBJ_DIR)/, \
-		$(subst .cpp,.o,$(filter %.cpp,$1)) \
-		$(subst .asm,.o,$(filter %.asm,$1)) \
-		$(subst .c,.o,$(filter %.c,$1)))
-
 # $(call make-executable, $(source_files), $(out_path), $(link_flags), $(grub-type))
 define make-executable
-	executables += $(addprefix $(BIN_DIR)/,$2)
-	sources += $1
+executables += $(addprefix $(BIN_DIR)/,$2)
+sources += $1
 $(call register-grub-file,$4,$(addprefix $(BIN_DIR)/,$2))
 $(call link-executable,$(addprefix $(BIN_DIR)/,$2),$(call source-to-object,$1),$3)
 endef
 
 # $(call make-library, $(source_files), $(out_path), $(link_flags))
 define make-library
-	libraries += $(addprefix $(BIN_DIR)/,$2)
-	sources += $1
+libraries += $(addprefix $(BIN_DIR)/,$2)
+sources += $1
 $(call link-library,$(addprefix $(BIN_DIR)/,$2),$(call source-to-object,$1),$3)
 endef
 
