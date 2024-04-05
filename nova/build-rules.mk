@@ -51,8 +51,16 @@ ARCH_SRC := $(ARCH_PATH)/kernel
 # Build functions
 #########################################
 
-# $(call compile-src, $(obj_path), $(src_path))
-define compile-src
+source-to-object = $(addprefix $(OBJ_DIR)/, \
+		$(subst .cpp,.o,$(filter %.cpp,$1)) \
+		$(subst .asm,.o,$(filter %.asm,$1)) \
+		$(subst .c,.o,$(filter %.c,$1)))
+
+# $(call compile-src, $(src_path))
+compile-src = $(call compile-src-to-obj,$(call source-to-object,$1),$1)
+
+# $(call compile-src-to-obj, $(obj_path), $(src_path))
+define compile-src-to-obj
 $(if $(filter %.c,$2),$(call compile-c,$1,$2),)
 $(if $(filter %.cpp,$2),$(call compile-cpp,$1,$2),)
 $(if $(filter %.asm,$2),$(call compile-asm,$1,$2),)
@@ -109,6 +117,8 @@ endef
 #########################################
 # GRUB functions
 #########################################
+GRUB_CFG_OUT := $(BOOT_DIR)/grub/grub.cfg
+GRUB_CFG_BOOT_DATA :=
 
 # $(call escape-sed-str, $(string))
 escape-sed-str = $(subst /,\/,$1)
@@ -116,45 +126,27 @@ escape-sed-str = $(subst /,\/,$1)
 # $(call to-fs-boot-path, $(path))
 to-fs-boot-path = /boot/$(notdir $1)
 
-# $(call copy-to-boot, $(path))
-define add-boot-file
-$(BOOT_DIR)/$(notdir $1): $1
-	@$(MKDIR) $(dir $$@)
-	@$(CP) $$^ $(BOOT_DIR)/
-endef
-
-
-
-
-grubdata :=
-grubfiles :=
-
-
-# $(call add-grub-file, $(type), $(path))
-define add-grub-file
-	type = $(strip $1)
-	fspath = $(call to-fs-boot-path,$2)
-
-	ifeq ($(type), grub-start)
-		grubdata := $(grubdata)multiboot $(fspath)\n\t
-	else ifeq ($(type), grub-module)
-		grubdata := $(grubdata)module $(fspath)\n\t
+# $(call add-file-to-grub-cfg, $(file-type), $(file-fs-path)
+define add-file-to-grub-cfg
+	ifeq ($1, grub-start)
+		GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)multiboot $2\n\t
+	else ifeq ($1, grub-module)
+		GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)module $2\n\t
 	endif
-
-
-	grubfiles += $(BOOT_DIR)/$(notdir $2)
-
-$(BOOT_DIR)/$(notdir $2): $2
-	@$(MKDIR) $(BOOT_DIR)
-	@$(CP) $$^ $(BOOT_DIR)/
-
 endef
 
-$(BOOT_DIR)/grub/grub.cfg: $(executables)
+# $(call register-grub-file, $(file-type), $(path))
+register-grub-file = $(call add-file-to-grub-cfg,$(strip $1),$(call to-fs-boot-path,$2))
+
+$(GRUB_CFG_OUT): $(executables)
 	@$(MKDIR) $(dir $@)
-	@$(SED) -e 's/%MODULE-LIST%/$(call escape-sed-str,$(grubdata))/g' grub-cfg.tmpl > $@
+	@$(SED) -e 's/%MODULE-LIST%/$(call escape-sed-str,$(GRUB_CFG_BOOT_DATA))/g' grub-cfg.tmpl > $@
 	@echo "$(ANSI_GREEN)[GRUB]$(ANSI_NC) -> $@"
 
+package-boot: $(GRUB_CFG_OUT)
+	@$(RM) $(BOOT_DIR)/*.elf
+	@$(MKDIR) $(BOOT_DIR)
+	@find $(BIN_DIR) -type f -name "*.elf" -exec cp {} $(BOOT_DIR)/ \;
 
 
 #########################################
@@ -172,28 +164,29 @@ source-to-object = $(addprefix $(OBJ_DIR)/, \
 
 # $(call make-executable, $(source_files), $(out_path), $(link_flags), $(grub-type))
 define make-executable
-executables += $(addprefix $(BIN_DIR)/,$2)
-sources += $1
-$(call add-grub-file,$4,$(addprefix $(BIN_DIR)/,$2))
+	executables += $(addprefix $(BIN_DIR)/,$2)
+	sources += $1
+$(call register-grub-file,$4,$(addprefix $(BIN_DIR)/,$2))
 $(call link-executable,$(addprefix $(BIN_DIR)/,$2),$(call source-to-object,$1),$3)
 endef
 
 # $(call make-library, $(source_files), $(out_path), $(link_flags))
 define make-library
-libraries += $(addprefix $(BIN_DIR)/,$2)
-sources += $1
+	libraries += $(addprefix $(BIN_DIR)/,$2)
+	sources += $1
 $(call link-library,$(addprefix $(BIN_DIR)/,$2),$(call source-to-object,$1),$3)
 endef
+
+
+#########################################
+# Load modules
+#########################################
 
 # Usage: $(subdirectory) Description: Returns the relative path to the current module
 subdirectory = $(patsubst %/module.mk,%,                      \
                $(word                                         \
                $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
-
-#########################################
-# Load modules
-#########################################
 include $(ARCH_PATH)/modules.mk
 include libc/module.mk
 
@@ -211,7 +204,7 @@ endef
 
 # $(call generate-compile-rules)
 define generate-compile-rules
-$(foreach f, $(strip $(call remove-duplicates,$(sources))),$(call compile-src,$(call source-to-object,$f),$f))
+$(foreach f, $(strip $(call remove-duplicates,$(sources))),$(call compile-src,$f))
 endef
 
 $(eval $(generate-compile-rules))
@@ -220,4 +213,4 @@ $(eval $(generate-compile-rules))
 # General rules
 #########################################
 .PHONY: all
-all: $(libraries) $(executables) $(grubfiles) $(BOOT_DIR)/grub/grub.cfg
+all: $(libraries) $(executables) package-boot
