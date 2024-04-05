@@ -1,0 +1,19 @@
+set default=0
+set timeout=0
+
+set root (hd0,1)
+
+
+menuentry "Nova OS (Development)" {
+	%MODULE-LIST%
+}
+
+menuentry "System restart" {
+	echo "System rebooting..."
+	reboot
+}
+
+menuentry "System shutdown" {
+	echo "System shutting down..."
+	halt
+}

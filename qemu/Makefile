@@ -14,7 +14,7 @@ endif
 # QEMU parameters
 ######################################################
 QEMU_MEMORY := 1024
-QEMU_DRIVE := "format=raw,file=../bin/kernel.img"
+QEMU_DRIVE := "format=raw,file=../build/kernel.img"
 QEMU_SERIAL := "file:serial.log"
 
 QEMU_FLAGS := -m $(QEMU_MEMORY) -drive $(QEMU_DRIVE) -serial $(QEMU_SERIAL)
@@ -28,7 +28,7 @@ DEBUG_FLAGS := -s -S -vnc :5 -daemonize
 ######################################################
 GDB := gdb
 GDB_FLAGS := -ex "target remote localhost:1234"
-GDB_FLAGS += -ex "symbol-file ../bin/nova_kernel.elf"
+GDB_FLAGS += -ex "symbol-file ../build/nova_kernel.elf"
 GDB_FLAGS += -ex "break kmain" -ex "continue"
 
 
@@ -45,3 +45,7 @@ debug:
 	@echo "Starting QEMU (architecture: $(ARCH), debug: false)..."
 	@$(QEMU_COMMAND) $(QEMU_FLAGS) $(DEBUG_FLAGS)
 	@$(GDB) $(GDB_FLAGS)
+
+kill:
+	@echo "Killing QEMU..."
+	@killall $(QEMU_COMMAND)

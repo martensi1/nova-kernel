@@ -1,5 +1,11 @@
 # Resources
 
+## ELF
+
+The Executable and Linkable Format (ELF) is a common standard file format for executables, object code, shared libraries, and core dumps.
+
+* [ELF Specification](http://www.skyfree.org/linux/references/ELF_Format.pdf)
+
 ## GRUB
 
 The Multiboot specification is an open standard that provides kernels with a uniform way to be booted by Multiboot-compliant bootloaders. The reference implementation of the Multiboot specification is provided by the GNU GRUB bootloader.
@@ -12,6 +18,13 @@ The Multiboot specification is an open standard that provides kernels with a uni
 ## Calling conventions
 
 * [x86 Calling Conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)
+
+## Hardware Interfacing
+
+* [CPUID - CPU Identification](https://www.felixcloutier.com/x86/cpuid)
+* [SVGA/VGA Video Programming Information Page](http://www.osdever.net/FreeVGA/vga/crtcreg.htm)
+
+
 
 ## QEMU
 

@@ -1,4 +1,25 @@
 #!/bin/sh
+#
+# Nova OS
+# Copyright (C) 2024 Simon Alm Mårtensson
+#
+# This software is provided 'as-is', without any express or implied warranty.
+# In no event will the authors be held liable for any damages arising from the use of this software.
+#
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it freely,
+# subject to the following restrictions:
+#
+# 1. The origin of this software must not be misrepresented;
+#    you must not claim that you wrote the original software.
+#    If you use this software in a product, an acknowledgment
+#    in the product documentation would be appreciated but is not required.
+#
+# 2. Altered source versions must be plainly marked as such,
+#    and must not be misrepresented as being the original software.
+#
+# 3. This notice may not be removed or altered from any source distribution.
+#
 
 # Makes script fail if any command fails
 set -e
@@ -23,7 +44,7 @@ error () {
 ############################
 # Print welcome message
 ############################
-VERSION='0.1.0'
+VERSION='0.1.2'
 
 echo "############################################"
 echo "#    Nova OS - Image Builder (v${VERSION})  "
@@ -35,6 +56,11 @@ echo "############################################"
 ############################
 if [ "$(id -u)" -ne 0 ]; then
     error "Please run as root"
+    exit 1
+fi
+
+if [ -z "$SUDO_USER" ]; then
+    error "Please run with sudo"
     exit 1
 fi
 
@@ -57,15 +83,14 @@ checkpoint "Build tools found"
 ############################
 # Create empty image
 ############################
-IMAGE_PATH="bin/kernel.img"
+IMAGE_PATH="build/kernel.img"
 IMAGE_SIZE="30M"
 
 if [ -f "$IMAGE_PATH" ]; then
     rm -f "$IMAGE_PATH"
 
     if [ -f "$IMAGE_PATH" ]; then
-        echo "Failed to delete old image file: $IMAGE_PATH"
-        exit 1
+        error "Failed to delete old image file: $IMAGE_PATH"
     fi
 fi
 
@@ -152,19 +177,21 @@ checkpoint "GRUB v${GRUB_VERSION} installed"
 
 
 ############################
-# Kernel multiboot test
-############################
-ELF_FILE="./kernel/bin/nova_kernel.elf"
-grub-file --is-x86-multiboot "$ELF_FILE"
-
-checkpoint "Kernel multiboot check"
-
-
-############################
 # Install kernel
 ############################
-cp "$ELF_FILE" "$MOUNT_DIR/boot/"
+KERNEL_FILES="build/boot"
+cp -R "$KERNEL_FILES" "$MOUNT_DIR/"
 checkpoint "Kernel copied"
+
+
+############################
+# Kernel multiboot test
+############################
+GRUB_CFG="$MOUNT_DIR/boot/grub/grub.cfg"
+KERNEL_ENTRY_FILE="$MOUNT_DIR/$(grep -oP "multiboot \K\S+" "$GRUB_CFG")"
+
+grub-file --is-x86-multiboot "$KERNEL_ENTRY_FILE"
+checkpoint "Kernel multiboot check"
 
 
 ############################
@@ -184,11 +211,13 @@ sleep 0.1
 losetup -d "$LOOP_DEVICE"
 sleep 0.1
 
+sudo chown $SUDO_USER $IMAGE_PATH
+sudo chgrp $SUDO_USER $IMAGE_PATH
+
+# Copy ELF to output directory for debugging
+#cp "$ELF_FILE" "$(dirname "$IMAGE_PATH")"
 
 ############################
 # Finalize
 ############################
 echo "Image produced (size: $IMAGE_SIZE, MD5: $(md5sum "$IMAGE_PATH" | cut -d ' ' -f 1))"
-
-# Copy ELF to output directory for debugging
-cp "$ELF_FILE" "$OUTPUT_DIR/"
