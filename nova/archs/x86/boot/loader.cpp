@@ -112,7 +112,7 @@ static void _load_kernel(const multiboot_info_t* boot_info)
         void* module_start = (void*)module->mod_start;
         void* module_end = (void*)module->mod_end;
 
-        log("Kernel module found at 0x%x - 0x%x", module->mod_start, module->mod_end);
+        log("Kernel ELF found at 0x%x - 0x%x", module->mod_start, module->mod_end);
         void* entry_point = _load_elf_to_memory(module_start);
 
         if (entry_point == NULL)
