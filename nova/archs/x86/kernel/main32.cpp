@@ -35,17 +35,9 @@ extern "C" {
     ////////////////////////////////////////////////////////////
     /// @brief Kernel entry point (32-bit)
     ///
-    /// @param boot_handover_eax The value of the EAX register 
-    ///                          at the time of the boot handover
-    /// @param boot_handover_ebx The value of the EBX register
-    ///                          at the time of the boot handover
-    ///
     ////////////////////////////////////////////////////////////
-    int kmain_32(uint32_t boot_handover_eax, uint32_t boot_handover_ebx)
+    int kmain_32()
     {
-        static_cast<void>(boot_handover_ebx);
-        static_cast<void>(boot_handover_eax);
-
         initialize_terminal();
 
         print_logo();
@@ -59,7 +51,6 @@ extern "C" {
         SetupPIT(200);
         run_sbit();
 
-        log("Hello world!");
         return 0;
     }
 }
