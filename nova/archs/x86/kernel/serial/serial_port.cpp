@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 #include <arch/serial/serial_port.h>
-#include <arch/sysbus.h>
+#include <arch/cpu/sysbus.h>
 #include <nova/panic.h>
 #include <nova/sync/spin_guard.h>
 

@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 #include <arch/pic.h>
-#include <arch/sysbus.h>
+#include <arch/cpu/sysbus.h>
 
 
 #define PRIMARY_PIC_COMMAND_PORT 0x20

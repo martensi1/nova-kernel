@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 #include <nova/drivers/console.h>
-#include <arch/sysbus.h>
+#include <arch/cpu/sysbus.h>
 #include <arch/serial/serial.h>
 
 using namespace nova;

@@ -11,6 +11,15 @@
 
 extern "C" {
     ////////////////////////////////////////////////////////////
+    /// @brief Prints the compiler information
+    ///
+    ////////////////////////////////////////////////////////////
+    FORCE_INLINE static void print_compiler_info(void)
+    {
+        log("Compiled %s by %s (arch %s)", NOVA_BUILD_DATETIME, NOVA_COMPILER, NOVA_ARCHITECTURE);
+    }
+
+    ////////////////////////////////////////////////////////////
     /// @brief Loader main function
     ///
     /// @param boot_handover_eax The value of the EAX register 
@@ -22,6 +31,8 @@ extern "C" {
     void kernel_loader_main(u32 boot_handover_eax, u32 boot_handover_ebx) 
     {
         initialize_terminal();
+        
+        print_compiler_info();
         run_hbit(boot_handover_eax);
 
         Serial::scanForPorts();

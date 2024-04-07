@@ -3,6 +3,8 @@
 #include <arch/pit.h>
 #include <nova/build.h>
 #include <arch/serial/serial.h>
+#include <arch/cpu/setup.h>
+#include <arch/sbit.h>
 
 using namespace nova;
 
@@ -52,7 +54,10 @@ extern "C" {
         Serial::scanForPorts();
         terminal_scan_drivers();
 
+        cpu_setup();
+
         SetupPIT(200);
+        run_sbit();
 
         log("Hello world!");
         return 0;

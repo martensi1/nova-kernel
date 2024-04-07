@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 #include <arch/pit.h>
-#include <arch/sysbus.h>
+#include <arch/cpu/sysbus.h>
 #include <nova/types.h>
 #include <nova/panic.h>
 #include <nova/print.h>

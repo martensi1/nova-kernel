@@ -60,14 +60,20 @@ static void* _load_elf_to_memory(void* elf_start)
         elf32_program_header_t segment = elf.segments[i];
 
         if (segment.type == PT_LOAD) {
-            const void* src = (const void*) ((u8*)elf_start + segment.offset);                         
-            memcpy((void*)segment.paddr, src, segment.file_size);
+            void* segment_src = (void*)((u8*)elf_start + segment.offset);
+            void* segment_dst = (void*)segment.paddr;
 
-            if (segment.file_size < segment.mem_size) {
-                memset((void*)(segment.paddr + segment.file_size), 0, segment.mem_size - segment.file_size);
+            u32 file_size = segment.file_size;
+            u32 mem_size = segment.mem_size;
+
+            memcpy(segment_dst, segment_src, file_size);
+
+            if (file_size < mem_size) {
+                u32 zero_size = mem_size - file_size;
+                memset((u8*)segment_dst + file_size, 0, zero_size);
             }
 
-            log("Loaded segment %d: 0x%x - 0x%x", i, segment.vaddr, segment.vaddr + segment.mem_size);
+            log("Loaded segment %d: 0x%x - 0x%x", i, segment_dst, (u8*)segment_dst + mem_size);
         }
     }
 
@@ -82,12 +88,6 @@ static void _jump_to_kernel(void* entrypoint_addr, const multiboot_info_t* boot_
 
     typedef int func(void*);
     func* jump = (func*)entrypoint_addr;
-
-    // wait for 1 000 000 cycles
-    for (int i = 0; i < 2000000000; i++)
-    {
-        asm volatile("nop");
-    }
 
     void* boot_info_addr = (void*)boot_info;
     jump(boot_info_addr);

@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 #include <arch/serial/serial.h>
-#include <arch/sysbus.h>
+#include <arch/cpu/sysbus.h>
 #include <nova/print.h>
 #include <nova/panic.h>
 
