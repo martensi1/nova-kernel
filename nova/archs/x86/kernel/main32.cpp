@@ -39,7 +39,7 @@ extern "C" {
     ///                          at the time of the boot handover
     ///
     ////////////////////////////////////////////////////////////
-    int kmain(uint32_t boot_handover_eax, uint32_t boot_handover_ebx)
+    int kmain_32(uint32_t boot_handover_eax, uint32_t boot_handover_ebx)
     {
         static_cast<void>(boot_handover_ebx);
         static_cast<void>(boot_handover_eax);

@@ -61,87 +61,87 @@ typedef struct __attribute__((packed)) {
 } gdtr_t;
 
 
-namespace nova
+////////////////////////////////////////////////////////////
+static void* _write_descriptor(void* dest, u32 base, u32 limit, u16 flags)
 {
-    namespace priv
-    {
-        static void* write_descriptor(void* dest, u32 base, u32 limit, u16 flags)
-        {
-            u8* dest8 = (u8*)dest;
-            u8 i = 0;
+    u8* dest8 = (u8*)dest;
+    u8 i = 0;
 
-            // Write limit (bit 0-15)
-            dest8[i++] = limit & 0xFF;
-            dest8[i++] = (limit >> 8) & 0xFF;
+    // Write limit (bit 0-15)
+    dest8[i++] = limit & 0xFF;
+    dest8[i++] = (limit >> 8) & 0xFF;
 
-            // Write base (bit 0-23)
-            dest8[i++] = base & 0xFF;
-            dest8[i++] = (base >> 8) & 0xFF;
-            dest8[i++] = (base >> 16) & 0xFF;
+    // Write base (bit 0-23)
+    dest8[i++] = base & 0xFF;
+    dest8[i++] = (base >> 8) & 0xFF;
+    dest8[i++] = (base >> 16) & 0xFF;
 
-            // Write pres, priv, desc type, etc
-            dest8[i++] = flags & 0xFF;
-            dest8[i++] = ((flags >> 8) & 0xF0) | ((limit >> 16) & 0x0F);
-            
-            // Write base (bit 24-31)
-            dest8[i++] = (base >> 24) & 0xFF;
+    // Write pres, priv, desc type, etc
+    dest8[i++] = flags & 0xFF;
+    dest8[i++] = ((flags >> 8) & 0xF0) | ((limit >> 16) & 0x0F);
+    
+    // Write base (bit 24-31)
+    dest8[i++] = (base >> 24) & 0xFF;
 
-            dest8 += i;
-            return (void*)dest8;  
-        }
+    dest8 += i;
+    return (void*)dest8;  
+}
 
-        static void write_table(const u32 write_address, gdtr_t& gdtr)
-        {
-            void* dest = (void*)write_address;
 
-            // We want to use paging and not segmentation, so we define 
-            // 4 large overlapping segments that cover the entire 4GB address space
-            dest = write_descriptor(dest, 0, 0, 0);
-            dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL0);
-            dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL0);
-            dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
-            dest = write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
+////////////////////////////////////////////////////////////
+static void _write_table(const u32 write_address, gdtr_t& gdtr)
+{
+    void* dest = (void*)write_address;
 
-            gdtr.size = (u16)((u32)dest - write_address);
-            gdtr.offset = write_address;
+    // We want to use paging and not segmentation, so we define 
+    // 4 large overlapping segments that cover the entire 4GB address space
+    dest = _write_descriptor(dest, 0, 0, 0);
+    dest = _write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL0);
+    dest = _write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL0);
+    dest = _write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_CODE_PL3);
+    dest = _write_descriptor(dest, 0, 0xFFFFFFFF, GDT_SEGMENT_DATA_PL3);
 
-            log("Global Descriptor Table (GDT) successfully written to memory");
-        }
+    gdtr.size = (u16)((u32)dest - write_address);
+    gdtr.offset = write_address;
 
-        static void load_table(const gdtr_t& gdtr)
-        {
-            log("Loading GDT into processor...");
+    log("Global Descriptor Table (GDT) successfully written to memory");
+}
 
-            // Disable interrupts and update the GDTR register to
-            // point to our new GDT
-            asm volatile("cli");
-            asm volatile("lgdt %0" : : "m" (gdtr));
 
-            // Now when we have a new GDT, we need to set the segment registers
-            // to point to the correct segments (for us kernel code and data segments)
-            asm volatile("\
-                mov %0, %%ax\n \
-                mov %%ax, %%ds\n \
-                mov %%ax, %%es\n \
-                mov %%ax, %%fs\n \
-                mov %%ax, %%gs\n \
-                mov %%ax, %%ss\n \
-                jmp %1, $gdt_jump_%=\n \
-                gdt_jump_%=:\n \
-                " : : "i" (KERNEL_DATA_SEGMENT), "i" (KERNEL_CODE_SEGMENT));
-            
+////////////////////////////////////////////////////////////
+static void _load_table(const gdtr_t& gdtr)
+{
+    log("Loading GDT into processor...");
 
-            log("GDT loaded and activated"); 
-        }
-    }
+    // Disable interrupts and update the GDTR register to
+    // point to our new GDT
+    asm volatile("cli");
+    asm volatile("lgdt %0" : : "m" (gdtr));
 
-    void setup_gdt(const u32 write_address, u16& gdt_size)
-    {
-        gdtr_t gdtr;
+    // Now when we have a new GDT, we need to set the segment registers
+    // to point to the correct segments (for us kernel code and data segments)
+    asm volatile("\
+        mov %0, %%ax\n \
+        mov %%ax, %%ds\n \
+        mov %%ax, %%es\n \
+        mov %%ax, %%fs\n \
+        mov %%ax, %%gs\n \
+        mov %%ax, %%ss\n \
+        jmp %1, $gdt_jump_%=\n \
+        gdt_jump_%=:\n \
+        " : : "i" (KERNEL_DATA_SEGMENT), "i" (KERNEL_CODE_SEGMENT));
+    
 
-        priv::write_table(write_address, gdtr);
-        priv::load_table(gdtr);
+    log("GDT loaded and activated"); 
+}
 
-        gdt_size = gdtr.size;
-    }
+////////////////////////////////////////////////////////////
+void setup_gdt(const u32 write_address, u16& gdt_size)
+{
+    gdtr_t gdtr;
+
+    _write_table(write_address, gdtr);
+    _load_table(gdtr);
+
+    gdt_size = gdtr.size;
 }

@@ -1,6 +1,6 @@
 global entrypoint
 
-extern kernel_entry_point
+extern kernel_loader_main
 extern kernel_start, ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
 
 
@@ -48,7 +48,7 @@ section .text
         push ebx
         push eax
 
-        call kernel_entry_point
+        call kernel_loader_main
         add esp, 8
 
         ; Run C++ global destructors

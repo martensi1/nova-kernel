@@ -1,20 +1,7 @@
 global entrypoint
 
-extern kmain
+extern kmain_32
 extern kernel_start, ctors_start_addr, ctors_end_addr, dtors_start_addr, dtors_end_addr
-
-
-section .multiboot
-    ; The executable must start with a multiboot header to be loaded by GRUB
-    ; See specification (https://www.gnu.org/software/grub/manual/multiboot/multiboot.html)
-    %define MULTIBOOT_HEADER_MAGIC 0x1BADB002
-    %define MULTIBOOT_HEADER_FLAGS 0x00000003
-    %define MULTIBOOT_HEADER_CHECKSUM -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
-
-    align 4
-    dd MULTIBOOT_HEADER_MAGIC
-    dd MULTIBOOT_HEADER_FLAGS
-    dd MULTIBOOT_HEADER_CHECKSUM
 
 
 section .bss
@@ -26,15 +13,13 @@ section .bss
         resb STACK_SIZE
 
 section .data
-    boot_handover_ebx dd 0
-    boot_handover_eax dd 0
+    multiboot_info_addr dd 0
 
 
 section .text
     entrypoint:
-        ; The boot handover information is passed by GRUB in the registers
-        mov [boot_handover_ebx], ebx
-        mov [boot_handover_eax], eax
+        ; The multiboot information is passed in the eax register
+        mov [multiboot_info_addr], eax
 
         ; Setup the stack
         mov esp, stack + STACK_SIZE
@@ -43,13 +28,11 @@ section .text
         call run_ctors
 
         ; Call the kernel's main function
-        mov ebx, [boot_handover_ebx]
-        mov eax, [boot_handover_eax]
-        push ebx
+        mov eax, [multiboot_info_addr]
         push eax
 
-        call kmain
-        add esp, 8
+        call kmain_32
+        add esp, 4
 
         ; Run C++ global destructors
         call run_dtors

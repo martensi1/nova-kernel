@@ -8,8 +8,6 @@
 #include <nova/print.h>
 #include <libc/string.h>
 
-using namespace nova;
-
 
 typedef struct __attribute__((packed)) {
     u8 gate_type;

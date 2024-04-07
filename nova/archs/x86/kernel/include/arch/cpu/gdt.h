@@ -37,10 +37,15 @@ enum segment_register_value : u16 {
     KERNEL_DATA_SEGMENT = 0x10,
 };
 
-namespace nova
-{
-    void setup_gdt(const u32 write_address, u16& gdt_size);
-}
+
+////////////////////////////////////////////////////////////
+/// \brief Sets up the Global Descriptor Table (GDT)
+///
+/// write_address The memory address to write the GDT to
+/// gdt_size      The size of the GDT (out parameter)
+///
+////////////////////////////////////////////////////////////
+void setup_gdt(const u32 write_address, u16& gdt_size);
 
 
 #endif // NOVA_GDT_H

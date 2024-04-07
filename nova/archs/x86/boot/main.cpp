@@ -7,12 +7,10 @@
 #include "hbit.h"
 #include "loader.h"
 
-using namespace nova;
-
 
 extern "C" {
     ////////////////////////////////////////////////////////////
-    /// @brief Kernel entry point (32-bit)
+    /// @brief Loader main function
     ///
     /// @param boot_handover_eax The value of the EAX register 
     ///                          at the time of the boot handover
@@ -20,7 +18,7 @@ extern "C" {
     ///                          at the time of the boot handover
     ///
     ////////////////////////////////////////////////////////////
-    void kernel_entry_point(u32 boot_handover_eax, u32 boot_handover_ebx) 
+    void kernel_loader_main(u32 boot_handover_eax, u32 boot_handover_ebx) 
     {
         initialize_terminal();
         run_hbit(boot_handover_eax);
