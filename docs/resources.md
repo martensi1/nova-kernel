@@ -30,3 +30,4 @@ QEMU (Quick Emulator) is an open-source emulator
 
 * [Calling Conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)
 * [Registers and Flags](https://en.wikibooks.org/wiki/X86_Assembly/X86_Architecture)
+* [Instruction Reference](https://www.felixcloutier.com/x86/)

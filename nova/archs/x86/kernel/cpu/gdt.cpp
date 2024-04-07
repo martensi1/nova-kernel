@@ -118,8 +118,9 @@ static void _load_table(const gdtr_t& gdtr)
     asm volatile("cli");
     asm volatile("lgdt %0" : : "m" (gdtr));
 
-    // Now when we have a new GDT, we need to set the segment registers
-    // to point to the correct segments (for us kernel code and data segments)
+    // We will in our memory model use paging instead of segmentation, 
+    // so we set all segment registers to the same value (kernel code segment)
+    // Perform a far jump to reload the segment registers
     asm volatile("\
         mov %0, %%ax\n \
         mov %%ax, %%ds\n \
