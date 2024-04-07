@@ -1,12 +1,6 @@
 # Nova
 
-Hobby project OS written in C++ and C
-
-## Architectures
-
-Currently supports:
-
-- x86-family
+Nova is a hobby operating system project. The goal is to create a simple, yet functional, operating system from scratch. The project is written in C++ and currently only supports x86-family architectures.
 
 ## Structure
 
@@ -19,7 +13,7 @@ Currently supports:
 
 Install the following dependencies:
 
-- `build-essential`
+- `build-essential`:
 - `make`
 - `nasm`
 - `grub2`
@@ -27,7 +21,7 @@ Install the following dependencies:
 - `fdisk`
 - `gdb`
 
-## Run OS
+## Emulate OS
 
 To test out the OS, run `make test-32` in the root of the repository. This will:
 
