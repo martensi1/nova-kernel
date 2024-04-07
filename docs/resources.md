@@ -24,7 +24,7 @@ The Multiboot specification is an open standard that provides kernels with a uni
 * [CPUID - CPU Identification](https://www.felixcloutier.com/x86/cpuid)
 * [SVGA/VGA Video Programming Information Page](http://www.osdever.net/FreeVGA/vga/crtcreg.htm)
 
-
+http://www.skyfree.org/linux/references/ELF_Format.pdf
 
 ## QEMU
 

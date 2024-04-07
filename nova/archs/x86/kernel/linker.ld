@@ -9,7 +9,7 @@ OUTPUT_ARCH(i386)
 Define the entry point of the program
 Is the first instruction to be executed and is defined in the assembly file
 */
-ENTRY(kmain)
+ENTRY(entrypoint)
 
 
 /*
@@ -18,7 +18,7 @@ The sections start at an offset of 0x100000 (1MB) in RAM and are aligned to 0x10
 The reason for this is to avoid conflicts with the bootloader and other system components that may be loaded at lower memory addresses
 */
 SECTIONS {
-    . = 0x100000;
+    . = 0x200000;
     kernel_start = .;
 
     .text : {

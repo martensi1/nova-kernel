@@ -28,8 +28,9 @@ DEBUG_FLAGS := -s -S -vnc :5 -daemonize
 ######################################################
 GDB := gdb
 GDB_FLAGS := -ex "target remote localhost:1234"
-GDB_FLAGS += -ex "symbol-file ../build/nova_kernel.elf"
-GDB_FLAGS += -ex "break kmain" -ex "continue"
+GDB_FLAGS += -ex "symbol-file ../build/boot/loader.elf"
+GDB_FLAGS += -ex "add-symbol-file ../build/kernel.elf 0x200000"
+GDB_FLAGS += -ex "break kernel_entry_point" -ex "continue"
 
 
 ######################################################

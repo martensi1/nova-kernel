@@ -131,7 +131,7 @@ define add-file-to-grub-cfg
 ifeq ($1, grub-start)
 	GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)multiboot $2\n\t
 else ifeq ($1, grub-module)
-	GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)module $2\n\t
+	GRUB_CFG_BOOT_DATA := $(GRUB_CFG_BOOT_DATA)module $2 "nova"\n\t
 endif
 endef
 
