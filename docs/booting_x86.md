@@ -10,30 +10,44 @@ Nova uses the GRUB boot loader which follows the Multiboot Specification. The Mu
 
 Specification: [Multiboot Specification](https://www.gnu.org/software/grub/manual/multiboot/multiboot.html)
 
-The boot loader will load N
+## Kernel boot
 
-### Memory Layout
+Once control is transferred from the boot loader to the kernel, the rest of the boot process is divided into two stages:
+- Kernel loader (32-bit)
+- Main kernel (32-bit or 64-bit)
+
+The kernel loader is a small 32-bit program that is responsible for locating the main kernel, decompress it into memory and hand over control to it. The main kernel can be either a 32-bit or 64-bit program. 
+
+If the main kernel is 64-bit, the kernel loader switches the processor to long mode (64-bit) before transferring control.
+
+```mermaid
+
+graph LR
+    bios[BIOS] --> bloader[Boot Loader]
+    bloader --> kloader[Kernel Loader / 32-bit]
+    kloader --> kernel[Main Kernel / 32-bit or 64-bit]
+
+```
+
+## Memory Layout
 
 The memory layout of an x86 system is as follows:
 ```
 +------------------+ <- 0xFFFFFFFF (4GB)
-|     ...          |
-|                  |
+|       ...        |
 |                  |
 |                  |
 +------------------+ <- Depends
-|  Protected-Mode  |
-|  Kernel (32-bit) |
+|  PM Main Kernel  |
+|  (32 or 64-bit)  |
++------------------+ <- 0x00200000 (2MB)
+| PM Kernel Loader |
+|     (32 bit)     |
 +------------------+ <- 0x00100000 (1MB)
 |  Video/IO memory |
 |    Boot Loader   |
 |       BIOS       |
 +------------------+ <- 0x00000000 (0MB)
+
+PM = Protected-Mode
 ```
-
-### Boot Process (32-bit)
-
-
-
-
-### Boot Process (64-bit)

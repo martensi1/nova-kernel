@@ -1,14 +1,8 @@
 /*
-Output format ELF for x86 (Executable and Linkable Format)
+Define output format and entrypoint
 */
 OUTPUT_FORMAT(elf32-i386) 
 OUTPUT_ARCH(i386)
-
-
-/*
-Define the entry point of the program
-Is the first instruction to be executed and is defined in the assembly file
-*/
 ENTRY(entrypoint)
 
 
