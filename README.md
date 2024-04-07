@@ -31,4 +31,4 @@ To test out the OS, run `make test-32` in the root of the repository. This will:
 
 ## Author
 
-Simon Alm Mårtensson
+Simon Alm-Mårtensson
