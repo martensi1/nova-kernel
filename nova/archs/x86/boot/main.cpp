@@ -3,6 +3,7 @@
 #include <nova/build.h>
 #include <nova/macros.h>
 #include <arch/cpu/gdt.h>
+#include <arch/serial/serial.h>
 
 #include "hbit.h"
 #include "loader.h"
@@ -22,6 +23,9 @@ extern "C" {
     {
         initialize_terminal();
         run_hbit(boot_handover_eax);
+
+        Serial::scanForPorts();
+        terminal_scan_drivers();
 
         u16 gdt_size;
         setup_gdt(0x800, gdt_size);

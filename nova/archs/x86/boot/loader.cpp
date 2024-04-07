@@ -78,7 +78,7 @@ static void* _load_elf_to_memory(void* elf_start)
 ////////////////////////////////////////////////////////////
 static void _jump_to_kernel(void* entrypoint_addr, const multiboot_info_t* boot_info)
 {
-    log("Jumping to kernel entry point at 0x%x", entrypoint_addr);
+    log("Jumping to kernel entry point (0x%x)", entrypoint_addr);
 
     typedef int func(void*);
     func* jump = (func*)entrypoint_addr;
@@ -136,7 +136,7 @@ void load_kernel(u32 boot_handover_ebx)
     {
         kernel_panic("Failed to locate kernel (GRUB modules not available)");
     }
-    
+
     log("GRUB modules are available");
     _load_kernel(params);
 }
