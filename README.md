@@ -10,24 +10,28 @@ Currently supports:
 
 ## Structure
 
-- `kernel` - Kernel source code
-- `libc` - Libc implementation used by kernel
+- `docs` - Documentation
+- `nova` - Kernel source code
 - `sysroot` - The initial file system of the OS
 - `qemu` - Emulation scripts
 
-## Setup
+## Build
 
-1. Install Vagrant and VirtualBox
-2. Clone repository. Be sure that the checked out files have unix-style line endings, `LF`)
-   Example: `git clone --config core.autocrlf=false --config core.eol lf <repo-url>`
-3. Run `vagrant up --provision` to setup a new development environment
-4. Run `vagrant ssh` to SSH into the VM instance
+Install the following dependencies:
+
+- `build-essential`
+- `make`
+- `nasm`
+- `grub2`
+- `qemu-system`
+- `fdisk`
+- `gdb`
 
 ## Run OS
 
-To test out the OS, run `make test` in the root of the repository. This will:
+To test out the OS, run `make test-32` in the root of the repository. This will:
 
-1. Build the kernel (along with libc)
+1. Build the kernel
 2. Create a bootable image with GRUB and the kernel
 3. Launch the bootable image in QEMU
 
