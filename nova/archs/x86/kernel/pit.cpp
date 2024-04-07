@@ -101,7 +101,7 @@ namespace nova
         }
     }
 
-    void SetupPIC(const u32 frequency)
+    void SetupPIT(const u32 frequency)
     {
         spin_guard guard(lock);
 

@@ -3,8 +3,8 @@
  * Responisble for setting up the Interrupt Descriptor Table (IDT)
  * The following code is not portable to other architectures
 */
-#include <arch/idt.h>
-#include <arch/gdt.h>
+#include <arch/cpu/idt.h>
+#include <arch/cpu/gdt.h>
 #include <nova/print.h>
 #include <libc/string.h>
 

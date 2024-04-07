@@ -2,6 +2,7 @@ local_src :=
 local_src += $(wildcard $(subdirectory)/*.cpp)
 local_src += $(wildcard $(subdirectory)/**/*.cpp)
 local_src += $(wildcard $(subdirectory)/*.asm)
+local_src += $(wildcard $(subdirectory)/**/*.asm)
 
 local_src += $(wildcard $(CORE_SRC)/*.cpp)
 local_src += $(wildcard $(CORE_SRC)/**/*.cpp)

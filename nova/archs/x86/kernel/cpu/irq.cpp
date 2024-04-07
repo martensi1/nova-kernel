@@ -2,8 +2,8 @@
  * irq.cpp
  * Responisble for setting up the Interrupt Request (IRQ) handlers
 */
-#include <arch/irq.h>
-#include <arch/idt.h>
+#include <arch/cpu/irq.h>
+#include <arch/cpu/idt.h>
 #include <arch/pic.h>
 #include <nova/print.h>
 #include <nova/panic.h>

@@ -23,8 +23,8 @@
 ////////////////////////////////////////////////////////////
 #include <nova/sync/spin_lock.h>
 
-#include <arch/flgreg.h>
-#include <arch/irq.h>
+#include <arch/cpu/flgreg.h>
+#include <arch/cpu/irq.h>
 
 
 

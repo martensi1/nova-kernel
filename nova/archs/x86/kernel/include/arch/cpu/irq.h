@@ -5,7 +5,7 @@
 #ifndef __NOVA_IRQ_H__
 #define __NOVA_IRQ_H__
 
-#include <arch/flgreg.h>
+#include <arch/cpu/flgreg.h>
 
 
 typedef void* (*irq_handler_t)(void);

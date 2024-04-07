@@ -2,8 +2,8 @@
  * exceptions.cpp
  * Responsible CPU exception catching and handling
 */
-#include <arch/exceptions.h>
-#include <arch/idt.h>
+#include <arch/cpu/exceptions.h>
+#include <arch/cpu/idt.h>
 #include <nova/panic.h>
 
 #define LOCATE_ISR(x) extern "C" void cpuex_##x(void);

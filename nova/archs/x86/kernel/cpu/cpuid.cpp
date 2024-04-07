@@ -3,8 +3,8 @@
  * Implementation of CPUID instruction for CPU identification (only x86)
  * Get vendor name, serial number, version info, features, etc
 */
-#include <arch/cpuid.h>
-#include <arch/flgreg.h>
+#include <arch/cpu/cpuid.h>
+#include <arch/cpu/flgreg.h>
 #include <nova/print.h>
 #include <nova/panic.h>
 

@@ -46,73 +46,76 @@ __attribute__ ((constructor)) void globalConstructorTest()
 extern u32 kernel_start;
 
 
-namespace nova
+////////////////////////////////////////////////////////////
+static void _check_if_multiboot_loaded(u32 boot_handover_eax)
 {
-    namespace priv
+    #define MULTIBOOT_SPEC_MAGIC_BYTE 0x2BADB002
+
+    if (boot_handover_eax == MULTIBOOT_SPEC_MAGIC_BYTE)
     {
-        static void check_if_multiboot_loaded(u32 boot_handover_eax)
-        {
-            #define MULTIBOOT_SPEC_MAGIC_BYTE 0x2BADB002
-
-            if (boot_handover_eax == MULTIBOOT_SPEC_MAGIC_BYTE)
-            {
-                TEST_OK("Boot handover from multiboot compliant bootloader");
-            }
-            else 
-            {
-                TEST_FAIL("Boot handover not from a multiboot compliant bootloader", boot_handover_eax);
-            }
-        }
-
-        static void check_cpu_mode(void) 
-        {
-            u32 cr0;
-            asm volatile("mov %%cr0, %0" : "=r" (cr0));
-
-            if (cr0 & 0x1) {
-                TEST_OK("CPU in expected mode (32-bit protected mode)");
-            }
-            else {
-                TEST_FAIL("CPU not in expected mode (32-bit protected mode)", cr0);
-            }
-        }
-
-        static void check_start_address(void)
-        {
-            #define EXPECTED_KERNEL_START_ADDRESS 0x100000
-
-            if (&kernel_start == (u32*)EXPECTED_KERNEL_START_ADDRESS)
-            {
-                TEST_OK("Kernel start address correct");
-            }
-            else
-            {
-                TEST_FAIL("Kernel start address not correct", (u32)&kernel_start);
-            }
-        }
-
-        static void check_global_constructors_called(void)
-        {
-            if (global_constructors_called)
-            {
-                TEST_OK("Global constructor initialization");
-            }
-            else
-            {
-                TEST_FAIL("Global constructors not initialized", 0);
-            }
-        }
+        TEST_OK("Boot handover from multiboot compliant bootloader");
     }
-
-    void run_hbit(u32 boot_handover_eax)
+    else 
     {
-        log("Running HBIT (Handover Buildt-in Test)");
-
-        priv::check_if_multiboot_loaded(boot_handover_eax);
-        priv::check_cpu_mode();
-        priv::check_start_address();
-        priv::check_global_constructors_called();
-
-        log("HBIT passed!");
+        TEST_FAIL("Boot handover not from a multiboot compliant bootloader", boot_handover_eax);
     }
+}
+
+
+////////////////////////////////////////////////////////////
+static void _check_cpu_mode(void) 
+{
+    u32 cr0;
+    asm volatile("mov %%cr0, %0" : "=r" (cr0));
+
+    if (cr0 & 0x1) {
+        TEST_OK("CPU in expected mode (32-bit protected mode)");
+    }
+    else {
+        TEST_FAIL("CPU not in expected mode (32-bit protected mode)", cr0);
+    }
+}
+
+
+////////////////////////////////////////////////////////////
+static void _check_start_address(void)
+{
+    #define EXPECTED_KERNEL_START_ADDRESS 0x100000
+
+    if (&kernel_start == (u32*)EXPECTED_KERNEL_START_ADDRESS)
+    {
+        TEST_OK("Kernel start address correct");
+    }
+    else
+    {
+        TEST_FAIL("Kernel start address not correct", (u32)&kernel_start);
+    }
+}
+
+
+////////////////////////////////////////////////////////////
+static void _check_global_constructors_called(void)
+{
+    if (global_constructors_called)
+    {
+        TEST_OK("Global constructor initialization");
+    }
+    else
+    {
+        TEST_FAIL("Global constructors not initialized", 0);
+    }
+}
+
+
+////////////////////////////////////////////////////////////
+void run_hbit(u32 boot_handover_eax)
+{
+    log("Running HBIT (Handover Buildt-in Test)");
+
+    _check_if_multiboot_loaded(boot_handover_eax);
+    _check_cpu_mode();
+    _check_start_address();
+    _check_global_constructors_called();
+
+    log("HBIT passed!");
 }

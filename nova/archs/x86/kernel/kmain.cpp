@@ -1,6 +1,11 @@
-#include <nova/print.h>
 #include <nova/tty.h>
+#include <nova/kernel.h>
+#include <arch/pit.h>
 #include <nova/build.h>
+#include <arch/serial/serial.h>
+
+using namespace nova;
+
 
 extern "C" {
     ////////////////////////////////////////////////////////////
@@ -43,6 +48,11 @@ extern "C" {
 
         print_logo();
         print_compiler_info();
+
+        Serial::scanForPorts();
+        terminal_scan_drivers();
+
+        SetupPIT(200);
 
         log("Hello world!");
         return 0;

@@ -37,7 +37,7 @@ namespace nova
     ///                  interrupts (the nearest possible frequency will be used)
     ///
     ////////////////////////////////////////////////////////////
-    void SetupPIC(const u32 frequency);
+    void SetupPIT(const u32 frequency);
 }
 
 

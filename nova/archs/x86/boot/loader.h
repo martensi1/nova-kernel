@@ -26,10 +26,17 @@
 
 #include <nova/types.h>
 
-namespace nova
-{
-    void load_kernel(u32 boot_handover_ebx);
-}
+
+////////////////////////////////////////////////////////////
+/// \brief Locates the kernel in the multiboot modules and
+///        loads it into memory. Jumps to the kernel entry
+///
+/// boot_handover_eax The value of the EBX register when the 
+///                   bootloader handed over control to the 
+///                   kernel loader
+///
+////////////////////////////////////////////////////////////
+void load_kernel(u32 boot_handover_ebx);
 
 
 #endif // NOVA_LOADER_H

@@ -2,7 +2,7 @@
  * flgreg.cpp
  * Functionality for interacting with the CPU's FLAGS registry
 */
-#include <arch/flgreg.h>
+#include <arch/cpu/flgreg.h>
 
 
 /// @brief Tests if specified CPU flag is changeable

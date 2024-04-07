@@ -21,7 +21,7 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
-#include <arch/gdt.h>
+#include <arch/cpu/gdt.h>
 #include <nova/print.h>
 
 

@@ -2,14 +2,12 @@
 #include <nova/print.h>
 #include <nova/build.h>
 #include <nova/macros.h>
-
-#include <arch/gdt.h>
+#include <arch/cpu/gdt.h>
 
 #include "hbit.h"
 #include "loader.h"
 
 using namespace nova;
-
 
 
 extern "C" {
@@ -24,10 +22,7 @@ extern "C" {
     ////////////////////////////////////////////////////////////
     void kernel_entry_point(u32 boot_handover_eax, u32 boot_handover_ebx) 
     {
-        static_cast<void>(boot_handover_ebx);
-
         initialize_terminal();
-
         run_hbit(boot_handover_eax);
 
         u16 gdt_size;
